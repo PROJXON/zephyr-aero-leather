@@ -1,9 +1,12 @@
 const nextConfig = {
   images: {
+    domains: [
+      new URL(process.env.WOOCOMMERCE_API_URL).hostname
+    ],
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "zephyr.local",
+        hostname: new URL(process.env.WOOCOMMERCE_API_URL).hostname,
       },
     ],
   },
