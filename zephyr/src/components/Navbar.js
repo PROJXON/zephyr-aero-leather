@@ -4,33 +4,24 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
+import { useAuth } from "@/app/context/AuthContext";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  const { isAuthenticated, user, loading, logout } = useAuth();
 
-  // 🔹 Check if the authentication cookie exists
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch("/api/auth/check", { method: "GET" });
-        const data = await response.json();
-        setIsAuthenticated(data.isAuthenticated);
-      } catch (error) {
-        console.error("Error checking auth status:", error);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  // 🔹 Logout function (clears authentication cookie)
   const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST" });
-    setIsAuthenticated(false);
+    await fetch("/api/logout", { method: "POST"});
+    setAccountOpen(false);
+    logout();
   };
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <nav className="bg-white antialiased">
@@ -86,41 +77,46 @@ const Navbar = () => {
                 </svg>
                 <span className="hidden sm:flex">{isAuthenticated ? "My Cart" : "Guest Cart"}</span>
               </button>
+
+              {cartOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4">
+                  <p className="text-sm text-gray-900">Your cart is empty.</p>
+                </div>
+              )}
             </div>
 
-            {/* Authentication Links */}
             {!isAuthenticated ? (
               <ul className="text-sm font-medium text-gray-900 flex space-x-4">
-                <li>
-                  <Link href="/login" className="block px-3 py-2 hover:bg-gray-100 rounded-md">
-                    Sign In
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/register" className="block px-3 py-2 hover:bg-gray-100 rounded-md">
-                    Create Account
-                  </Link>
-                </li>
-              </ul>
-            ) : (
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    setAccountOpen(!accountOpen);
-                    setCartOpen(false);
-                  }}
-                  className="inline-flex items-center p-2 hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-900"
-                >
-                  <svg className="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                    <path
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                    />
-                  </svg>
-                  Account
-                </button>
-                {accountOpen && (
+              <li>
+                <Link href="/login" className="block px-3 py-2 hover:bg-gray-100 rounded-md">
+                  Sign In
+                </Link>
+              </li>
+              <li>
+                <Link href="/register" className="block px-3 py-2 hover:bg-gray-100 rounded-md">
+                  Create Account
+                </Link>
+              </li>
+            </ul>
+            ) : 
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setAccountOpen(!accountOpen);
+                  setCartOpen(false);
+                }}
+                className="inline-flex items-center p-2 hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-900"
+              >
+                <svg className="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <path
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </svg>
+                {user && user.first_name}
+              </button>
+              {accountOpen && (
                   <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg p-2">
                     <button
                       onClick={handleLogout}
@@ -130,10 +126,37 @@ const Navbar = () => {
                     </button>
                   </div>
                 )}
-              </div>
-            )}
+            </div>
+            }
+
+            {/* Mobile Menu Button */}
+            <button
+              type="button"
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="inline-flex lg:hidden items-center p-2 hover:bg-gray-100 rounded-md text-gray-900"
+            >
+              <span className="sr-only">Open Menu</span>
+              <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M5 7h14M5 12h14M5 17h14" />
+              </svg>
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 mt-4">
+            <ul className="text-gray-900 text-sm font-medium space-y-3">
+              {["Home", "Best Sellers", "Gift Ideas", "Games", "Electronics", "Home & Garden"].map((item) => (
+                <li key={item}>
+                  <Link href={`/${item.toLowerCase().replace(/ /g, "-")}`} className="hover:text-primary-700">
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </nav>
   );

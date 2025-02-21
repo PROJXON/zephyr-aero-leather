@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
-import Cookies from "cookies";
+import { cookies } from "next/headers"; // Use `cookies()` instead
 
-export async function GET(req) {
-  const cookies = new Cookies(req);
-  const token = cookies.get("token");
+export async function GET() {
+  const cookieStore = await cookies(); // This is now correct in Next.js App Router
+  const token = cookieStore.get("token")?.value; // Get token safely
 
-  return NextResponse.json({ isAuthenticated: !!token });
+  if (!token) {
+    return NextResponse.json({ isAuthenticated: false }, { status: 200 });
+  }
+
+  return NextResponse.json({ isAuthenticated: true }, { status: 200 });
 }

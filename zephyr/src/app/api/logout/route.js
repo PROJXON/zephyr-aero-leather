@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import Cookies from "cookies";
+import { cookies } from "next/headers"; 
 
 export async function POST(req) {
-  const cookies = new Cookies(req);
-  cookies.set("token", "", { expires: new Date(0) }); // Expire the cookie
+  const cookieStore =  await cookies()
+  cookieStore.set("token", "", { expires: new Date(0), path: "/" }); 
 
   return NextResponse.json({ message: "Logged out" });
 }

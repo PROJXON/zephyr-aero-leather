@@ -9,31 +9,37 @@ export async function POST(req) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
     }
 
-    // Encode WooCommerce API credentials
-    const authHeader = `Basic ${Buffer.from(
-      `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-    ).toString("base64")}`;
+    const response = await axios.post(`${process.env.WOOCOMMERCE_API_URL}/wp-json/jwt-auth/v1/token`, {
+      username: email,
+      password: password,
+    });
 
-    // Fetch user by email from WooCommerce
-    const { data } = await axios.get(
-      `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/customers?email=${email}`,
-      { headers: { Authorization: authHeader } }
-    );
+    const data = response.data;
 
-    if (!data.length) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const res = NextResponse.json({ success: true, user: data.user }, { status: 200 });
+
+    // Set authentication token in a secure HTTP-only cookie
+    res.cookies.set("token", data.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    return res;
+  } catch (error) {
+    let errorMessage = "Invalid email or password";
+
+    if (error.response && error.response.data) {
+      const errorData = typeof error.response.data === "string" ? error.response.data.replace(/<\/?[^>]+(>|$)/g, "").trim() : error.response.data.message;
+
+      if (errorData && errorData.includes("is not registered on this site")) {
+        errorMessage = `This email is not registered on this site.`;
+      } else {
+        errorMessage = "Incorrect password";
+      }
     }
 
-    const user = data[0];
-
-    // WooCommerce doesn't expose passwords via API. This assumes authentication is successful.
-    return NextResponse.json({ token: "fake-jwt-token", user }, { status: 200 });
-
-  } catch (error) {
-    console.error("Login error:", error);
-    return NextResponse.json(
-      { error: error.response?.data?.message || "Server error, please try again" },
-      { status: error.response?.status || 500 }
-    );
+    return NextResponse.json({ error: errorMessage }, { status: error.response?.status || 401 });
   }
 }

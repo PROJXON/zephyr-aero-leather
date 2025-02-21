@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { useAuth } from "@/app/context/AuthContext";
+
 const backgroundImageUrl = "/ifr.jpg";
 
 const Login = () => {
@@ -11,6 +13,8 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  const { setIsAuthenticated, setUser } = useAuth();
 
   const [error, setError] = useState("");
   const router = useRouter();
@@ -27,13 +31,8 @@ const Login = () => {
     event.preventDefault();
     setError("");
 
-    if (!formData.email) {
-      setError("Please enter your email");
-      return;
-    }
-
-    if (!formData.password) {
-      setError("Please enter your password");
+    if (!formData.email || !formData.password) {
+      setError("Email and password are required");
       return;
     }
 
@@ -47,19 +46,26 @@ const Login = () => {
           email: formData.email,
           password: formData.password,
         }),
+        credentials: "include", // IMPORTANT: Ensures cookies are stored in the browser
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
+        const data = await response.json();
         setError(data.error || "Invalid email or password");
         return;
       }
 
-      // Store JWT token in localStorage
-      localStorage.setItem("token", data.token);
+      console.log("User logged in successfully");
 
-      console.log("User logged in:", data);
+      const data = await response.json();
+      setIsAuthenticated(true);
+      setUser(data.user)
+      
+      const userResponse = await fetch("/api/auth/user", { credentials: "include" });
+      const userData = await userResponse.json();
+      if (userData.isAuthenticated) {
+        setUser(userData.user); // Make sure to set the latest user data
+      }
 
       // Redirect to homepage after login
       router.push("/");
