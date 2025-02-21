@@ -1,6 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "../../components/Navbar"; // Keep Navbar import
+import Navbar from "@/components/Navbar"; // Keep Navbar import
 import "flowbite"; // ✅ Keep this import
 
 const geistSans = Geist({
