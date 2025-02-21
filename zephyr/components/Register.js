@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
+const backgroundImageUrl = "/ifr.jpg"
+
 const Register = () => {
   const [formData, setFormdata] = useState({
     name: "",
@@ -88,9 +90,10 @@ const Register = () => {
   };  
 
   return(
-    <section className="bg-gray-50 dark:bg-gray-900">
+    // <section className="bg-gray-50 dark:bg-gray-900">
+    <section className="bg-cover bg-center" style={{backgroundImage: `url(${backgroundImageUrl})`}}>
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-20">
-          <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 border-2 border-gray-300">
               <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                   <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                       Create an account
