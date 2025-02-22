@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-    "./app/**/*.{js,ts,jsx,tsx}",  // Include `app` directory for Next.js 13+
-    "node_modules/flowbite/**/*.js" // ✅ Add Flowbite
+    "./src/**/*.{js,ts,jsx,tsx}", // Adjust paths based on your project structure
   ],
   theme: {
     extend: {
