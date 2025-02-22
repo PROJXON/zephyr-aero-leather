@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
+import { useAuth } from "@/app/context/AuthContext";
+
 const backgroundImageUrl = "/ifr.jpg"
 
 const Register = () => {
@@ -18,6 +20,8 @@ const Register = () => {
 
   const [error, setError] = useState("");
   const router = useRouter();
+
+  const { setIsAuthenticated, setUser } = useAuth();
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -79,9 +83,34 @@ const Register = () => {
         setError(data.error || "Failed to create an account");
         return;
       }
+
+      const loginResponse = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password, 
+        }),
+        credentials: "include", 
+      });
+
+      const loginData = await loginResponse.json();
+      setIsAuthenticated(true);
+      setUser(loginData.user)
   
-      console.log("User created:", data);
-  
+      if (!loginResponse.ok) {
+        setError(loginData.error || "Failed to log in");
+        return;
+      }
+
+      const userResponse = await fetch("/api/auth/user", { credentials: "include" });
+      const userData = await userResponse.json();
+      if (userData.isAuthenticated) {
+        setUser(userData.user); // Make sure to set the latest user data
+      }
+
       router.push("/");
     } catch (error) {
       setError("An error occurred. Please try again.");

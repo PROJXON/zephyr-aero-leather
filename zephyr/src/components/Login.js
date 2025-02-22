@@ -65,6 +65,7 @@ const Login = () => {
       const userData = await userResponse.json();
       if (userData.isAuthenticated) {
         setUser(userData.user); // Make sure to set the latest user data
+        localStorage.setItem('userData', JSON.stringify(userData.user));
       }
 
       // Redirect to homepage after login

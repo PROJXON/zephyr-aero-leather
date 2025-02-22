@@ -28,8 +28,6 @@ export async function GET() {
 
     // Ensure customer data is present before responding
     if (customerResponse.data) {
-      console.log("Customer Data:", customerResponse.data); // Check if it includes first_name, last_name, etc.
-
       return NextResponse.json({
         isAuthenticated: true,
         user: customerResponse.data,

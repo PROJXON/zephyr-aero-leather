@@ -19,10 +19,6 @@ const Navbar = () => {
     logout();
   };
 
-  if (loading) {
-    return <div>Loading...</div>
-  }
-
   return (
     <nav className="bg-white antialiased">
       <div className="max-w-screen-xl px-4 mx-auto py-4">
