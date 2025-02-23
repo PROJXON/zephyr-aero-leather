@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Zephyr
 
-## Getting Started
+[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
 
-First, run the development server:
+Zephyr is a headless e-commerce solution powered by **Next.js** and **WooCommerce**, designed for seamless performance and flexibility.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- [Node.js](https://nodejs.org/) (Latest LTS recommended)
+- [Next.js](https://nextjs.org/) (Installed with project dependencies)
+- [LocalWP](https://localwp.com/) (For local WordPress development)
+- WooCommerce plugin (Installed and activated in WordPress)
+- WooCommerce REST API Key (Created from **WooCommerce > Settings > Advanced > REST API**)
+
+## Installation
+
+Clone the repository and navigate to the project directory:
+
+```sh
+git clone https://github.com/projxon/zephyr.git
+cd zephyr
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Ignore the `./frontend/` folder.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Install Dependencies
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```sh
+npm install next@latest
+```
 
-## Learn More
+### Start the Development Server
 
-To learn more about Next.js, take a look at the following resources:
+```sh
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The application should now be running locally.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Features
 
-## Deploy on Vercel
+- **Headless WooCommerce** integration with Next.js
+- **Optimized API calls** for fast product retrieval
+- **Scalable and customizable** e-commerce setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Usage
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Set up **LocalWP** and install WordPress.
+2. Activate the **WooCommerce** plugin.
+3. Create a WooCommerce REST API key:
+   - Go to **WooCommerce > Settings > Advanced > REST API**
+   - Click **Add Key**, provide a name, and set permissions to **Read/Write**
+   - Copy the **Consumer Key** and **Consumer Secret**
+4. Configure your `.env.local` file in the root of the project:
+
+```sh
+WOOCOMMERCE_API_URL=http://your-local-wp-site.com/wp-json/wc/v3
+WOOCOMMERCE_API_KEY=your_consumer_key
+WOOCOMMERCE_API_SECRET=your_consumer_secret
+```
+
+5. Restart the development server:
+
+```sh
+npm run dev
+```
