@@ -24,7 +24,7 @@ cd zephyr
 ### Install Dependencies
 
 ```sh
-npm install
+npm install next@latest
 ```
 
 ### Start Development Server
