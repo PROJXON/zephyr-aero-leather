@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
@@ -14,44 +14,10 @@ const Navbar = () => {
   const { isAuthenticated, user, loading, logout } = useAuth();
 
   const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST"});
+    await fetch("/api/logout", { method: "POST" });
     setAccountOpen(false);
     logout();
   };
-
-  if (loading) {
-    return (
-      <nav className="bg-white antialiased">
-        <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-center">
-          <div className="flex items-center space-x-2">
-            {/* Spinner */}
-            <svg
-              className="animate-spin h-5 w-5 text-gray-500"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v8H4z"
-              />
-            </svg>
-            {/* Loading text */}
-            <span className="text-gray-500">Loading user data...</span>
-          </div>
-        </div>
-      </nav>
-    );
-  }
 
   return (
     <nav className="bg-white antialiased">
@@ -128,7 +94,7 @@ const Navbar = () => {
                   </Link>
                 </li>
               </ul>
-            ) : (
+            ) :
               <div className="relative">
                 <button
                   onClick={() => {
@@ -157,7 +123,7 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-            )}
+            }
 
             {/* Mobile Menu Button */}
             <button
@@ -178,12 +144,12 @@ const Navbar = () => {
           <div className="bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 mt-4">
             <ul className="text-gray-900 text-sm font-medium space-y-3">
               {["Home", "Best Sellers", "Gift Ideas", "Games", "Electronics", "Home & Garden"].map((item) => (
-                  <li key={item}>
-                    <Link href={`/${item.toLowerCase().replace(/ /g, "-")}`} className="hover:text-primary-700">
-                      {item}
-                    </Link>
-                  </li>
-                ))}
+                <li key={item}>
+                  <Link href={`/${item.toLowerCase().replace(/ /g, "-")}`} className="hover:text-primary-700">
+                    {item}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         )}

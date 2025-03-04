@@ -16,15 +16,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/auth/user/route.js"
     ],
+    "/best-sellers/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/best-sellers/page.js"
+    ],
     "/home/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/home/page.js"
     ],
-    "/best-sellers/page": [
+    "/login/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/best-sellers/page.js"
+      "static/chunks/app/login/page.js"
     ]
   }
 }
