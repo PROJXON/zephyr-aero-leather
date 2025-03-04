@@ -57,7 +57,7 @@ const Navbar = ({ initialUser }) => {
 
             {/* Desktop Menu */}
             <ul className="hidden lg:flex items-center gap-6 md:gap-8 py-3">
-              {["Home", "Best Sellers", "Gift Ideas", "Today's Deals", "Sell"].map((item) => (
+              {["Home", "Best Sellers", "Gift Ideas", "auth-test", "login"].map((item) => (
                 <li key={item}>
                   <Link
                     href={`/${item.toLowerCase().replace(/ /g, "-")}`}
