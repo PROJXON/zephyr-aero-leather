@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
@@ -10,7 +10,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  
+
   const { isAuthenticated, user, loading, logout } = useAuth();
 
   const handleLogout = async () => {
@@ -18,6 +18,40 @@ const Navbar = () => {
     setAccountOpen(false);
     logout();
   };
+
+  if (loading) {
+    return (
+      <nav className="bg-white antialiased">
+        <div className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-center">
+          <div className="flex items-center space-x-2">
+            {/* Spinner */}
+            <svg
+              className="animate-spin h-5 w-5 text-gray-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8H4z"
+              />
+            </svg>
+            {/* Loading text */}
+            <span className="text-gray-500">Loading user data...</span>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="bg-white antialiased">
@@ -83,36 +117,36 @@ const Navbar = () => {
 
             {!isAuthenticated ? (
               <ul className="text-sm font-medium text-gray-900 flex space-x-4">
-              <li>
-                <Link href="/login" className="block px-3 py-2 hover:bg-gray-100 rounded-md">
-                  Sign In
-                </Link>
-              </li>
-              <li>
-                <Link href="/register" className="block px-3 py-2 hover:bg-gray-100 rounded-md">
-                  Create Account
-                </Link>
-              </li>
-            </ul>
-            ) : 
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setAccountOpen(!accountOpen);
-                  setCartOpen(false);
-                }}
-                className="inline-flex items-center p-2 hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-900"
-              >
-                <svg className="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                  <path
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                  />
-                </svg>
-                {user && user.first_name}
-              </button>
-              {accountOpen && (
+                <li>
+                  <Link href="/login" className="block px-3 py-2 hover:bg-gray-100 rounded-md">
+                    Sign In
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/register" className="block px-3 py-2 hover:bg-gray-100 rounded-md">
+                    Create Account
+                  </Link>
+                </li>
+              </ul>
+            ) : (
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setAccountOpen(!accountOpen);
+                    setCartOpen(false);
+                  }}
+                  className="inline-flex items-center p-2 hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-900"
+                >
+                  <svg className="w-5 h-5 mr-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                  </svg>
+                  {user && user.first_name}
+                </button>
+                {accountOpen && (
                   <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg p-2">
                     <button
                       onClick={handleLogout}
@@ -122,8 +156,8 @@ const Navbar = () => {
                     </button>
                   </div>
                 )}
-            </div>
-            }
+              </div>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -144,12 +178,12 @@ const Navbar = () => {
           <div className="bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 mt-4">
             <ul className="text-gray-900 text-sm font-medium space-y-3">
               {["Home", "Best Sellers", "Gift Ideas", "Games", "Electronics", "Home & Garden"].map((item) => (
-                <li key={item}>
-                  <Link href={`/${item.toLowerCase().replace(/ /g, "-")}`} className="hover:text-primary-700">
-                    {item}
-                  </Link>
-                </li>
-              ))}
+                  <li key={item}>
+                    <Link href={`/${item.toLowerCase().replace(/ /g, "-")}`} className="hover:text-primary-700">
+                      {item}
+                    </Link>
+                  </li>
+                ))}
             </ul>
           </div>
         )}
