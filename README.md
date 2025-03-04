@@ -17,7 +17,7 @@ Before setting up the project, ensure you have:
 Clone the repository and navigate to the project folder:
 
 ```sh
-git clone https://github.com/projxon/zephyr-aero-leathers.git
+git clone https://github.com/projxon/zephyr.git
 cd zephyr
 ```
 
