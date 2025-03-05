@@ -8,29 +8,17 @@ import { useAuth } from "@/app/context/AuthContext";
 
 
 const Navbar = ({ initialUser }) => {
+  const { isAuthenticated, user, login, logout, fetchUserFromServer } = useAuth();
+  const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
-  const { isAuthenticated, user, login, logout } = useAuth();
-  const [serverUser, setServerUser] = useState(initialUser || null)
-
   useEffect(() => {
-    const fetchUserFromServer = async () => {
-      try {
-        const response = await fetch("/api/auth/user", { credentials: "include" });
-        const data = await response.json();
-        if (data.isAuthenticated) {
-          setServerUser(data.user);
-          login(data.user); // ✅ Sync AuthContext
-        }
-      } catch (error) {
-        console.error("Error fetching user from API:", error);
-      }
-    };
-
-    fetchUserFromServer();
-  }, []);
+    if (!initialUser) { 
+      fetchUserFromServer();
+    }
+  }, [initialUser]);
 
   const handleLogout = async () => {
     await logout();

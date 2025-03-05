@@ -9,29 +9,33 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const verifyAuth = async () => {
-      try {
-        const response = await fetch("/api/auth/user", { credentials: "include" });
-        const data = await response.json();
+  const clearAuthState = () => {
+    setUser(null);
+    setIsAuthenticated(false);
+  };
 
-        if (data.isAuthenticated) {
-          setUser(data.user);
-          setIsAuthenticated(true);
-        } else {
-          setUser(null);
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error("Error fetching auth state:", error);
-        setUser(null);
-        setIsAuthenticated(false);
-      } finally {
-        setLoading(false);
+  const fetchUserFromServer = async () => {
+    try {
+      const response = await fetch("/api/auth/user", { credentials: "include" });
+      if (!response.ok) throw new Error("Failed to fetch user");
+      const data = await response.json();
+
+      if (data.isAuthenticated) {
+        setUser(data.user);
+        setIsAuthenticated(true);
+      } else {
+        clearAuthState();
       }
-    };
+    } catch (error) {
+      console.error("Error fetching user from API:", error);
+      clearAuthState();
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    verifyAuth();
+  useEffect(() => {
+    fetchUserFromServer();
   }, []);
 
   const login = (userData) => {
@@ -40,13 +44,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    setUser(null);
-    setIsAuthenticated(false);
     await fetch("/api/logout", { method: "POST", credentials: "include" });
+    clearAuthState();
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, fetchUserFromServer, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

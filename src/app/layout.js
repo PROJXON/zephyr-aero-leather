@@ -23,10 +23,10 @@ export default async function RootLayout({ children }) {
   let user = null;
 
   try {
-    const cookieStore = await cookies(); // ✅ Read cookies from the server
+    const cookieStore = await cookies(); 
     const userCookie = cookieStore.get("userData")?.value;
     if (userCookie) {
-      user = JSON.parse(Buffer.from(userCookie, "base64").toString("utf-8")); // ✅ Decode Base64
+      user = JSON.parse(atob(userCookie));
     }
   } catch (error) {
     console.error("Error reading cookies on server:", error);
@@ -36,7 +36,7 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-          <Navbar initialUser={user} /> {/* ✅ Pass `user` to Navbar before render */}
+          <Navbar initialUser={user} />
           <main>{children}</main>
         </AuthProvider>
       </body>

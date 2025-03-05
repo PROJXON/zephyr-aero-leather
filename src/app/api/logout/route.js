@@ -6,7 +6,6 @@ export async function POST() {
     headers: { "Content-Type": "application/json" },
   });
 
-  // ✅ Properly clear authentication cookies
   response.cookies.set("token", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

@@ -1,22 +1,22 @@
 import { NextResponse } from "next/server";
 
 const protectedRoutes = ["/account", "/orders", "/checkout"];
+const authPages = ["/login", "/register"];
 
 export function middleware(request) {
-  const token = request.cookies.get("token");
+  const hasToken = request.cookies.has("token");
   const path = request.nextUrl.pathname;
 
   const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
-  const isAuthPage = path.startsWith("/login");
+  const isAuthPage = authPages.some(page => path.startsWith(page));
 
-  if (!token && isProtectedRoute) {
+  if (!hasToken && isProtectedRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (token && isAuthPage) {
+  if (hasToken && isAuthPage) {
     return NextResponse.redirect(new URL("/", request.url));
   }
-
   return NextResponse.next();
 }
 
