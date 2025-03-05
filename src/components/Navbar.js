@@ -6,17 +6,24 @@ import Link from "next/link";
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
 import { useAuth } from "@/app/context/AuthContext";
 
-const Navbar = () => {
+
+const Navbar = ({ initialUser }) => {
+  const { isAuthenticated, user, login, logout, fetchUserFromServer } = useAuth();
+  const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
-  const { isAuthenticated, user, loading, logout } = useAuth();
+  useEffect(() => {
+    if (!initialUser) { 
+      fetchUserFromServer();
+    }
+  }, [initialUser]);
 
   const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST" });
+    await logout();
     setAccountOpen(false);
-    logout();
+    setServerUser(null);
   };
 
   return (
@@ -38,7 +45,7 @@ const Navbar = () => {
 
             {/* Desktop Menu */}
             <ul className="hidden lg:flex items-center gap-6 md:gap-8 py-3">
-              {["Home", "Best Sellers", "Gift Ideas", "Today's Deals", "Sell"].map((item) => (
+              {["Home", "Best Sellers", "Gift Ideas", "auth-test", "login"].map((item) => (
                 <li key={item}>
                   <Link
                     href={`/${item.toLowerCase().replace(/ /g, "-")}`}
@@ -71,7 +78,7 @@ const Navbar = () => {
                     d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
                   />
                 </svg>
-                <span className="hidden sm:flex">{isAuthenticated ? "My Cart" : "Guest Cart"}</span>
+                <span className="hidden sm:flex">{isAuthenticated || serverUser ? "My Cart" : "Guest Cart"}</span>
               </button>
 
               {cartOpen && (
@@ -81,7 +88,7 @@ const Navbar = () => {
               )}
             </div>
 
-            {!isAuthenticated ? (
+            {!isAuthenticated && !serverUser ? (
               <ul className="text-sm font-medium text-gray-900 flex space-x-4">
                 <li>
                   <Link href="/login" className="block px-3 py-2 hover:bg-gray-100 rounded-md">
@@ -94,7 +101,7 @@ const Navbar = () => {
                   </Link>
                 </li>
               </ul>
-            ) :
+            ) : (
               <div className="relative">
                 <button
                   onClick={() => {
@@ -110,7 +117,7 @@ const Navbar = () => {
                       d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                     />
                   </svg>
-                  {user && user.first_name}
+                  {serverUser?.first_name || user?.first_name}
                 </button>
                 {accountOpen && (
                   <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg p-2">
@@ -123,7 +130,7 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-            }
+            )}
 
             {/* Mobile Menu Button */}
             <button

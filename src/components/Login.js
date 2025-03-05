@@ -8,72 +8,51 @@ import { useAuth } from "@/app/context/AuthContext";
 const backgroundImageUrl = "/ifr.jpg";
 
 const Login = () => {
-  const [formData, setFormdata] = useState({
-    email: "",
-    password: "",
-  });
-
   const { login } = useAuth();
-
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormdata((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value.trim() }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    setLoading(true);
   
     if (!formData.email || !formData.password) {
       setError("Email and password are required");
+      setLoading(false);
       return;
     }
   
     try {
       const response = await fetch("/api/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
         credentials: "include",
       });
   
       if (!response.ok) {
         const data = await response.json();
         setError(data.error || "Invalid email or password");
+        setLoading(false);
         return;
       }
-  
+      
       const data = await response.json();
-      
-      // After successful login, immediately fetch the complete user data
-      const userResponse = await fetch("/api/auth/user", {
-        credentials: "include",
-      });
-      
-      const userData = await userResponse.json();
-      
-      // Use the properly formatted user data from the auth/user endpoint
-      if (userData.isAuthenticated) {
-        login(userData.user);
-      } else {
-        login(data.user); // Fallback to original user data
-      }
-      
+      login(data.user);
       router.push("/");
     } catch (error) {
       setError("An error occurred. Please try again.");
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -121,9 +100,11 @@ const Login = () => {
               </div>
               <button
                 type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                Sign In
+                disabled={loading}
+                className={`w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}              >
+                {loading ? "Signing In..." : "Sign In"}
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Forgot your password?{" "}
