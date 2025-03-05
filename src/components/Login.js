@@ -8,112 +8,147 @@ import { useAuth } from "@/app/context/AuthContext";
 const backgroundImageUrl = "/ifr.jpg";
 
 const Login = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const { login } = useAuth();
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value.trim() }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
-    setLoading(true);
-  
+
     if (!formData.email || !formData.password) {
       setError("Email and password are required");
-      setLoading(false);
       return;
     }
-  
+
     try {
       const response = await fetch("/api/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
         credentials: "include",
       });
-  
+
       if (!response.ok) {
         const data = await response.json();
         setError(data.error || "Invalid email or password");
-        setLoading(false);
         return;
       }
-      
+
       const data = await response.json();
-      login(data.user);
+
+      // Fetch user data after login
+      const userResponse = await fetch("/api/auth/user", {
+        credentials: "include",
+      });
+
+      const userData = await userResponse.json();
+
+      if (userData.isAuthenticated) {
+        login(userData.user);
+      } else {
+        login(data.user);
+      }
+
       router.push("/");
     } catch (error) {
       setError("An error occurred. Please try again.");
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <section className="bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImageUrl})` }}>
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-20">
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 border-2 border-gray-300">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              Sign In
-            </h1>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit} noValidate>
-              <div>
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  autoComplete="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="name@company.com"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  autoComplete="current-password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required
-                />
-              </div>
+    <section
+      className="flex items-center justify-center min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+    >
+      <div className="relative w-[800px] max-w-full min-h-[500px] bg-white shadow-lg rounded-xl flex overflow-hidden">
+        {/* Left Panel: Sign In Form */}
+        <div className="w-1/2 flex flex-col justify-center items-center p-10 bg-white bg-opacity-90 rounded-l-xl">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 mt-4">Sign in</h2>
+
+          <form onSubmit={handleSubmit} className="w-full">
+            {/* Email Input */}
+            <input
+              type="email"
+              name="email"
+              placeholder="name@company.com"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all"
+              required
+            />
+
+            {/* Password Input with Show/Hide Button */}
+            <div className="relative w-full">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all pr-16"
+                required
+              />
               <button
-                type="submit"
-                disabled={loading}
-                className={`w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 ${
-                  loading ? "opacity-50 cursor-not-allowed" : ""
-                }`}              >
-                {loading ? "Signing In..." : "Sign In"}
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-4 flex items-center text-sm text-[#605137] font-semibold hover:underline focus:outline-none"
+              >
+                {showPassword ? "Hide" : "Show"}
               </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Forgot your password?{" "}
-                <Link href="/forgot-password" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
-                  Click here
-                </Link>
-              </p>
-            </form>
-          </div>
+            </div>
+
+            {/* Display Error Message */}
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
+            {/* Forgot Password */}
+            <p className="text-sm text-gray-600 mb-4 mt-2">
+              Forgot your password?{" "}
+              <Link href="/forgot-password" className="text-[#605137] font-semibold hover:text-[#30291C] transition">
+                Click here
+              </Link>
+            </p>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full py-2 bg-[#30291C] text-white font-bold rounded-full hover:bg-[#605137] transition-all"
+            >
+              Sign In
+            </button>
+          </form>
+        </div>
+
+        {/* Right Panel: Sign Up Prompt */}
+        <div className="w-1/2 flex flex-col justify-center items-center p-8 bg-[#605137] text-white rounded-r-xl">
+          <h2 className="text-3xl font-bold">New Here?</h2>
+          <p className="text-center mt-2">Create an account to start shopping with us.</p>
+
+          <Link href="/register">
+            <button className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition">
+              Create Account
+            </button>
+          </Link>
         </div>
       </div>
     </section>
