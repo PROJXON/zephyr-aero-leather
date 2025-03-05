@@ -44,7 +44,7 @@ export default function ForgotPassword() {
       className="flex items-center justify-center min-h-screen bg-cover bg-center"
       style={{ backgroundImage: `url(${backgroundImageUrl})` }}
     >
-      <div className="relative w-[800px] max-w-full min-h-[500px] bg-white shadow-lg rounded-xl flex overflow-hidden">
+      <div className="relative w-[800px] max-w-full min-h-[600px] bg-white shadow-lg rounded-xl flex overflow-hidden">
         {/* Left Panel */}
         <div className="w-1/2 flex flex-col justify-center items-center p-8 bg-[#605137] text-white rounded-l-xl">
           <h2 className="text-3xl font-bold">Remember Password?</h2>
