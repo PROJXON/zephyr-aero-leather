@@ -49,7 +49,7 @@ const Navbar = ({ initialUser }) => {
 
             {/* Desktop Menu */}
             <ul className="hidden lg:flex items-center gap-8 py-3 relative">
-              {["Home", "Best Sellers", "Gift Ideas", "auth-test", "login"].map((item) => (
+              {["Best Sellers", "Gift Ideas", "auth-test", "login"].map((item) => (
                 <li key={item} className="relative group overflow-hidden">
                   <Link
                     href={`/${item.toLowerCase().replace(/ /g, "-")}`}
