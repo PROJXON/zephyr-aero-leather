@@ -118,7 +118,7 @@ const Navbar = ({ initialUser }) => {
             <NavButton
               onClick={() => setMenuOpen(!menuOpen)}
               additionalClasses="lg:hidden rounded-md"
-              srOnly="OpenMenu"
+              srOnly="Open Menu"
               d="M5 7h14M5 12h14M5 17h14"
             />
           </div>
