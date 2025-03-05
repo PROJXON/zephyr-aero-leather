@@ -33,6 +33,7 @@ const Navbar = ({ initialUser }) => {
           {/* Logo */}
           <div className="flex items-center space-x-8">
             <div className="shrink-0">
+            <Link href="/" passHref>
               <Image
                 className="w-64 h-32 object-contain"
                 src={ZephyrLogo}
@@ -41,18 +42,22 @@ const Navbar = ({ initialUser }) => {
                 height={64}
                 priority={true}
               />
+            </Link>
+
             </div>
 
             {/* Desktop Menu */}
-            <ul className="hidden lg:flex items-center gap-6 md:gap-8 py-3">
+            <ul className="hidden lg:flex items-center gap-8 py-3 relative">
               {["Home", "Best Sellers", "Gift Ideas", "auth-test", "login"].map((item) => (
-                <li key={item}>
+                <li key={item} className="relative group overflow-hidden">
                   <Link
                     href={`/${item.toLowerCase().replace(/ /g, "-")}`}
-                    className="text-sm font-medium text-gray-900 hover:text-primary-700"
+                    className="text-lg font-medium text-black transition-all duration-300"
                   >
                     {item}
                   </Link>
+                  <span className="absolute left-0 bottom-0 w-full h-[2px] bg-black transition-transform duration-300 transform scale-x-0 group-hover:scale-x-100"></span>
+
                 </li>
               ))}
             </ul>
