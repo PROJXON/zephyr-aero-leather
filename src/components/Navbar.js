@@ -73,13 +73,9 @@ const Navbar = ({ initialUser }) => {
                   setAccountOpen(false);
                 }}
                 srOnly="Cart"
-                path={<path
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
-                />}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
                 text={isAuthenticated || serverUser ? "My Cart" : "Guest Cart"}
               />
 
@@ -102,12 +98,7 @@ const Navbar = ({ initialUser }) => {
                     setAccountOpen(!accountOpen);
                     setCartOpen(false);
                   }}
-                  srOnly={null}
-                  path={<path
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                  />}
+                  d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                   text={serverUser?.first_name || user?.first_name}
                 />
                 {accountOpen && (
