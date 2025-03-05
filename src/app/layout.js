@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 import { cookies } from "next/headers";
 
 const geistSans = Geist({
@@ -36,8 +37,10 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-          <Navbar initialUser={user} />
-          <main>{children}</main>
+          <CartProvider>
+            <Navbar initialUser={user} />
+            <main>{children}</main>
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>
