@@ -1,4 +1,4 @@
-import fetchProducts from "../../lib/woocommerce.js";
+import fetchProducts from "../../lib/fetchProducts.js";
 import Image from "next/image";
 
 export default async function Home() {
@@ -13,7 +13,7 @@ export default async function Home() {
           products.map((product) => (
             <div key={product.id} className="p-4 border rounded shadow">
               <Image
-                src={product.images[0]?.src || "/placeholder.jpg"} 
+                src={product.images[0]?.src || "/placeholder.jpg"}
                 alt={product.name}
                 width={300}
                 height={200}
