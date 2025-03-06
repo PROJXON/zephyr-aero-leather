@@ -27,6 +27,21 @@ const Navbar = ({ initialUser }) => {
     setServerUser(null);
   };
 
+  useEffect(() => {
+    const handleClickOutside = e => {
+      if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
+        setAccountOpen(false)
+      }
+      if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target)) {
+        setCartOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [accountOpen, cartOpen])
+
   return (
     <nav className="bg-white antialiased">
       <div className="max-w-screen-xl px-4 mx-auto py-4">
@@ -66,7 +81,7 @@ const Navbar = ({ initialUser }) => {
 
           <div className="flex items-center lg:space-x-2">
             {/* Cart Dropdown */}
-            <div className="relative">
+            <div id="cartBtn" className="relative">
               <NavButton
                 onClick={() => {
                   setCartOpen(!cartOpen);
@@ -91,7 +106,7 @@ const Navbar = ({ initialUser }) => {
                 <NavLoggedOutBtn href="/register" text="Create Account" />
               </ul>
             ) : (
-              <div className="relative">
+              <div id="profileBtn" className="relative">
                 <NavButton
                   onClick={() => {
                     setAccountOpen(!accountOpen);
