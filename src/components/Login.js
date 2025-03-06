@@ -16,6 +16,7 @@ const Login = () => {
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Added loading state
   const router = useRouter();
 
   const handleChange = (event) => {
@@ -35,6 +36,8 @@ const Login = () => {
       return;
     }
 
+    setLoading(true); // Disable button & show loading
+
     try {
       const response = await fetch("/api/login", {
         method: "POST",
@@ -51,12 +54,12 @@ const Login = () => {
       if (!response.ok) {
         const data = await response.json();
         setError(data.error || "Invalid email or password");
+        setLoading(false); // Re-enable button on error
         return;
       }
 
       const data = await response.json();
 
-      // Fetch user data after login
       const userResponse = await fetch("/api/auth/user", {
         credentials: "include",
       });
@@ -73,6 +76,7 @@ const Login = () => {
     } catch (error) {
       setError("An error occurred. Please try again.");
       console.error(error);
+      setLoading(false); // Re-enable button on error
     }
   };
 
@@ -96,6 +100,7 @@ const Login = () => {
               onChange={handleChange}
               className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all"
               required
+              disabled={loading} // Disable input when loading
             />
 
             {/* Password Input with Show/Hide Button */}
@@ -108,11 +113,13 @@ const Login = () => {
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all pr-16"
                 required
+                disabled={loading} // Disable input when loading
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute inset-y-0 right-4 flex items-center text-sm text-[#605137] font-semibold hover:underline focus:outline-none"
+                disabled={loading} // Disable toggle when loading
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -129,12 +136,15 @@ const Login = () => {
               </Link>
             </p>
 
-            {/* Submit Button */}
+            {/* Submit Button with Loading State */}
             <button
               type="submit"
-              className="w-full py-2 bg-[#30291C] text-white font-bold rounded-full hover:bg-[#605137] transition-all"
+              disabled={loading}
+              className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
         </div>

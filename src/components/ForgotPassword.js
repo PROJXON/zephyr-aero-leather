@@ -10,13 +10,16 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  
+  const [loading, setLoading] = useState(false); // Added loading state
+
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setError("");
+
+    setLoading(true); // Disable button & show loading
 
     try {
       const response = await fetch("/api/forgot-password", {
@@ -85,11 +88,14 @@ export default function ForgotPassword() {
                 />
               </div>
               <button
-                type="submit"
-                className="w-full py-2 bg-[#30291C] text-white font-bold rounded-full hover:bg-[#605137] transition-all"
-              >
-                Reset Password
-              </button>
+              type="submit"
+              disabled={loading}
+              className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {loading ? "Resetting..." : "Reset Password"}
+            </button>
             </form>
           </div>
         </div>
