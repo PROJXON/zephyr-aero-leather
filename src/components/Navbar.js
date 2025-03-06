@@ -27,6 +27,8 @@ const Navbar = ({ initialUser }) => {
     setServerUser(null);
   };
 
+  const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"]
+
   return (
     <nav className="bg-white antialiased">
       <div className="max-w-screen-xl px-4 mx-auto py-4">
@@ -49,7 +51,7 @@ const Navbar = ({ initialUser }) => {
 
             {/* Desktop Menu */}
             <ul className="hidden lg:flex items-center gap-8 py-3 relative">
-              {["Best Sellers", "Gift Ideas", "auth-test", "login"].map((item) => (
+              {navItems.map((item) => (
                 <li key={item} className="relative group overflow-hidden">
                   <Link
                     href={`/${item.toLowerCase().replace(/ /g, "-")}`}
