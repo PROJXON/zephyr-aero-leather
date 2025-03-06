@@ -1,7 +1,7 @@
 const nextConfig = {
   images: {
     domains: [
-      new URL(process.env.WOOCOMMERCE_API_URL).hostname
+      new URL(process.env.WOOCOMMERCE_API_URL).hostname,
     ],
     remotePatterns: [
       {

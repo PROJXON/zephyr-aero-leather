@@ -34,7 +34,7 @@ const Navbar = ({ initialUser }) => {
           {/* Logo */}
           <div className="flex items-center space-x-8">
             <div className="shrink-0">
-              <Link href="/" passHref>
+              <Link href="/">
                 <Image
                   className="w-64 h-32 object-contain"
                   src={ZephyrLogo}
