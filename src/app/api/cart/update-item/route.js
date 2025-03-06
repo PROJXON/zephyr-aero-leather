@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/cart/update`;
+const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/custom/v1/cart/update`;
 
 export async function POST(req) {
   try {
@@ -13,21 +13,21 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const updateResponse = await fetch(API_BASE_URL, {
+    const response = await fetch(API_BASE_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ id: productId, quantity }),
+      body: JSON.stringify({ product_id: productId, quantity }),
     });
 
-    if (!updateResponse.ok) throw new Error("Failed to update cart quantity");
+    if (!response.ok) throw new Error("Failed to update cart item");
 
-    const updatedCart = await updateResponse.json();
+    const updatedCart = await response.json();
     return NextResponse.json(updatedCart);
   } catch (error) {
-    console.error("Error updating cart:", error.message);
+    console.error("Error updating cart item:", error.message);
     return NextResponse.json({ error: "Failed to update cart" }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/store/cart`;
+const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/custom/v1/cart`;
 
 export async function GET() {
   try {
@@ -12,17 +12,17 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const cartResponse = await fetch(API_BASE_URL, {
+    const response = await fetch(API_BASE_URL, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (!cartResponse.ok) throw new Error("Failed to fetch WooCommerce cart");
+    if (!response.ok) throw new Error("Failed to fetch saved cart");
 
-    const cartData = await cartResponse.json();
+    const cartData = await response.json();
     return NextResponse.json(cartData);
   } catch (error) {
-    console.error("Error fetching cart:", error.message);
-    return NextResponse.json({ error: "Failed to fetch cart" }, { status: 500 });
+    console.error("Error fetching saved cart:", error.message);
+    return NextResponse.json({ error: "Failed to fetch saved cart" }, { status: 500 });
   }
 }

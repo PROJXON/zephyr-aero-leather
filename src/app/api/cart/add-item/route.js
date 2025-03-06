@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/store/cart/items`;
+const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/custom/v1/cart/add`;
 
 export async function POST(req) {
   try {
@@ -13,22 +13,18 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const authHeader = "Basic " + Buffer.from(
-      `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-    ).toString("base64");
-
-    const addItemResponse = await fetch(API_BASE_URL, {
+    const response = await fetch(API_BASE_URL, {
       method: "POST",
       headers: {
-        Authorization: authHeader,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ product_id: productId, quantity }),
     });
 
-    if (!addItemResponse.ok) throw new Error("Failed to add item to cart");
+    if (!response.ok) throw new Error("Failed to add item to cart");
 
-    const updatedCart = await addItemResponse.json();
+    const updatedCart = await response.json();
     return NextResponse.json(updatedCart);
   } catch (error) {
     console.error("Error adding item to cart:", error.message);
