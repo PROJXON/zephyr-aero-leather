@@ -82,12 +82,12 @@ const Navbar = ({ initialUser }) => {
                   strokeLinejoin="round"
                   d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
                 />}
-                text={`${isAuthenticated || serverUser ? "My Cart" : "Guest Cart"} ${cartItems.length > 0 ? `(${cartItems.length})` : ""}`}
+                text={`${isAuthenticated || serverUser ? "My Cart" : "Guest Cart"} ${cartItems?.length > 0 ? `(${cartItems.length})` : ""}`}
               />
 
               {cartOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4">
-                  {cartItems.length > 0 ? (
+                  {cartItems?.length > 0 ? (
                     <>
                       <ul>
                         {cartItems.map((item) => (

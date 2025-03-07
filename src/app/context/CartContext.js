@@ -2,7 +2,13 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 
-export const CartContext = createContext();
+export const CartContext = createContext({
+  cartItems: [], 
+  addToCart: () => {},
+  removeFromCart: () => {},
+  updateQuantity: () => {},
+});
+
 
 export const CartProvider = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
@@ -35,6 +41,7 @@ export const CartProvider = ({ children }) => {
       setCartItems(data.items || []);
     } catch (error) {
       console.error("Error fetching cart:", error.message);
+      setCartItems([]);
     }
   };
 
@@ -50,7 +57,8 @@ export const CartProvider = ({ children }) => {
         if (!response.ok) throw new Error("Failed to add item to cart");
 
         const data = await response.json();
-        setCartItems(data.items);
+        console.log("Cart API response", data);
+        await fetchUserCart();
       } catch (error) {
         console.error("Error adding to cart: ", error.message);
       }
@@ -77,10 +85,10 @@ export const CartProvider = ({ children }) => {
           body: JSON.stringify({ productId }),
         });
   
+        const data = await response.json();
         if (!response.ok) throw new Error("Failed to remove item from cart");
   
-        const data = await response.json();
-        setCartItems(data.items);
+        await fetchUserCart();
       } catch (error) {
         console.error("Error removing from cart:", error.message);
       }
@@ -103,7 +111,7 @@ export const CartProvider = ({ children }) => {
         if (!response.ok) throw new Error("Failed to update cart quantity");
 
         const data = await response.json();
-        setCartItems(data.items);
+        setCartItems([...data.items]);
       } catch (error) {
         console.error("Error updating cart:", error.message);
       }
