@@ -13,6 +13,7 @@ export const CartContext = createContext({
 export const CartProvider = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
+  const [orderId, setOrderId] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -39,9 +40,11 @@ export const CartProvider = ({ children }) => {
 
       const data = await response.json();
       setCartItems(data.items || []);
+      setOrderId(data.orderId || null);
     } catch (error) {
       console.error("Error fetching cart:", error.message);
       setCartItems([]);
+      setOrderId(null);
     }
   };
 
@@ -51,13 +54,11 @@ export const CartProvider = ({ children }) => {
         const response = await fetch("/api/cart/add-item", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId, quantity }),
+          body: JSON.stringify({ orderId, productId, quantity }),
         });
 
         if (!response.ok) throw new Error("Failed to add item to cart");
 
-        const data = await response.json();
-        console.log("Cart API response", data);
         await fetchUserCart();
       } catch (error) {
         console.error("Error adding to cart: ", error.message);
@@ -82,12 +83,12 @@ export const CartProvider = ({ children }) => {
         const response = await fetch("/api/cart/remove-item", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId }),
+          body: JSON.stringify({ orderId, productId }),
         });
   
-        const data = await response.json();
         if (!response.ok) throw new Error("Failed to remove item from cart");
-  
+
+        setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
         await fetchUserCart();
       } catch (error) {
         console.error("Error removing from cart:", error.message);
@@ -105,13 +106,12 @@ export const CartProvider = ({ children }) => {
         const response = await fetch("/api/cart/update-item", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId, quantity }),
+          body: JSON.stringify({ orderId, productId, quantity }),
         });
 
         if (!response.ok) throw new Error("Failed to update cart quantity");
 
-        const data = await response.json();
-        setCartItems([...data.items]);
+        await fetchUserCart();
       } catch (error) {
         console.error("Error updating cart:", error.message);
       }
@@ -124,7 +124,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const syncGuestCartToWooCommerce = async () => {
-    if (isAuthenticated) {
+    if (isAuthenticated && orderId) {
       const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
       for (let item of guestCart) {
         await addToCart(item.id, item.quantity);
@@ -135,7 +135,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     syncGuestCartToWooCommerce();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, orderId]);
 
   return (
     <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity }}>

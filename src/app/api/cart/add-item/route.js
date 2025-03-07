@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/custom/v1/cart`;
+const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/orders`;
 
 export async function POST(req) {
   try {
-    const { productId, quantity } = await req.json();
+    const { orderId, productId, quantity } = await req.json();
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
@@ -13,27 +13,49 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const response = await fetch(API_BASE_URL, {
-      method: "POST",
+    if (!orderId) {
+      return NextResponse.json({ error: "No pending order found" }, { status: 400 });
+    }
+
+    // Fetch the current pending order
+    const orderResponse = await fetch(`${API_BASE_URL}/${orderId}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Basic ${Buffer.from(
+          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
+        ).toString("base64")}`,
+      },
+    });
+
+    if (!orderResponse.ok) throw new Error("Failed to fetch order");
+
+    const orderData = await orderResponse.json();
+
+    // Merge existing line items with new item
+    const existingItems = orderData.line_items || [];
+    const itemIndex = existingItems.findIndex((item) => item.product_id === productId);
+
+    if (itemIndex > -1) {
+      existingItems[itemIndex].quantity += quantity; // Increase quantity if item exists
+    } else {
+      existingItems.push({ product_id: productId, quantity }); // Add new item
+    }
+
+    // Update order with merged line items
+    const updateResponse = await fetch(`${API_BASE_URL}/${orderId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Basic ${Buffer.from(
+          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
+        ).toString("base64")}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ product_id: productId, quantity }),
+      body: JSON.stringify({ line_items: existingItems }),
     });
 
-    const responseData = await response.json();
-    console.log("✅ WooCommerce Cart Response:", responseData);
+    if (!updateResponse.ok) throw new Error("Failed to add item to cart");
 
-    if (!response.ok) throw new Error("Failed to add item to cart");
-
-    // ✅ Fetch updated cart
-    const cartResponse = await fetch(`${process.env.WOOCOMMERCE_API_URL}/wp-json/custom/v1/cart`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    const cartData = await cartResponse.json();
-    return NextResponse.json({ success: true, cart: cartData });
+    const updatedCart = await updateResponse.json();
+    return NextResponse.json({ success: true, cart: updatedCart });
 
   } catch (error) {
     console.error("Error adding item to cart:", error.message);
