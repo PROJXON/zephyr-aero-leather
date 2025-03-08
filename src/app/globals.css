@@ -19,3 +19,7 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.nav-button-no-svg {
+  @apply block px-3 py-2 hover:bg-gray-100 rounded-md duration-300;
+}
