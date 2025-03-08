@@ -10,13 +10,16 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  
+  const [loading, setLoading] = useState(false); // Added loading state
+
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setError("");
+
+    setLoading(true); // Disable button & show loading
 
     try {
       const response = await fetch("/api/forgot-password", {
@@ -44,7 +47,7 @@ export default function ForgotPassword() {
       className="flex items-center justify-center min-h-screen bg-cover bg-center"
       style={{ backgroundImage: `url(${backgroundImageUrl})` }}
     >
-      <div className="relative w-[800px] max-w-full min-h-[500px] bg-white shadow-lg rounded-xl flex overflow-hidden">
+      <div className="relative w-[800px] max-w-full min-h-[600px] bg-white shadow-lg rounded-xl flex overflow-hidden">
         {/* Left Panel */}
         <div className="w-1/2 flex flex-col justify-center items-center p-8 bg-[#605137] text-white rounded-l-xl">
           <h2 className="text-3xl font-bold">Remember Password?</h2>
@@ -85,11 +88,14 @@ export default function ForgotPassword() {
                 />
               </div>
               <button
-                type="submit"
-                className="w-full py-2 bg-[#30291C] text-white font-bold rounded-full hover:bg-[#605137] transition-all"
-              >
-                Reset Password
-              </button>
+              type="submit"
+              disabled={loading}
+              className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {loading ? "Resetting..." : "Reset Password"}
+            </button>
             </form>
           </div>
         </div>

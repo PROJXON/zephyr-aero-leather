@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
 import { cookies } from "next/headers";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default async function RootLayout({ children }) {
         <AuthProvider>
           <Navbar initialUser={user} />
           <main>{children}</main>
+          <Footer />
         </AuthProvider>
       </body>
     </html>

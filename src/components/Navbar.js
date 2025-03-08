@@ -27,20 +27,22 @@ const Navbar = ({ initialUser }) => {
     setServerUser(null);
   };
 
-  useEffect(() => {
-    const handleClickOutside = e => {
-      if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
-        setAccountOpen(false)
-      }
-      if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target)) {
-        setCartOpen(false)
-      }
+useEffect(() => {
+  const handleClickOutside = e => {
+    if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
+      setAccountOpen(false);
     }
+    if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target)) {
+      setCartOpen(false);
+    }
+  };
 
-    document.addEventListener("mousedown", handleClickOutside)
+  document.addEventListener("mousedown", handleClickOutside);
 
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [accountOpen, cartOpen])
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, [accountOpen, cartOpen]);
+
+const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"];
 
   return (
     <nav className="bg-white antialiased">
@@ -49,7 +51,7 @@ const Navbar = ({ initialUser }) => {
           {/* Logo */}
           <div className="flex items-center space-x-8">
             <div className="shrink-0">
-              <Link href="/" passHref>
+              <Link href="/">
                 <Image
                   className="w-64 h-32 object-contain"
                   src={ZephyrLogo}
@@ -64,7 +66,7 @@ const Navbar = ({ initialUser }) => {
 
             {/* Desktop Menu */}
             <ul className="hidden lg:flex items-center gap-8 py-3 relative">
-              {["Best Sellers", "Gift Ideas", "auth-test", "login"].map((item) => (
+              {navItems.map((item) => (
                 <li key={item} className="relative group overflow-hidden">
                   <Link
                     href={`/${item.toLowerCase().replace(/ /g, "-")}`}
