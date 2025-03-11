@@ -44,13 +44,13 @@ export default function ForgotPassword() {
 
   return (
     <section
-      className="flex items-center justify-center min-h-screen bg-cover bg-center"
+      className="flex items-center justify-center min-h-screen bg-cover bg-center px-4"
       style={{ backgroundImage: `url(${backgroundImageUrl})` }}
     >
-      <div className="relative w-[800px] max-w-full min-h-[600px] bg-white shadow-lg rounded-xl flex overflow-hidden">
+      <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Panel */}
-        <div className="w-1/2 flex flex-col justify-center items-center p-8 bg-[#605137] text-white rounded-l-xl">
-          <h2 className="text-3xl font-bold">Remember Password?</h2>
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-[#605137] text-white rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+          <h2 className="text-2xl font-bold mb-4 mt-2">Remember Password?</h2>
           <p className="text-center mt-2">Go back and sign in to your account.</p>
 
           <button
@@ -62,7 +62,7 @@ export default function ForgotPassword() {
         </div>
 
         {/* Right Panel */}
-        <div className="w-1/2 flex flex-col justify-center items-center p-10 bg-white bg-opacity-90 rounded-r-xl">
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white bg-opacity-90 rounded-b-xl md:rounded-r-xl md:rounded-bl-none">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-4 mt-2">
               Forgot Password
