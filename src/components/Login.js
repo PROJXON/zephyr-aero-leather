@@ -82,12 +82,12 @@ const Login = () => {
 
   return (
     <section
-      className="flex items-center justify-center min-h-screen bg-cover bg-center"
+      className="flex items-center justify-center min-h-screen bg-cover bg-center px-4"
       style={{ backgroundImage: `url(${backgroundImageUrl})` }}
     >
-      <div className="relative w-[800px] max-w-full min-h-[600px] bg-white shadow-lg rounded-xl flex overflow-hidden">
+      <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Panel: Sign In Form */}
-        <div className="w-1/2 flex flex-col justify-center items-center p-10 bg-white bg-opacity-90 rounded-l-xl">
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-white bg-opacity-90 rounded-l-xl">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 mt-4">Sign in</h2>
 
           <form onSubmit={handleSubmit} className="w-full">
@@ -150,7 +150,7 @@ const Login = () => {
         </div>
 
         {/* Right Panel: Sign Up Prompt */}
-        <div className="w-1/2 flex flex-col justify-center items-center p-8 bg-[#605137] text-white rounded-r-xl">
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-[#605137] text-white rounded-r-xl">
           <h2 className="text-3xl font-bold">New Here?</h2>
           <p className="text-center mt-2">Create an account to start shopping with us.</p>
 
