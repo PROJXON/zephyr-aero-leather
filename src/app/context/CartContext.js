@@ -3,14 +3,13 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 
 export const CartContext = createContext({
-  cartItems: [], 
+  cartItems: [],
   cartOpen: false,
-  setCartOpen: () => {},
-  addToCart: () => {},
-  removeFromCart: () => {},
-  updateQuantity: () => {},
+  setCartOpen: () => { },
+  addToCart: () => { },
+  removeFromCart: () => { },
+  updateQuantity: () => { },
 });
-
 
 export const CartProvider = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
@@ -73,7 +72,10 @@ export const CartProvider = ({ children }) => {
       if (itemIndex > -1) {
         updatedCart[itemIndex].quantity += quantity;
       } else {
-        updatedCart.push({ id: productId, quantity });
+        updatedCart.push({
+          id: productId,
+          quantity
+        });
       }
 
       saveGuestCart(updatedCart);
@@ -88,7 +90,7 @@ export const CartProvider = ({ children }) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId, productId }),
         });
-  
+
         if (!response.ok) throw new Error("Failed to remove item from cart");
 
         setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
@@ -101,7 +103,7 @@ export const CartProvider = ({ children }) => {
       saveGuestCart(updatedCart);
     }
   };
-  
+
 
   const updateQuantity = async (productId, quantity) => {
     if (isAuthenticated) {

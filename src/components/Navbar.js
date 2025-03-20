@@ -10,11 +10,10 @@ import NavLoggedOutBtn from "./NavLoggedOutBtn";
 import { useCart, setCartOpen, cartOpen, removeFromCart } from "@/app/context/CartContext";
 
 
-const Navbar = ({ initialUser }) => {
+const Navbar = ({ initialUser, allProducts }) => {
   const { isAuthenticated, user, login, logout, fetchUserFromServer } = useAuth();
   const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
-  // const [cartOpen, setCartOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const { cartItems, removeFromCart, setCartOpen, cartOpen } = useCart();
 
@@ -30,22 +29,22 @@ const Navbar = ({ initialUser }) => {
     setServerUser(null);
   };
 
-useEffect(() => {
-  const handleClickOutside = e => {
-    if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
-      setAccountOpen(false);
-    }
-    if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target)) {
-      setCartOpen(false);
-    }
-  };
+  useEffect(() => {
+    const handleClickOutside = e => {
+      if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
+        setAccountOpen(false);
+      }
+      if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target)) {
+        setCartOpen(false);
+      }
+    };
 
-  document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
-  return () => document.removeEventListener("mousedown", handleClickOutside);
-}, [accountOpen, cartOpen]);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [accountOpen, cartOpen]);
 
-const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"];
+  const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"];
 
   return (
     <nav className="bg-white antialiased">
@@ -103,17 +102,19 @@ const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"];
                   {cartItems?.length > 0 ? (
                     <>
                       <ul>
-                        {cartItems.map((item) => (
-                          <li key={item.id} className="flex justify-between border-b py-2">
-                            <span>{item.name} x {item.quantity}</span>
+                        {cartItems.map((item) => {
+                          const itemName = allProducts.filter(product => product.id === item.id)[0].name
+
+                          return (<li key={item.id} className="flex justify-between border-b py-2">
+                            <span>{itemName} x {item.quantity}</span>
                             <button
                               onClick={() => removeFromCart(item.id)}
                               className="text-red-500 text-xs"
                             >
                               Remove
                             </button>
-                          </li>
-                        ))}
+                          </li>)
+                        })}
                       </ul>
 
                       {/* Checkout Button */}

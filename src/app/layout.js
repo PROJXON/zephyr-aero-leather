@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { cookies } from "next/headers";
+import fetchProducts from "../../lib/woocommerce"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,8 +24,10 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   let user = null;
 
+  const products = await fetchProducts();
+
   try {
-    const cookieStore = await cookies(); 
+    const cookieStore = await cookies();
     const userCookie = cookieStore.get("userData")?.value;
     if (userCookie) {
       user = JSON.parse(atob(userCookie));
@@ -38,7 +41,7 @@ export default async function RootLayout({ children }) {
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <CartProvider>
-            <Navbar initialUser={user} />
+            <Navbar initialUser={user} allProducts={products} />
             <main>{children}</main>
           </CartProvider>
         </AuthProvider>
