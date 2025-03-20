@@ -52,8 +52,6 @@ export async function POST(req) {
       body: JSON.stringify({ line_items: existingItems }),
     });
 
-    console.log(updateResponse)
-
     if (!updateResponse.ok) throw new Error("Failed to add item to cart");
 
     const updatedCart = await updateResponse.json();

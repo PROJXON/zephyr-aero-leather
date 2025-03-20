@@ -3,10 +3,10 @@ import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
 
 export default function ProductList({ products }) {
-  const { addToCart, cartOpen, setCartOpen } = useCart(); 
+  const { addToCart, cartOpen, setCartOpen } = useCart();
 
   const handleAddToCart = (productId) => {
-    addToCart(productId); 
+    addToCart(productId);
     if (!cartOpen) {
       console.log('Cart is closed, opening now.');
       setCartOpen(true); // Only open the cart if it was closed
@@ -23,7 +23,7 @@ export default function ProductList({ products }) {
         products.map((product) => (
           <div key={product.id} className="p-4 border rounded shadow">
             <Image
-              src={product.images[0]?.src || "/placeholder.jpg"} 
+              src={product.images[0]?.src || "/placeholder.jpg"}
               alt={product.name}
               width={300}
               height={200}
@@ -36,7 +36,7 @@ export default function ProductList({ products }) {
 
             <button
               onClick={() => handleAddToCart(product.id)}
-              className="mt-2 bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600"
+              className="mt-2 bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 addToCartBtn"
             >
               Add to Cart
             </button>
