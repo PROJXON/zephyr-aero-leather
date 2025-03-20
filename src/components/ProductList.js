@@ -3,7 +3,17 @@ import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
 
 export default function ProductList({ products }) {
-  const { addToCart } = useCart(); 
+  const { addToCart, cartOpen, setCartOpen } = useCart(); 
+
+  const handleAddToCart = (productId) => {
+    addToCart(productId); 
+    if (!cartOpen) {
+      console.log('Cart is closed, opening now.');
+      setCartOpen(true); // Only open the cart if it was closed
+    } else {
+      console.log('Cart is already open.');
+    }
+  };
 
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -25,7 +35,7 @@ export default function ProductList({ products }) {
             </p>
 
             <button
-              onClick={() => addToCart(product.id)}
+              onClick={() => handleAddToCart(product.id)}
               className="mt-2 bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600"
             >
               Add to Cart

@@ -4,6 +4,8 @@ import { useAuth } from "@/app/context/AuthContext";
 
 export const CartContext = createContext({
   cartItems: [], 
+  cartOpen: false,
+  setCartOpen: () => {},
   addToCart: () => {},
   removeFromCart: () => {},
   updateQuantity: () => {},
@@ -14,6 +16,7 @@ export const CartProvider = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [orderId, setOrderId] = useState(null);
+  const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -138,7 +141,7 @@ export const CartProvider = ({ children }) => {
   }, [isAuthenticated, orderId]);
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, setCartOpen, cartOpen }}>
       {children}
     </CartContext.Provider>
   );
