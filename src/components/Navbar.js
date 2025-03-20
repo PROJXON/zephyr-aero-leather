@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from 'next/navigation'
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
 import { useAuth } from "@/app/context/AuthContext";
 import NavButton from "./NavButton";
@@ -15,6 +16,7 @@ const Navbar = ({ initialUser, allProducts }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const { cartItems, removeFromCart, setCartOpen, cartOpen } = useCart();
+  const { replace } = useRouter()
 
   useEffect(() => {
     if (!initialUser) {
@@ -117,7 +119,10 @@ const Navbar = ({ initialUser, allProducts }) => {
                       </ul>
 
                       {/* Checkout Button */}
-                      <button className="w-full bg-blue-500 text-white mt-4 p-2 rounded">
+                      <button
+                        className="w-full bg-blue-500 text-white mt-4 p-2 rounded"
+                        onClick={() => replace("checkout")}
+                      >
                         Checkout
                       </button>
                     </>
