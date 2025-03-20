@@ -1,8 +1,8 @@
-import fetchProducts from "../../lib/woocommerce.js";
+import fetchProducts from "../../lib/woocommerce";
 import ProductList from "../components/ProductList";
 
 export default async function Home() {
-  const products = await fetchProducts(); 
+  const products = await fetchProducts();
 
   return (
     <div className="container mx-auto p-6">

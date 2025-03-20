@@ -8,7 +8,7 @@ import ZephyrLogo from "../../public/zephyrlogo.jpg";
 import { useAuth } from "@/app/context/AuthContext";
 import NavButton from "./NavButton";
 import NavLoggedOutBtn from "./NavLoggedOutBtn";
-import { useCart, setCartOpen, cartOpen, removeFromCart } from "@/app/context/CartContext";
+import { useCart, removeFromCart } from "@/app/context/CartContext";
 
 const Navbar = ({ initialUser, allProducts }) => {
   const { isAuthenticated, user, login, logout, fetchUserFromServer } = useAuth();
