@@ -1,10 +1,29 @@
 "use client"
 import { useCart } from "@/app/context/CartContext";
+import ChangeQuantity from "./ChangeQuantity";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
 export default function Checkout({ products }) {
-    const { cartItems, removeFromCart, setCartOpen, cartOpen } = useCart();
-    let total = 0
+    const { cartItems, addToCart, removeFromCart } = useCart();
+
+    const calculateTotal = () => {
+        let initialTotal = 0
+
+        cartItems.map(item => {
+            const itemInfo = products.filter(product => product.id === item.id)[0]
+            const price = itemInfo.price * item.quantity
+            initialTotal += price
+        })
+
+        return initialTotal
+    }
+
+    const [total, setTotal] = useState(calculateTotal)
+
+    useEffect(() => {
+        setTotal(calculateTotal())
+    }, [cartItems])
 
     return (<>
         {cartItems?.length > 0 ? <div className="grid grid-cols-[60%_40%]">
@@ -19,7 +38,6 @@ export default function Checkout({ products }) {
                         const imageInfo = itemInfo.images[0]
 
                         const price = itemInfo.price * item.quantity
-                        total += price
                         const priceJSX = <p className="text-right text-green-600">${price}</p>
 
                         return (<li key={item.id} className="grid grid-cols-[100px_auto] gap-2 mb-2">
@@ -33,12 +51,28 @@ export default function Checkout({ products }) {
                             />
                             <div className="text-sm">
                                 <p>{itemInfo.name}</p>
-                                {item.quantity > 1 ?
-                                    <div className="grid grid-cols-2">
-                                        <p className="text-zinc-300">x {item.quantity}</p>
-                                        {priceJSX}
-                                    </div> : priceJSX
-                                }
+                                <div className="grid grid-cols-2">
+                                    <div>
+                                        {item.quantity > 1 && <>
+                                            <span className="text-zinc-300 mr-3 align-middle">x {item.quantity}</span>
+                                        </>}
+                                        <ChangeQuantity
+                                            sign="+"
+                                            onClick={() => {
+                                                addToCart(item.id)
+                                                setTotal(curr => curr + itemInfo.price)
+                                            }}
+                                        />&nbsp;&nbsp;
+                                        <ChangeQuantity
+                                            sign="-"
+                                            onClick={() => {
+                                                removeFromCart(item.id)
+                                                setTotal(curr => curr - itemInfo.price)
+                                            }}
+                                        />
+                                    </div>
+                                    {priceJSX}
+                                </div>
                             </div>
                         </li>)
                     })}
