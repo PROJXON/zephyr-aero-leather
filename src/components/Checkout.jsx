@@ -44,17 +44,13 @@ export default function Checkout({ products }) {
                         const changeQuantitySpans = [
                             {
                                 sign: "+",
-                                onClick: () => {
-                                    addToCart(item.id)
-                                    setTotal(curr => curr + itemInfo.price)
-                                }
+                                onClick: () => addToCart(item.id)
                             },
                             {
                                 sign: "-",
                                 onClick: () => {
                                     if (item.quantity == 1) removeFromCart(item.id)
                                     else updateQuantity(item.id, item.quantity - 1)
-                                    setTotal(curr => curr - itemInfo.price)
                                 }
                             },
                             {
