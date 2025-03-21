@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation"
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
 import { useAuth } from "@/app/context/AuthContext";
 import NavButton from "./NavButton";
@@ -14,6 +15,7 @@ const Navbar = ({ initialUser }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const pathname = usePathname()
 
   useEffect(() => {
     if (!initialUser) {
@@ -21,28 +23,32 @@ const Navbar = ({ initialUser }) => {
     }
   }, [initialUser]);
 
+  useEffect(() => {
+    setCartOpen(false)
+  }, [pathname])
+
   const handleLogout = async () => {
     await logout();
     setAccountOpen(false);
     setServerUser(null);
   };
 
-useEffect(() => {
-  const handleClickOutside = e => {
-    if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
-      setAccountOpen(false);
-    }
-    if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target)) {
-      setCartOpen(false);
-    }
-  };
+  useEffect(() => {
+    const handleClickOutside = e => {
+      if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
+        setAccountOpen(false);
+      }
+      if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target)) {
+        setCartOpen(false);
+      }
+    };
 
-  document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
-  return () => document.removeEventListener("mousedown", handleClickOutside);
-}, [accountOpen, cartOpen]);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [accountOpen, cartOpen]);
 
-const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"];
+  const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"];
 
   return (
     <nav className="bg-white antialiased">
