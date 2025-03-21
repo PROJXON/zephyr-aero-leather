@@ -3,17 +3,21 @@ import { useCart } from "@/app/context/CartContext";
 
 export default function Checkout({ products }) {
     const { cartItems, removeFromCart, setCartOpen, cartOpen } = useCart();
-    console.log(cartItems)
 
     return (<>
-        {cartItems?.length > 0 ? <div>
-            {cartItems.map(item => {
-                const itemInfo = products.filter(product => product.id === item.id)[0]
+        {cartItems?.length > 0 ? <div className="grid grid-cols-[60%_40%]">
+            <form>
+                Form elements go here
+            </form>
+            <ul>
+                {cartItems.map(item => {
+                    const itemInfo = products.filter(product => product.id === item.id)[0]
 
-                return (<div key={item.id}>
-                    <p>{itemInfo.name}</p>
-                </div>)
-            })}
+                    return (<li key={item.id}>
+                        <p>{itemInfo.name}</p>
+                    </li>)
+                })}
+            </ul>
         </div> : <p>Your cart is empty</p>}
     </>)
 }
