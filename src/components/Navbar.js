@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from "next/navigation"
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
 import { useAuth } from "@/app/context/AuthContext";
 import NavButton from "./NavButton";
@@ -17,12 +17,17 @@ const Navbar = ({ initialUser, allProducts }) => {
   const [accountOpen, setAccountOpen] = useState(false);
   const { cartItems, removeFromCart, setCartOpen, cartOpen } = useCart();
   const { replace } = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     if (!initialUser) {
       fetchUserFromServer();
     }
   }, [initialUser]);
+
+  useEffect(() => {
+    setCartOpen(false)
+  }, [pathname])
 
   const handleLogout = async () => {
     await logout();
@@ -35,7 +40,7 @@ const Navbar = ({ initialUser, allProducts }) => {
       if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
         setAccountOpen(false);
       }
-      if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target) && !e.target.classList.contains("addToCartBtn")) {
+      if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target)) {
         setCartOpen(false);
       }
     };
