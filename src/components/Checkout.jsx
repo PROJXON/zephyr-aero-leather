@@ -7,12 +7,18 @@ import { useState, useEffect } from "react";
 export default function Checkout({ products }) {
     const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart();
 
+    const getItemInfo = item => {
+        const itemInfo = products.filter(product => product.id === item.id)[0]
+        const price = itemInfo.price * item.quantity
+
+        return [itemInfo, price]
+    }
+
     const calculateTotal = () => {
         let initialTotal = 0
 
         cartItems.map(item => {
-            const itemInfo = products.filter(product => product.id === item.id)[0]
-            const price = itemInfo.price * item.quantity
+            const price = getItemInfo(item)[1]
             initialTotal += price
         })
 
@@ -34,10 +40,8 @@ export default function Checkout({ products }) {
                 <h2 className="font-bold text-xl mb-2">Order Summary</h2>
                 <ul>
                     {cartItems.map(item => {
-                        const itemInfo = products.filter(product => product.id === item.id)[0]
+                        const [itemInfo, price] = getItemInfo(item)
                         const imageInfo = itemInfo.images[0]
-
-                        const price = itemInfo.price * item.quantity
                         const priceJSX = <p className="text-right text-green-600">${price}</p>
 
                         return (<li key={item.id} className="grid grid-cols-[100px_auto] gap-2 mb-2">
