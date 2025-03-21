@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { cookies } from "next/headers";
+import Footer from "@/components/Footer";
 import fetchProducts from "../../lib/woocommerce"
 
 const geistSans = Geist({
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }) {
           <CartProvider>
             <Navbar initialUser={user} allProducts={products} />
             <main>{children}</main>
+            <Footer />
           </CartProvider>
         </AuthProvider>
       </body>

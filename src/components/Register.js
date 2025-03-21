@@ -23,6 +23,7 @@ const Register = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { setIsAuthenticated, setUser } = useAuth();
 
@@ -66,7 +67,9 @@ const Register = () => {
       setError("You must accept the terms and conditions");
       return;
     }
-  
+    
+    setLoading(true);
+
     try {
       const response = await fetch("/api/register", {
         method: "POST",
@@ -84,6 +87,7 @@ const Register = () => {
   
       if (!response.ok) {
         setError(data.error || "Failed to create an account");
+        setLoading(false);
         return;
       }
 
@@ -118,6 +122,7 @@ const Register = () => {
     } catch (error) {
       setError("An error occurred. Please try again.");
       console.error(error);
+      setLoading(false); // Re-enable button on error
     }
   };  
 
@@ -160,6 +165,7 @@ const Register = () => {
                             className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
                             placeholder="Maverick" 
                             required 
+                            disabled={loading} // Disable input when loading
                           />
                       </div>
                       <div>
@@ -174,6 +180,7 @@ const Register = () => {
                             className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
                             placeholder="name@company.com" 
                             required 
+                            disabled={loading} // Disable input when loading
                           />
                       </div>
                       <div className="relative w-full">
@@ -188,6 +195,7 @@ const Register = () => {
                             placeholder="••••••••" 
                             className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
                             required 
+                            disabled={loading} // Disable input when loading
                           />
                             <button
                               type="button"
@@ -208,6 +216,7 @@ const Register = () => {
                             placeholder="••••••••" 
                             className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
                             required
+                            disabled={loading} // Disable input when loading
                           />
                             <button
                                 type="button"
@@ -227,13 +236,22 @@ const Register = () => {
                               onChange={handleChange}
                               className="w-5 h-5 border border-gray-700 rounded bg-gray-50 focus:ring-2 focus:ring-[#605137] transition checked:bg-[#605137] checked:border-[#30291C] checked:appearance-auto"
                               required
+                              disabled={loading} // Disable input when loading
                             />
                           </div>
                           <div className="ml-3 text-sm">
                             <label htmlFor="terms" className="font-light text-gray-500 dark:text-gray-300">I accept the <a className="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">Terms and Conditions</a></label>
                           </div>
                       </div>
-                      <button type="submit" className="w-full mt-4 py-2 bg-[#30291C] text-white font-bold rounded-full hover:bg-[#605137] transition-all">Create an account</button>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${
+                          loading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        {loading ? "Creating Account..." : "Create Account"}
+                      </button>
                   </form>
               </div>
         </div>
