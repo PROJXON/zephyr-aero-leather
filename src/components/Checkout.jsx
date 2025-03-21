@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 
 export default function Checkout({ products }) {
-    const { cartItems, addToCart, removeFromCart } = useCart();
+    const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart();
 
     const calculateTotal = () => {
         let initialTotal = 0
@@ -53,9 +53,7 @@ export default function Checkout({ products }) {
                                 <p>{itemInfo.name}</p>
                                 <div className="grid grid-cols-2">
                                     <div>
-                                        {item.quantity > 1 && <>
-                                            <span className="text-zinc-300 mr-3 align-middle">x {item.quantity}</span>
-                                        </>}
+                                        {item.quantity > 1 && <span className="text-zinc-300 mr-3 align-middle">x {item.quantity}</span>}
                                         <ChangeQuantity
                                             sign="+"
                                             onClick={() => {
@@ -66,7 +64,8 @@ export default function Checkout({ products }) {
                                         <ChangeQuantity
                                             sign="-"
                                             onClick={() => {
-                                                removeFromCart(item.id)
+                                                if (item.quantity == 1) removeFromCart(item.id)
+                                                else updateQuantity(item.id, item.quantity - 1)
                                                 setTotal(curr => curr - itemInfo.price)
                                             }}
                                         />
