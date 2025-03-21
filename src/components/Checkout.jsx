@@ -1,8 +1,7 @@
 "use client"
 import { useCart } from "@/app/context/CartContext";
-import ChangeQuantity from "./ChangeQuantity";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 
 export default function Checkout({ products }) {
     const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart();
@@ -42,6 +41,27 @@ export default function Checkout({ products }) {
                     {cartItems.map(item => {
                         const [itemInfo, price] = getItemInfo(item)
                         const imageInfo = itemInfo.images[0]
+                        const changeQuantitySpans = [
+                            {
+                                sign: "+",
+                                onClick: () => {
+                                    addToCart(item.id)
+                                    setTotal(curr => curr + itemInfo.price)
+                                }
+                            },
+                            {
+                                sign: "-",
+                                onClick: () => {
+                                    if (item.quantity == 1) removeFromCart(item.id)
+                                    else updateQuantity(item.id, item.quantity - 1)
+                                    setTotal(curr => curr - itemInfo.price)
+                                }
+                            },
+                            {
+                                sign: "X",
+                                onClick: () => removeFromCart(item.id)
+                            }
+                        ]
 
                         return (<li key={item.id} className="grid grid-cols-[100px_auto] gap-2 mb-2">
                             <Image
@@ -49,29 +69,22 @@ export default function Checkout({ products }) {
                                 alt={imageInfo.alt}
                                 width={100}
                                 height={100}
-                                className="object-cover"
-                                style={{ aspectRatio: "1 / 1" }}
+                                className="object-cover aspect-square"
                             />
                             <div className="text-sm">
                                 <p>{itemInfo.name}</p>
                                 <div className="grid grid-cols-2">
                                     <div>
                                         {item.quantity > 1 && <span className="text-zinc-300 mr-3 align-middle">x {item.quantity}</span>}
-                                        <ChangeQuantity
-                                            sign="+"
-                                            onClick={() => {
-                                                addToCart(item.id)
-                                                setTotal(curr => curr + itemInfo.price)
-                                            }}
-                                        />&nbsp;&nbsp;
-                                        <ChangeQuantity
-                                            sign="-"
-                                            onClick={() => {
-                                                if (item.quantity == 1) removeFromCart(item.id)
-                                                else updateQuantity(item.id, item.quantity - 1)
-                                                setTotal(curr => curr - itemInfo.price)
-                                            }}
-                                        />
+                                        {changeQuantitySpans.map((cqs, i) => (<Fragment key={i}>
+                                            {i !== 0 && <>&nbsp;&nbsp;</>}
+                                            <span
+                                                className="text-neutral-600 font-bold cursor-pointer text-base align-middle"
+                                                onClick={cqs.onClick}
+                                            >
+                                                {cqs.sign}
+                                            </span>
+                                        </Fragment>))}
                                     </div>
                                     <p className="text-right text-green-600">${price}</p>
                                 </div>
