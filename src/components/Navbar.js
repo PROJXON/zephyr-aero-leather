@@ -8,7 +8,7 @@ import ZephyrLogo from "../../public/zephyrlogo.jpg";
 import { useAuth } from "@/app/context/AuthContext";
 import NavButton from "./NavButton";
 import NavLoggedOutBtn from "./NavLoggedOutBtn";
-import { useCart, removeFromCart } from "@/app/context/CartContext";
+import { useCart } from "@/app/context/CartContext";
 
 const Navbar = ({ initialUser, allProducts }) => {
   const { isAuthenticated, user, login, logout, fetchUserFromServer } = useAuth();
@@ -40,7 +40,7 @@ const Navbar = ({ initialUser, allProducts }) => {
       if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
         setAccountOpen(false);
       }
-      if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target)) {
+      if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target) && !e.target.classList.contains("addToCartBtn")) {
         setCartOpen(false);
       }
     };

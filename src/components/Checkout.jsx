@@ -42,7 +42,6 @@ export default function Checkout({ products }) {
                     {cartItems.map(item => {
                         const [itemInfo, price] = getItemInfo(item)
                         const imageInfo = itemInfo.images[0]
-                        const priceJSX = <p className="text-right text-green-600">${price}</p>
 
                         return (<li key={item.id} className="grid grid-cols-[100px_auto] gap-2 mb-2">
                             <Image
@@ -74,7 +73,7 @@ export default function Checkout({ products }) {
                                             }}
                                         />
                                     </div>
-                                    {priceJSX}
+                                    <p className="text-right text-green-600">${price}</p>
                                 </div>
                             </div>
                         </li>)
