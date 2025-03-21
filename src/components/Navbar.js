@@ -125,7 +125,6 @@ const Navbar = ({ initialUser, allProducts }) => {
 
                       {/* Checkout Button */}
                       <button
-                        id="goToCheckoutBtn"
                         className="w-full bg-blue-500 text-white mt-4 p-2 rounded"
                         onClick={() => replace("checkout")}
                       >
