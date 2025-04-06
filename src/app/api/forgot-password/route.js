@@ -1,11 +1,4 @@
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-
-const api = new WooCommerceRestApi({
-  url: process.env.WOOCOMMERCE_API_URL, // 
-  consumerKey: process.env.WOOCOMMERCE_API_KEY,
-  consumerSecret: process.env.WOOCOMMERCE_API_SECRET,
-  version: "wc/v3",
-});
+import wcAPI from '../../../../lib/wcAPI'
 
 export async function POST(req) {
   const { email } = await req.json();
@@ -18,7 +11,7 @@ export async function POST(req) {
       );
     }
 
-    const response = await api.post("customers/reset_password", { email });
+    const response = await wcAPI.post("customers/reset_password", { email });
 
     if (response.status === 200) {
       return new Response(
