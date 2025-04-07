@@ -2,11 +2,11 @@
 import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
 import { useState, useEffect, Fragment } from "react";
-import { FaPlus, FaMinus } from "react-icons/fa";
+import { FaPlus, FaMinus, FaEdit } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6"
 
 export default function Checkout({ products }) {
-    const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart();
+    const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart()
 
     const getItemInfo = item => {
         const itemInfo = products.filter(product => product.id === item.id)[0]
@@ -32,8 +32,6 @@ export default function Checkout({ products }) {
         return `$${dollars}.${cents.toString().padStart(2, '0')}`
     }
 
-    const [total, setTotal] = useState(calculateTotal)
-
     const changeQuantitySpans = [
         {
             icon: FaPlus,
@@ -49,8 +47,19 @@ export default function Checkout({ products }) {
         {
             icon: FaXmark,
             onClick: item => removeFromCart(item.id)
+        },
+        {
+            icon: FaEdit,
+            onClick: item => {
+                setEditID(item.id)
+                setNewQty(item.quantity.toString())
+            }
         }
     ]
+
+    const [total, setTotal] = useState(calculateTotal)
+    const [editID, setEditID] = useState(null)
+    const [newQty, setNewQty] = useState('')
 
     useEffect(() => setTotal(calculateTotal()), [cartItems])
 
@@ -78,11 +87,31 @@ export default function Checkout({ products }) {
                                 <p>{itemInfo.name}</p>
                                 <div className="grid grid-cols-2">
                                     <div className="flex items-center flex-wrap gap-1">
-                                        {item.quantity > 1 && (
-                                            <span className="text-zinc-300 mr-1 align-middle  whitespace-nowrap">
-                                                x {item.quantity}
-                                            </span>
-                                        )}
+                                        {editID == item.id ? (<input
+                                            className="w-12 text-xs p-2 pr-0"
+                                            type="number"
+                                            min="0"
+                                            value={newQty}
+                                            autoFocus
+                                            onChange={e => setNewQty(e.target.value)}
+                                            onBlur={() => {
+                                                const qty = parseInt(newQty)
+                                                if (!isNaN(qty)) {
+                                                    if (qty == 0) removeFromCart(item.id)
+                                                    else if (qty > 0) updateQuantity(item.id, qty)
+                                                }
+                                                setEditID(null)
+                                            }}
+                                            onKeyDown={e => {
+                                                if (e.key === "Enter") e.target.blur()
+                                            }}
+                                        />) : (<>
+                                            {item.quantity > 1 && (
+                                                <span className="text-zinc-300 mr-1 align-middle  whitespace-nowrap">
+                                                    x {item.quantity}
+                                                </span>
+                                            )}
+                                        </>)}
                                         {changeQuantitySpans.map((cqs, i) => (<Fragment key={i}>
                                             <span
                                                 className="cursor-pointer text-base"
