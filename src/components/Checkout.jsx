@@ -2,6 +2,8 @@
 import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
 import { useState, useEffect, Fragment } from "react";
+import { FaPlus, FaMinus } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6"
 
 export default function Checkout({ products }) {
     const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart();
@@ -32,6 +34,24 @@ export default function Checkout({ products }) {
 
     const [total, setTotal] = useState(calculateTotal)
 
+    const changeQuantitySpans = [
+        {
+            icon: FaPlus,
+            onClick: item => addToCart(item.id)
+        },
+        {
+            icon: FaMinus,
+            onClick: item => {
+                if (item.quantity == 1) removeFromCart(item.id)
+                else updateQuantity(item.id, item.quantity - 1)
+            }
+        },
+        {
+            icon: FaXmark,
+            onClick: item => removeFromCart(item.id)
+        }
+    ]
+
     useEffect(() => setTotal(calculateTotal()), [cartItems])
 
     return (<>
@@ -45,23 +65,6 @@ export default function Checkout({ products }) {
                     {cartItems.map(item => {
                         const [itemInfo, priceInCents] = getItemInfo(item)
                         const imageInfo = itemInfo.images[0]
-                        const changeQuantitySpans = [
-                            {
-                                sign: "+",
-                                onClick: () => addToCart(item.id)
-                            },
-                            {
-                                sign: "-",
-                                onClick: () => {
-                                    if (item.quantity == 1) removeFromCart(item.id)
-                                    else updateQuantity(item.id, item.quantity - 1)
-                                }
-                            },
-                            {
-                                sign: "X",
-                                onClick: () => removeFromCart(item.id)
-                            }
-                        ]
 
                         return (<li key={item.id} className="grid grid-cols-[100px_auto] gap-2 mb-2">
                             <Image
@@ -74,15 +77,21 @@ export default function Checkout({ products }) {
                             <div className="text-sm">
                                 <p>{itemInfo.name}</p>
                                 <div className="grid grid-cols-2">
-                                    <div>
-                                        {item.quantity > 1 && <span className="text-zinc-300 mr-3 align-middle">x {item.quantity}</span>}
+                                    <div className="flex items-center flex-wrap gap-1">
+                                        {item.quantity > 1 && (
+                                            <span className="text-zinc-300 mr-1 align-middle  whitespace-nowrap">
+                                                x {item.quantity}
+                                            </span>
+                                        )}
                                         {changeQuantitySpans.map((cqs, i) => (<Fragment key={i}>
-                                            {i !== 0 && <>&nbsp;&nbsp;</>}
                                             <span
-                                                className="text-neutral-600 font-bold cursor-pointer text-base align-middle"
-                                                onClick={cqs.onClick}
+                                                className="cursor-pointer text-base"
+                                                onClick={() => cqs.onClick(item)}
                                             >
-                                                {cqs.sign}
+                                                <cqs.icon
+                                                    className="fill-neutral-600 duration-300 hover:opacity-50"
+                                                    size={15}
+                                                />
                                             </span>
                                         </Fragment>))}
                                     </div>
