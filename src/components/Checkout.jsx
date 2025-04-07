@@ -8,27 +8,31 @@ export default function Checkout({ products }) {
 
     const getItemInfo = item => {
         const itemInfo = products.filter(product => product.id === item.id)[0]
-        const price = itemInfo.price * item.quantity
+        const priceInCents = itemInfo.price * 100 * item.quantity
 
-        return [itemInfo, price]
+        return [itemInfo, priceInCents]
     }
 
     const calculateTotal = () => {
         let initialTotal = 0
 
         cartItems.map(item => {
-            const price = getItemInfo(item)[1]
-            initialTotal += price
+            const priceInCents = getItemInfo(item)[1]
+            initialTotal += priceInCents
         })
 
         return initialTotal
     }
 
+    const formatPrice = priceInCents => {
+        const dollars = Math.floor(priceInCents / 100)
+        const cents = priceInCents % 100
+        return `$${dollars}.${cents.toString().padStart(2, '0')}`
+    }
+
     const [total, setTotal] = useState(calculateTotal)
 
-    useEffect(() => {
-        setTotal(calculateTotal())
-    }, [cartItems])
+    useEffect(() => setTotal(calculateTotal()), [cartItems])
 
     return (<>
         {cartItems?.length > 0 ? <div className="grid grid-cols-[60%_40%]">
@@ -39,7 +43,7 @@ export default function Checkout({ products }) {
                 <h2 className="font-bold text-xl mb-2">Order Summary</h2>
                 <ul>
                     {cartItems.map(item => {
-                        const [itemInfo, price] = getItemInfo(item)
+                        const [itemInfo, priceInCents] = getItemInfo(item)
                         const imageInfo = itemInfo.images[0]
                         const changeQuantitySpans = [
                             {
@@ -82,7 +86,7 @@ export default function Checkout({ products }) {
                                             </span>
                                         </Fragment>))}
                                     </div>
-                                    <p className="text-right text-green-600">${price}</p>
+                                    <p className="text-right text-green-600">{formatPrice(priceInCents)}</p>
                                 </div>
                             </div>
                         </li>)
@@ -91,7 +95,7 @@ export default function Checkout({ products }) {
                 <hr />
                 <div className="grid grid-cols-2 text-sm mt-2">
                     <p className="font-bold">Total</p>
-                    <p className="text-right">${total}</p>
+                    <p className="text-right">{formatPrice(total)}</p>
                 </div>
             </div>
         </div> : <p>Your cart is empty</p>}
