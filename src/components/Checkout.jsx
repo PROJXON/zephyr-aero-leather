@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect, Fragment } from "react";
 import { FaEdit } from "react-icons/fa"
 import getChangeQuantity from "../../lib/getChangeQuantity"
+import ChangeQuantitySpans from "./ChangeQuantitySpans";
 
 export default function Checkout({ products }) {
     const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart()
@@ -96,16 +97,7 @@ export default function Checkout({ products }) {
                                                 </span>
                                             )}
                                         </>)}
-                                        {changeQuantity.map((cq, i) => (<span
-                                            key={i}
-                                            className="cursor-pointer text-base"
-                                            onClick={() => cq.onClick(item)}
-                                        >
-                                            <cq.icon
-                                                className="fill-neutral-600 duration-300 hover:opacity-50"
-                                                size={15}
-                                            />
-                                        </span>))}
+                                        <ChangeQuantitySpans cqs={changeQuantity} item={item} />
                                     </div>
                                     <p className="text-right text-green-600">{formatPrice(priceInCents)}</p>
                                 </div>

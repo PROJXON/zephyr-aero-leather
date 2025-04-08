@@ -8,6 +8,7 @@ import ZephyrLogo from "../../public/zephyrlogo.jpg";
 import { useAuth } from "@/app/context/AuthContext";
 import NavButton from "./NavButton";
 import NavLoggedOutBtn from "./NavLoggedOutBtn";
+import ChangeQuantitySpans from "./ChangeQuantitySpans";
 import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity"
 
@@ -20,7 +21,7 @@ const Navbar = ({ initialUser, allProducts }) => {
   const { replace } = useRouter()
   const pathname = usePathname()
 
-  let changeQuantity = getChangeQuantity({ addToCart, removeFromCart, updateQuantity })
+  const changeQuantity = getChangeQuantity({ addToCart, removeFromCart, updateQuantity })
 
   useEffect(() => {
     if (!initialUser) {
@@ -119,16 +120,7 @@ const Navbar = ({ initialUser, allProducts }) => {
                             <div className="m-auto">
                               <div className="text-center">x {item.quantity}</div>
                               <div className="flex items-center flex-wrap gap-1">
-                                {changeQuantity.map((cq, i) => (<span
-                                  key={i}
-                                  className="cursor-pointer text-base"
-                                  onClick={() => cq.onClick(item)}
-                                >
-                                  <cq.icon
-                                    className="fill-neutral-600 duration-300 hover:opacity-50"
-                                    size={15}
-                                  />
-                                </span>))}
+                                <ChangeQuantitySpans cqs={changeQuantity} item={item} />
                               </div>
                             </div>
                           </li>)
