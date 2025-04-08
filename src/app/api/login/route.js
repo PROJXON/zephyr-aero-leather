@@ -58,16 +58,12 @@ export async function POST(req) {
       console.error("Error fetching WooCommerce customer data:", error);
     }
 
-    const userResponseData = customerData || {
-      email: jwtData.user_email,
-      username: jwtData.user_nicename,
-      name: jwtData.user_display_name,
-      first_name: jwtData.user_display_name.split(" ")[0] || jwtData.user_display_name,
-      id: jwtData.user_id,
-    };
+    if (!customerData) {
+      return NextResponse.json({ error: "Failed to fetch WooCommerce customer Data" }, { status: 500 });
+    }
 
     // ✅ Step 4: Create response with cookies
-    const res = new NextResponse(JSON.stringify({ success: true, user: userResponseData }), {
+    const res = new NextResponse(JSON.stringify({ success: true, user: customerData }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -79,7 +75,7 @@ export async function POST(req) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
-    res.cookies.set("userData", Buffer.from(JSON.stringify(userResponseData)).toString("base64"), {
+    res.cookies.set("userData", Buffer.from(JSON.stringify(customerData)).toString("base64"), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",

@@ -3,17 +3,24 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation"
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
 import { useAuth } from "@/app/context/AuthContext";
 import NavButton from "./NavButton";
 import NavLoggedOutBtn from "./NavLoggedOutBtn";
+import { useCart } from "@/app/context/CartContext";
+import getChangeQuantity from "../../lib/getChangeQuantity"
 
-const Navbar = ({ initialUser }) => {
+const Navbar = ({ initialUser, allProducts }) => {
   const { isAuthenticated, user, login, logout, fetchUserFromServer } = useAuth();
   const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const { cartItems, addToCart, removeFromCart, updateQuantity, setCartOpen, cartOpen } = useCart();
+  const { replace } = useRouter()
+  const pathname = usePathname()
+
+  let changeQuantity = getChangeQuantity({ addToCart, removeFromCart, updateQuantity })
 
   useEffect(() => {
     if (!initialUser) {
@@ -21,28 +28,32 @@ const Navbar = ({ initialUser }) => {
     }
   }, [initialUser]);
 
+  useEffect(() => {
+    setCartOpen(false)
+  }, [pathname])
+
   const handleLogout = async () => {
     await logout();
     setAccountOpen(false);
     setServerUser(null);
   };
 
-useEffect(() => {
-  const handleClickOutside = e => {
-    if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
-      setAccountOpen(false);
-    }
-    if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target)) {
-      setCartOpen(false);
-    }
-  };
+  useEffect(() => {
+    const handleClickOutside = e => {
+      if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
+        setAccountOpen(false);
+      }
+      if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target) && !e.target.classList.contains("addToCartBtn")) {
+        setCartOpen(false);
+      }
+    };
 
-  document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
-  return () => document.removeEventListener("mousedown", handleClickOutside);
-}, [accountOpen, cartOpen]);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [accountOpen, cartOpen]);
 
-const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"];
+  const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"];
 
   return (
     <nav className="bg-white antialiased">
@@ -97,7 +108,44 @@ const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"];
 
               {cartOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4">
-                  <p className="text-sm text-gray-900">Your cart is empty.</p>
+                  {cartItems?.length > 0 ? (
+                    <>
+                      <ul>
+                        {cartItems.map((item) => {
+                          const itemName = allProducts.filter(product => product.id === item.id)[0].name
+
+                          return (<li key={item.id} className="grid grid-cols-[1fr_auto] border-b py-2 gap-1">
+                            <span>{itemName}</span>
+                            <div className="m-auto">
+                              <div className="text-center">x {item.quantity}</div>
+                              <div className="flex items-center flex-wrap gap-1">
+                                {changeQuantity.map((cq, i) => (<span
+                                  key={i}
+                                  className="cursor-pointer text-base"
+                                  onClick={() => cq.onClick(item)}
+                                >
+                                  <cq.icon
+                                    className="fill-neutral-600 duration-300 hover:opacity-50"
+                                    size={15}
+                                  />
+                                </span>))}
+                              </div>
+                            </div>
+                          </li>)
+                        })}
+                      </ul>
+
+                      {/* Checkout Button */}
+                      <button
+                        className="w-full bg-blue-500 text-white mt-4 p-2 rounded"
+                        onClick={() => replace("checkout")}
+                      >
+                        Checkout
+                      </button>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-900">Your cart is empty.</p>
+                  )}
                 </div>
               )}
             </div>
