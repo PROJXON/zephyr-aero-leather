@@ -9,15 +9,18 @@ import { useAuth } from "@/app/context/AuthContext";
 import NavButton from "./NavButton";
 import NavLoggedOutBtn from "./NavLoggedOutBtn";
 import { useCart } from "@/app/context/CartContext";
+import getChangeQuantity from "../../lib/getChangeQuantity"
 
 const Navbar = ({ initialUser, allProducts }) => {
   const { isAuthenticated, user, login, logout, fetchUserFromServer } = useAuth();
   const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const { cartItems, removeFromCart, setCartOpen, cartOpen } = useCart();
+  const { cartItems, addToCart, removeFromCart, updateQuantity, setCartOpen, cartOpen } = useCart();
   const { replace } = useRouter()
   const pathname = usePathname()
+
+  let changeQuantity = getChangeQuantity({ addToCart, removeFromCart, updateQuantity })
 
   useEffect(() => {
     if (!initialUser) {
@@ -111,14 +114,23 @@ const Navbar = ({ initialUser, allProducts }) => {
                         {cartItems.map((item) => {
                           const itemName = allProducts.filter(product => product.id === item.id)[0].name
 
-                          return (<li key={item.id} className="flex justify-between border-b py-2">
-                            <span>{itemName} x {item.quantity}</span>
-                            <button
-                              onClick={() => removeFromCart(item.id)}
-                              className="text-red-500 text-xs"
-                            >
-                              Remove
-                            </button>
+                          return (<li key={item.id} className="grid grid-cols-[1fr_auto] border-b py-2 gap-1">
+                            <span>{itemName}</span>
+                            <div className="m-auto">
+                              <div className="text-center">x {item.quantity}</div>
+                              <div className="flex items-center flex-wrap gap-1">
+                                {changeQuantity.map((cq, i) => (<span
+                                  key={i}
+                                  className="cursor-pointer text-base"
+                                  onClick={() => cq.onClick(item)}
+                                >
+                                  <cq.icon
+                                    className="fill-neutral-600 duration-300 hover:opacity-50"
+                                    size={15}
+                                  />
+                                </span>))}
+                              </div>
+                            </div>
                           </li>)
                         })}
                       </ul>

@@ -2,8 +2,8 @@
 import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
 import { useState, useEffect, Fragment } from "react";
-import { FaPlus, FaMinus, FaEdit } from "react-icons/fa";
-import { FaXmark } from "react-icons/fa6"
+import { FaEdit } from "react-icons/fa"
+import getChangeQuantity from "../../lib/getChangeQuantity"
 
 export default function Checkout({ products }) {
     const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart()
@@ -32,30 +32,14 @@ export default function Checkout({ products }) {
         return `$${dollars}.${cents.toString().padStart(2, '0')}`
     }
 
-    const changeQuantitySpans = [
-        {
-            icon: FaPlus,
-            onClick: item => addToCart(item.id)
-        },
-        {
-            icon: FaMinus,
-            onClick: item => {
-                if (item.quantity == 1) removeFromCart(item.id)
-                else updateQuantity(item.id, item.quantity - 1)
-            }
-        },
-        {
-            icon: FaXmark,
-            onClick: item => removeFromCart(item.id)
-        },
-        {
-            icon: FaEdit,
-            onClick: item => {
-                setEditID(item.id)
-                setNewQty(item.quantity.toString())
-            }
+    let changeQuantity = getChangeQuantity({ addToCart, removeFromCart, updateQuantity })
+    changeQuantity.push({
+        icon: FaEdit,
+        onClick: item => {
+            setEditID(item.id)
+            setNewQty(item.quantity.toString())
         }
-    ]
+    })
 
     const [total, setTotal] = useState(calculateTotal)
     const [editID, setEditID] = useState(null)
@@ -87,7 +71,7 @@ export default function Checkout({ products }) {
                                 <p>{itemInfo.name}</p>
                                 <div className="grid grid-cols-2">
                                     <div className="flex items-center flex-wrap gap-1">
-                                        {editID == item.id ? (<input
+                                        {editID === item.id ? (<input
                                             className="w-12 text-xs p-2 pr-0"
                                             type="number"
                                             min="0"
@@ -107,22 +91,21 @@ export default function Checkout({ products }) {
                                             }}
                                         />) : (<>
                                             {item.quantity > 1 && (
-                                                <span className="text-zinc-300 mr-1 align-middle  whitespace-nowrap">
+                                                <span className="text-zinc-300 mr-1 align-middle whitespace-nowrap">
                                                     x {item.quantity}
                                                 </span>
                                             )}
                                         </>)}
-                                        {changeQuantitySpans.map((cqs, i) => (<Fragment key={i}>
-                                            <span
-                                                className="cursor-pointer text-base"
-                                                onClick={() => cqs.onClick(item)}
-                                            >
-                                                <cqs.icon
-                                                    className="fill-neutral-600 duration-300 hover:opacity-50"
-                                                    size={15}
-                                                />
-                                            </span>
-                                        </Fragment>))}
+                                        {changeQuantity.map((cq, i) => (<span
+                                            key={i}
+                                            className="cursor-pointer text-base"
+                                            onClick={() => cq.onClick(item)}
+                                        >
+                                            <cq.icon
+                                                className="fill-neutral-600 duration-300 hover:opacity-50"
+                                                size={15}
+                                            />
+                                        </span>))}
                                     </div>
                                     <p className="text-right text-green-600">{formatPrice(priceInCents)}</p>
                                 </div>
