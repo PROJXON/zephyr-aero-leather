@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { FaFacebook, FaLinkedin, FaInstagram } from "react-icons/fa"; // Social Icons
-import ZephyrLogo from "../../public/zephyrlogo.jpg"; // ✅ Import Logo
+import { FaFacebook, FaLinkedin, FaInstagram } from "react-icons/fa";
+import ZephyrLogo from "../../public/zephyrlogo.jpg";
 
 const Footer = () => {
   return (
@@ -16,8 +16,8 @@ const Footer = () => {
               <Image 
                 src={ZephyrLogo} 
                 alt="Zephyr Logo" 
-                width={150} // ✅ Adjust width
-                height={75} // ✅ Adjust height
+                width={150}
+                height={75}
                 className="mx-auto md:mx-0"
               />
             </Link>
@@ -44,13 +44,13 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">Follow Us</h3>
             <div className="flex justify-center md:justify-start space-x-6">
-              <Link href="#" className="text-gray-400 hover:text-gray-200 transition">
+              <Link href="https://www.facebook.com/ZephyrAeroLeather/" className="text-gray-400 hover:text-gray-200 transition">
                 <FaFacebook size={26} />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-gray-200 transition"> {/* ✅ Changed Twitter to LinkedIn */}
+              <Link href="#" className="text-gray-400 hover:text-gray-200 transition">
                 <FaLinkedin size={26} />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-gray-200 transition">
+              <Link href="https://www.instagram.com/zephyr.aero.leather/" className="text-gray-400 hover:text-gray-200 transition">
                 <FaInstagram size={26} />
               </Link>
             </div>

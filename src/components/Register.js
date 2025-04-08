@@ -128,12 +128,11 @@ const Register = () => {
 
   return(
     // <section className="bg-gray-50 dark:bg-gray-900">
-    <section className="flex items-center justify-center min-h-screen bg-cover bg-center" style={{backgroundImage: `url(${backgroundImageUrl})`}}>
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-20">
-        <div className="relative w-[800px] max-w-full min-h-[500px] bg-white shadow-lg rounded-xl flex overflow-hidden">
+    <section className="flex items-center justify-center min-h-screen bg-cover bg-center px-4" style={{backgroundImage: `url(${backgroundImageUrl})`}}>
+        <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
 
           {/* Left: Already Have an Account? */}
-          <div className="w-1/2 flex flex-col justify-center items-center p-8 bg-[#605137] text-white rounded-l-xl">
+          <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-[#605137] text-white rounded-r-xl">
             <h2 className="text-3xl font-bold">Welcome Back!</h2>
             <p className="text-center mt-2">Already have an account? Sign in now.</p>
             
@@ -147,7 +146,7 @@ const Register = () => {
 
 
             {/* Right: Register Form */}
-              <div className="w-1/2 flex flex-col justify-center items-center p-10 bg-white bg-opacity-90 rounded-r-xl">
+              <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white bg-opacity-90 rounded-b-xl md:rounded-r-xl md:rounded-bl-none">
                   <h1 className="text-3xl font-bold text-gray-900 mb-4 mt-2">
                       Create an account
                   </h1>
@@ -255,7 +254,6 @@ const Register = () => {
                   </form>
               </div>
         </div>
-      </div>
     </section>
   )
 }
