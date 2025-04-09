@@ -1,4 +1,5 @@
 const nextConfig = {
+  output: "standalone",
   images: {
     domains: [
       new URL(process.env.WOOCOMMERCE_API_URL).hostname,

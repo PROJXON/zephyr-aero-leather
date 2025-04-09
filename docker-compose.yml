@@ -1,0 +1,16 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev # or production
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules # prevents host node_modules from overwriting container's
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    env_file:
+      - .env.local
