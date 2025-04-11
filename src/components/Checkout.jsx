@@ -1,10 +1,13 @@
 "use client"
 import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa"
 import getChangeQuantity from "../../lib/getChangeQuantity"
-import ChangeQuantitySpans from "./ChangeQuantitySpans";
+import ChangeQuantitySpans from "./ChangeQuantitySpans"
+import StripeForm from "./StripeForm"
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 
 export default function Checkout({ products }) {
     const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart()
@@ -48,11 +51,30 @@ export default function Checkout({ products }) {
 
     useEffect(() => setTotal(calculateTotal()), [cartItems])
 
+    const [clientSecret, setClientSecret] = useState('');
+
+    useEffect(() => {
+        if (total > 50) {
+            console.log(total)
+            fetch('/api/payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: total })
+            }).then(res => res.json())
+                .then(data => setClientSecret(data.clientSecret))
+        }
+    }, [total])
+
+    const appearance = { theme: 'stripe' };
+    const options = { clientSecret, appearance }
+
+    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+
     return (<>
-        {cartItems?.length > 0 ? <div className="grid grid-cols-[60%_40%]">
-            <form>
-                Form elements go here
-            </form>
+        {cartItems?.length > 0 ? <div className="grid grid-cols-[60%_40%] gap-2">
+            {clientSecret && (<Elements stripe={stripePromise} options={options}>
+                <StripeForm />
+            </Elements>)}
             <div>
                 <h2 className="font-bold text-xl mb-2">Order Summary</h2>
                 <ul>
