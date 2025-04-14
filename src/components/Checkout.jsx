@@ -55,7 +55,6 @@ export default function Checkout({ products }) {
 
     useEffect(() => {
         if (total > 50) {
-            console.log(total)
             fetch('/api/payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
