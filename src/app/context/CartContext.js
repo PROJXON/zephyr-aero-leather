@@ -41,7 +41,13 @@ export const CartProvider = ({ children }) => {
       if (!response.ok) throw new Error("Failed to fetch cart");
 
       const data = await response.json();
-      setCartItems(data.items || []);
+      setCartItems(
+        (data.items || []).map((item) => ({
+          lineItemId: item.id,
+          id: item.product_id,
+          quantity: item.quantity,
+        }))
+      );
       setOrderId(data.orderId || null);
     } catch (error) {
       console.error("Error fetching cart:", error.message);

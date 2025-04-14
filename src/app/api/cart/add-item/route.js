@@ -13,12 +13,43 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!orderId) {
-      return NextResponse.json({ error: "No pending order found" }, { status: 400 });
+    let finalOrderId = orderId;
+
+    // 🧠 If no order exists, create one first
+    if (!finalOrderId) {
+      // Get the current user info
+      const userRes = await fetch(`${process.env.WOOCOMMERCE_API_URL}/wp-json/wp/v2/users/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!userRes.ok) throw new Error("Failed to fetch user info");
+      const userData = await userRes.json();
+
+      // Create a new pending order
+      const createRes = await fetch(`${API_BASE_URL}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${Buffer.from(
+            `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
+          ).toString("base64")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customer_id: userData.id,
+          status: "pending",
+          line_items: [{ product_id: productId, quantity }],
+        }),
+      });
+
+      if (!createRes.ok) throw new Error("Failed to create order");
+      const newOrder = await createRes.json();
+      return NextResponse.json({ success: true, cart: newOrder, orderId: newOrder.id });
     }
 
     // Fetch the current pending order
-    const orderResponse = await fetch(`${API_BASE_URL}/${orderId}`, {
+    const orderResponse = await fetch(`${API_BASE_URL}/${finalOrderId}`, {
       headers: {
         Authorization: `Basic ${Buffer.from(
           `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
@@ -40,8 +71,17 @@ export async function POST(req) {
       existingItems.push({ product_id: productId, quantity }); // Add new item
     }
 
+    console.log("Adding to existing order:", finalOrderId);
+    console.log("Existing line items:", existingItems);
+
+    const updatedItems = existingItems.map((item) => ({
+      id: item.id,
+      product_id: item.product_id,
+      quantity: item.quantity,
+    }));
+
     // Update order with merged line items
-    const updateResponse = await fetch(`${API_BASE_URL}/${orderId}`, {
+    const updateResponse = await fetch(`${API_BASE_URL}/${finalOrderId}`, {
       method: "PUT",
       headers: {
         Authorization: `Basic ${Buffer.from(
@@ -49,10 +89,14 @@ export async function POST(req) {
         ).toString("base64")}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ line_items: existingItems }),
+      body: JSON.stringify({ line_items: updatedItems }),
     });
 
-    if (!updateResponse.ok) throw new Error("Failed to add item to cart");
+    if (!updateResponse.ok) {
+      const errorText = await updateResponse.text();
+      console.error("WooCommerce response error:", errorText);
+      throw new Error("Failed to add item to cart");
+    }    
 
     const updatedCart = await updateResponse.json();
     return NextResponse.json({ success: true, cart: updatedCart });

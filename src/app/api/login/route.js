@@ -15,11 +15,25 @@ export async function POST(req) {
       body: JSON.stringify({ username: email, password }),
     });
 
+    const rawJwtResponse = await jwtRes.text(); // get raw text
+    console.log("JWT raw response:", rawJwtResponse); // log it
+
     if (!jwtRes.ok) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
-    const jwtData = await jwtRes.json();
+    let jwtData;
+    try {
+      jwtData = JSON.parse(rawJwtResponse);
+    } catch (err) {
+      if (rawJwtResponse.includes('<!DOCTYPE html>')) {
+        console.error("Received HTML instead of JSON – likely Jetpack login screen.");
+      } else {
+        console.error("Failed to parse JWT response as JSON:", err);
+      }
+      return NextResponse.json({ error: "Unexpected response from auth server" }, { status: 500 });
+    }
+
     const token = jwtData.token;
 
     if (!token) {
