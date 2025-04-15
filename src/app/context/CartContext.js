@@ -20,6 +20,7 @@ export const CartProvider = ({ children }) => {
   const [orderId, setOrderId] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
 
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchUserCart();
@@ -180,9 +181,9 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    syncGuestCartToWooCommerce();
-  }, [isAuthenticated, orderId]);
+  // useEffect(() => {
+  //   syncGuestCartToWooCommerce();
+  // }, [isAuthenticated, orderId]);
 
   return (
     <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, setCartOpen, cartOpen }}>
