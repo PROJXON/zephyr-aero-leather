@@ -61,26 +61,20 @@ export async function POST(req) {
 
     const orderData = await orderResponse.json();
 
-    // Merge existing line items with new item
-    const existingItems = orderData.line_items || [];
-    const itemIndex = existingItems.findIndex((item) => item.product_id === productId);
-
-    if (itemIndex > -1) {
-      existingItems[itemIndex].quantity += quantity; // Increase quantity if item exists
-    } else {
-      existingItems.push({ product_id: productId, quantity }); // Add new item
-    }
+    // ✅ Find existing Woo line item (if it exists)
+    const existingItem = orderData.line_items.find((item) => item.product_id === productId);
 
     console.log("Adding to existing order:", finalOrderId);
-    console.log("Existing line items:", existingItems);
+    console.log("Client-sent quantity:", quantity);
 
-    const updatedItems = existingItems.map((item) => ({
-      id: item.id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-    }));
+    const finalQuantity = (existingItem?.quantity || 0) + quantity;
 
-    // Update order with merged line items
+    const updatedLineItem = {
+      id: existingItem?.id,
+      product_id: productId,
+      quantity: finalQuantity,
+    };
+
     const updateResponse = await fetch(`${API_BASE_URL}/${finalOrderId}`, {
       method: "PUT",
       headers: {
@@ -89,8 +83,9 @@ export async function POST(req) {
         ).toString("base64")}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ line_items: updatedItems }),
+      body: JSON.stringify({ line_items: [updatedLineItem] }),
     });
+
 
     if (!updateResponse.ok) {
       const errorText = await updateResponse.text();

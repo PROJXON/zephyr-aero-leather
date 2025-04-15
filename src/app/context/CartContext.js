@@ -11,11 +11,15 @@ export const CartContext = createContext({
   updateQuantity: () => { },
 });
 
+const pendingAdds = {}; // { [productId]: quantity }
+const addTimers = {};   // { [productId]: timeout }
+
 export const CartProvider = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [orderId, setOrderId] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
+
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -58,19 +62,51 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (productId, quantity = 1) => {
     if (isAuthenticated) {
-      try {
-        const response = await fetch("/api/cart/add-item", {
+      setCartItems((prevItems) => {
+        const updated = [...prevItems];
+        const index = updated.findIndex((item) => item.id === productId);
+  
+        if (index > -1) {
+          updated[index] = {
+            ...updated[index],
+            quantity: updated[index].quantity + quantity,
+          };
+        } else {
+          updated.push({ id: productId, quantity });
+        }
+  
+        return updated;
+      });
+  
+      // Accumulate quantity in memory
+      if (!pendingAdds[productId]) pendingAdds[productId] = 0;
+      pendingAdds[productId] += quantity;
+  
+      // Reset timer if one is already running
+      clearTimeout(addTimers[productId]);
+  
+      // Set new timer
+      addTimers[productId] = setTimeout(() => {
+        const batchedQuantity = pendingAdds[productId];
+        delete pendingAdds[productId];
+  
+        fetch("/api/cart/add-item", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, productId, quantity }),
-        });
+          body: JSON.stringify({ orderId, productId, quantity: batchedQuantity }),
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error("Failed to add item to cart");
+            return res.json();
+          })
+          .then(() => {
+            fetchUserCart();
+          })
+          .catch((err) => {
+            console.error("Error syncing cart with Woo:", err.message);
+          });
+      }, 300); 
 
-        if (!response.ok) throw new Error("Failed to add item to cart");
-
-        await fetchUserCart();
-      } catch (error) {
-        console.error("Error adding to cart: ", error.message);
-      }
     } else {
       const updatedCart = [...cartItems];
       const itemIndex = updatedCart.findIndex((item) => item.id === productId);
@@ -144,9 +180,9 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    syncGuestCartToWooCommerce();
-  }, [isAuthenticated, orderId]);
+  // useEffect(() => {
+  //   syncGuestCartToWooCommerce();
+  // }, [isAuthenticated, orderId]);
 
   return (
     <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, setCartOpen, cartOpen }}>
