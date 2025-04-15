@@ -59,7 +59,7 @@ export const CartProvider = ({ children }) => {
   const addToCart = async (productId, quantity = 1) => {
     if (isAuthenticated) {
       try {
-        const response = await fetch("/api/cart/add-item", {
+        const response = await fetch("/api/cart/item", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId, productId, quantity }),
@@ -91,8 +91,8 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (productId) => {
     if (isAuthenticated) {
       try {
-        const response = await fetch("/api/cart/remove-item", {
-          method: "POST",
+        const response = await fetch("/api/cart/item", {
+          method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId, productId }),
         });
@@ -114,11 +114,13 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = async (productId, quantity) => {
     if (isAuthenticated) {
       try {
-        const response = await fetch("/api/cart/update-item", {
-          method: "POST",
+        const response = await fetch("/api/cart/item", {
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId, productId, quantity }),
         });
+
+        console.log(response)
 
         if (!response.ok) throw new Error("Failed to update cart quantity");
 
