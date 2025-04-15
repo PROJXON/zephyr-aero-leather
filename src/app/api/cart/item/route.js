@@ -61,36 +61,30 @@ export async function POST(req) {
 
         const orderData = await orderResponse.json()
 
-        // Merge existing line items with new item
-        const existingItems = orderData.line_items || []
-        const itemIndex = existingItems.findIndex((item) => item.product_id === productId)
+        // ✅ Find existing Woo line item (if it exists)
+        const existingItem = orderData.line_items.find((item) => item.product_id === productId);
 
-        if (itemIndex > -1) {
-            existingItems[itemIndex].quantity += quantity // Increase quantity if item exists
-        } else {
-            existingItems.push({ product_id: productId, quantity }) // Add new item
-        }
+        console.log("Adding to existing order:", finalOrderId);
+        console.log("Client-sent quantity:", quantity);
 
-        console.log("Adding to existing order:", finalOrderId)
-        console.log("Existing line items:", existingItems)
+        const finalQuantity = (existingItem?.quantity || 0) + quantity;
 
-        const updatedItems = existingItems.map((item) => ({
-            id: item.id,
-            product_id: item.product_id,
-            quantity: item.quantity,
-        }))
+        const updatedLineItem = {
+        id: existingItem?.id,
+        product_id: productId,
+        quantity: finalQuantity,
+        };
 
-        // Update order with merged line items
         const updateResponse = await fetch(`${API_BASE_URL}/${finalOrderId}`, {
-            method: "PUT",
-            headers: {
-                Authorization: `Basic ${Buffer.from(
-                    `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-                ).toString("base64")}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ line_items: updatedItems }),
-        })
+        method: "PUT",
+        headers: {
+            Authorization: `Basic ${Buffer.from(
+            `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
+            ).toString("base64")}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ line_items: [updatedLineItem] }),
+        });
 
         if (!updateResponse.ok) {
             const errorText = await updateResponse.text()
