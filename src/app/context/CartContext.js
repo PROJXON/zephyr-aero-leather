@@ -90,7 +90,7 @@ export const CartProvider = ({ children }) => {
         const batchedQuantity = pendingAdds[productId];
         delete pendingAdds[productId];
   
-        fetch("/api/cart/add-item", {
+        fetch("/api/cart/item", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId, productId, quantity: batchedQuantity }),
@@ -105,8 +105,7 @@ export const CartProvider = ({ children }) => {
           .catch((err) => {
             console.error("Error syncing cart with Woo:", err.message);
           });
-      }, 300); 
-
+      }, 300);
     } else {
       const updatedCart = [...cartItems];
       const itemIndex = updatedCart.findIndex((item) => item.id === productId);
@@ -127,8 +126,8 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (productId) => {
     if (isAuthenticated) {
       try {
-        const response = await fetch("/api/cart/remove-item", {
-          method: "POST",
+        const response = await fetch("/api/cart/item", {
+          method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId, productId }),
         });
@@ -150,11 +149,13 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = async (productId, quantity) => {
     if (isAuthenticated) {
       try {
-        const response = await fetch("/api/cart/update-item", {
-          method: "POST",
+        const response = await fetch("/api/cart/item", {
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId, productId, quantity }),
         });
+
+        console.log(response)
 
         if (!response.ok) throw new Error("Failed to update cart quantity");
 
