@@ -115,7 +115,7 @@ const Navbar = ({ initialUser, allProducts }) => {
                         {cartItems.map((item) => {
                           const itemName = allProducts.filter(product => product.id === item.id)[0].name
 
-                          return (<li key={item.id} className="grid grid-cols-[1fr_auto] border-b py-2 gap-1">
+                          return (<li key={item.lineItemId} className="grid grid-cols-[1fr_auto] border-b py-2 gap-1">
                             <span>{itemName}</span>
                             <div className="m-auto">
                               <div className="text-center">x {item.quantity}</div>
