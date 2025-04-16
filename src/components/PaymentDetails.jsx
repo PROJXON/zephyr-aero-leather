@@ -1,30 +1,30 @@
 "use client"
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import CartItems from "./CartItems"
+import calculateTotal from "../../lib/calculateTotal"
 
-export default function PaymentDetails() {
+export default function PaymentDetails({ products }) {
     const searchParams = useSearchParams()
     const payment_intent = searchParams.get('payment_intent')
     const [paymentDetails, setPaymentDetails] = useState(null)
+    const [total, setTotal] = useState(0)
 
     useEffect(() => {
         if (payment_intent) {
             fetch(`/api/payment?payment_intent=${payment_intent}`)
                 .then(res => res.json())
-                .then(data => setPaymentDetails(data))
+                .then(data => {
+                    setPaymentDetails(data)
+                    setTotal(calculateTotal(data.items, products))
+                })
                 .catch(err => console.error(err))
         }
     }, [payment_intent])
 
     return (<>
         {paymentDetails ? (<>
-            <h2>Order Summary:</h2>
-            <ul>
-                {paymentDetails.items.map((item, index) => (
-                    <li key={index}>{item.name} – ${item.price / 100}</li>
-                ))}
-            </ul>
-            <p><strong>Total:</strong> ${paymentDetails.amount_total / 100}</p>
+            <CartItems cartItems={paymentDetails.items} products={products} total={total} />
         </>) : <p>Loading your payment details...</p>}
     </>)
 }
