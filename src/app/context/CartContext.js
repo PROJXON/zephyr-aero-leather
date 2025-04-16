@@ -164,7 +164,6 @@ export const CartProvider = ({ children }) => {
 
   const updateQuantity = (productId, newQuantity) => {
     if (isAuthenticated) {
-      // Optimistically update UI
       setCartItems((prevItems) => {
         const updated = [...prevItems];
         const index = updated.findIndex((item) => item.id === productId);
@@ -182,7 +181,6 @@ export const CartProvider = ({ children }) => {
         return updated;
       });
 
-      // Debounced server sync
       pendingUpdates.current[productId] = newQuantity;
       clearTimeout(updateTimers.current[productId]);
 
@@ -190,45 +188,48 @@ export const CartProvider = ({ children }) => {
         const finalQuantity = pendingUpdates.current[productId];
         delete pendingUpdates.current[productId];
 
-        const existingItem = cartItems.find((item) => item.id === productId);
+        fetch("/api/cart")
+          .then((res) => res.json())
+          .then(({ orderId: freshOrderId, items }) => {
+            const existingItem = items.find((item) => item.product_id === productId);
 
-        let method, body;
+            if (!existingItem && finalQuantity > 0) {
+              // 🆕 It's a new item — use POST
+              return fetch("/api/cart/item", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderId: freshOrderId, productId, quantity: finalQuantity }),
+              });
+            }
 
-        if (finalQuantity === 0) {
-          method = "DELETE";
-          body = JSON.stringify({ orderId, productId });
-        } else if (existingItem?.lineItemId) {
-          // 🧼 Clean up ALL cart items before sending to Woo
-          const fullLineItems = cartItems
-            .filter((item) => item.lineItemId)
-            .map((item) => ({
-              id: item.lineItemId,
-              quantity: item.id === productId ? finalQuantity : item.quantity,
-            }));
+            // 🧼 Otherwise build full sanitized line_items
+            const line_items = items.map((item) => {
+              return {
+                id: item.id,
+                quantity: item.product_id === productId ? finalQuantity : item.quantity,
+              };
+            });
 
-          method = "PUT";
-          body = JSON.stringify({ orderId, line_items: fullLineItems });
-        } else {
-          method = "POST";
-          body = JSON.stringify({ orderId, productId, quantity: finalQuantity });
-        }
+            // If removing, and it’s not in Woo yet, nothing to do
+            if (!existingItem && finalQuantity === 0) return;
 
-        fetch("/api/cart/item", {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body,
-        })
+            return fetch("/api/cart/item", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderId: freshOrderId, line_items }),
+            });
+          })
           .then((res) => {
-            if (!res.ok) throw new Error("Failed to sync cart");
-            return res.json();
+            if (res && !res.ok) throw new Error("Failed to update cart");
+            return res?.json?.();
           })
           .then(() => fetchUserCart())
           .catch((err) => {
-            console.error("Error updating cart:", err.message);
+            console.error("Error syncing cart:", err.message);
           });
       }, 300);
     } else {
-      // Guest logic
+      // guest logic unchanged
       const updatedCart = [...cartItems];
       const index = updatedCart.findIndex((item) => item.id === productId);
 
@@ -245,7 +246,6 @@ export const CartProvider = ({ children }) => {
       saveGuestCart(updatedCart);
     }
   };
-
 
 
   const syncGuestCartToWooCommerce = async () => {

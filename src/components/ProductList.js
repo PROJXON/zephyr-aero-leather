@@ -6,9 +6,9 @@ export default function ProductList({ products }) {
   const { updateQuantity, addToCart, cartItems, cartOpen, setCartOpen } = useCart();
 
   const handleAddToCart = (productId) => {
-    // const currentQty = cartItems.find(item => item.id === productId)?.quantity || 0;
-    // updateQuantity(productId, currentQty + 1);
-    addToCart(productId);
+    const currentQty = cartItems.find(item => item.id === productId)?.quantity || 0;
+    updateQuantity(productId, currentQty + 1);
+    // addToCart(productId);
     
     if (!cartOpen) {
       console.log('Cart is closed, opening now.');
