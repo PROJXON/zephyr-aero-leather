@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 
 export const CartContext = createContext({
@@ -11,8 +11,7 @@ export const CartContext = createContext({
   updateQuantity: () => { },
 });
 
-const pendingAdds = {}; // { [productId]: quantity }
-const addTimers = {};   // { [productId]: timeout }
+
 
 export const CartProvider = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
@@ -20,6 +19,8 @@ export const CartProvider = ({ children }) => {
   const [orderId, setOrderId] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
 
+  const pendingUpdates = useRef({}); 
+  const updateTimers = useRef({}); 
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -79,16 +80,17 @@ export const CartProvider = ({ children }) => {
       });
   
       // Accumulate quantity in memory
-      if (!pendingAdds[productId]) pendingAdds[productId] = 0;
-      pendingAdds[productId] += quantity;
+      if (!pendingUpdates.current[productId]) pendingUpdates.current[productId] = 0;
+      pendingUpdates.current[productId] += quantity;
+
   
       // Reset timer if one is already running
-      clearTimeout(addTimers[productId]);
+      clearTimeout(updateTimers.current[productId]);
   
       // Set new timer
-      addTimers[productId] = setTimeout(() => {
-        const batchedQuantity = pendingAdds[productId];
-        delete pendingAdds[productId];
+      updateTimers.current[productId] = setTimeout(() => {
+        const batchedQuantity = pendingUpdates.current[productId];
+        delete pendingUpdates.current[productId];
   
         fetch("/api/cart/item", {
           method: "POST",
@@ -125,51 +127,126 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = async (productId) => {
     if (isAuthenticated) {
-      try {
-        const response = await fetch("/api/cart/item", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, productId }),
+       // 1. Optimistically update UI
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+
+    // 2. Mark this product for removal
+    pendingRemovals[productId] = true;
+
+    // 3. Clear any existing timer
+    clearTimeout(removeTimers[productId]);
+
+    // 4. Set new timer to debounce removal
+    removeTimers[productId] = setTimeout(() => {
+      delete pendingRemovals[productId];
+
+      fetch("/api/cart/item", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, productId }),
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to remove item from cart");
+          return res.json();
+        })
+        .then(() => {
+          fetchUserCart(); // Sync final cart state
+        })
+        .catch((err) => {
+          console.error("Error syncing cart removal with Woo:", err.message);
         });
+    }, 300); // Same delay as addToCart
+  } else {
+    const updatedCart = cartItems.filter((item) => item.id !== productId);
+    saveGuestCart(updatedCart);
+  }
+};
 
-        if (!response.ok) throw new Error("Failed to remove item from cart");
-
-        setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
-        await fetchUserCart();
-      } catch (error) {
-        console.error("Error removing from cart:", error.message);
-      }
-    } else {
-      const updatedCart = cartItems.filter((item) => item.id !== productId);
-      saveGuestCart(updatedCart);
-    }
-  };
-
-
-  const updateQuantity = async (productId, quantity) => {
+  const updateQuantity = (productId, newQuantity) => {
     if (isAuthenticated) {
-      try {
-        const response = await fetch("/api/cart/item", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, productId, quantity }),
-        });
+      setCartItems((prevItems) => {
+        const updated = [...prevItems];
+        const index = updated.findIndex((item) => item.id === productId);
 
-        console.log(response)
+        if (index > -1) {
+          if (newQuantity > 0) {
+            updated[index] = { ...updated[index], quantity: newQuantity };
+          } else {
+            updated.splice(index, 1);
+          }
+        } else if (newQuantity > 0) {
+          updated.push({ id: productId, quantity: newQuantity });
+        }
 
-        if (!response.ok) throw new Error("Failed to update cart quantity");
+        return updated;
+      });
 
-        await fetchUserCart();
-      } catch (error) {
-        console.error("Error updating cart:", error.message);
-      }
+      pendingUpdates.current[productId] = newQuantity;
+      clearTimeout(updateTimers.current[productId]);
+
+      updateTimers.current[productId] = setTimeout(() => {
+        const finalQuantity = pendingUpdates.current[productId];
+        delete pendingUpdates.current[productId];
+
+        fetch("/api/cart")
+          .then((res) => res.json())
+          .then(({ orderId: freshOrderId, items }) => {
+            const existingItem = items.find((item) => item.product_id === productId);
+
+            if (!existingItem && finalQuantity > 0) {
+              // 🆕 It's a new item — use POST
+              return fetch("/api/cart/item", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderId: freshOrderId, productId, quantity: finalQuantity }),
+              });
+            }
+
+            // 🧼 Otherwise build full sanitized line_items
+            const line_items = items.map((item) => {
+              return {
+                id: item.id,
+                quantity: item.product_id === productId ? finalQuantity : item.quantity,
+              };
+            });
+
+            // If removing, and it’s not in Woo yet, nothing to do
+            if (!existingItem && finalQuantity === 0) return;
+
+            return fetch("/api/cart/item", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderId: freshOrderId, line_items }),
+            });
+          })
+          .then((res) => {
+            if (res && !res.ok) throw new Error("Failed to update cart");
+            return res?.json?.();
+          })
+          .then(() => fetchUserCart())
+          .catch((err) => {
+            console.error("Error syncing cart:", err.message);
+          });
+      }, 300);
     } else {
-      const updatedCart = cartItems.map((item) =>
-        item.id === productId ? { ...item, quantity } : item
-      );
+      // guest logic unchanged
+      const updatedCart = [...cartItems];
+      const index = updatedCart.findIndex((item) => item.id === productId);
+
+      if (index > -1) {
+        if (newQuantity > 0) {
+          updatedCart[index].quantity = newQuantity;
+        } else {
+          updatedCart.splice(index, 1);
+        }
+      } else if (newQuantity > 0) {
+        updatedCart.push({ id: productId, quantity: newQuantity });
+      }
+
       saveGuestCart(updatedCart);
     }
   };
+
 
   const syncGuestCartToWooCommerce = async () => {
     if (isAuthenticated && orderId) {
@@ -186,7 +263,7 @@ export const CartProvider = ({ children }) => {
   // }, [isAuthenticated, orderId]);
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, setCartOpen, cartOpen }}>
+    <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, setCartOpen, cartOpen }}>
       {children}
     </CartContext.Provider>
   );

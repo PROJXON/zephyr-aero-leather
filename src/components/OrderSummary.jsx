@@ -7,7 +7,6 @@ export default function OrderSummary({
     products,
     total,
     editable = false,
-    removeFromCart,
     updateQuantity,
     editID,
     setEditID,
@@ -50,7 +49,7 @@ export default function OrderSummary({
                                     onBlur={() => {
                                         const qty = parseInt(newQty)
                                         if (!isNaN(qty)) {
-                                            if (qty == 0) removeFromCart(item.id)
+                                            if (qty == 0) updateQuantity(item.id, 0)
                                             else if (qty > 0) updateQuantity(item.id, qty)
                                         }
                                         setEditID(null)

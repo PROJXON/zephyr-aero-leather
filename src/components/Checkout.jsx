@@ -1,6 +1,6 @@
 "use client"
 import { useCart } from "@/app/context/CartContext"
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 import { FaEdit } from "react-icons/fa"
 import getChangeQuantity from "../../lib/getChangeQuantity"
 import calculateTotal from "../../lib/calculateTotal"
@@ -10,16 +10,16 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 
 export default function Checkout({ products }) {
-    const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart()
+    const { cartItems, updateQuantity } = useCart()
 
-    let changeQuantity = getChangeQuantity({ addToCart, removeFromCart, updateQuantity })
+    let changeQuantity = getChangeQuantity({ updateQuantity })
     changeQuantity.push({
         icon: FaEdit,
-        onClick: item => {
-            setEditID(item.id)
-            setNewQty(item.quantity.toString())
+        onClick: (item) => {
+            setEditID(item.id);
+            setNewQty(item.quantity.toString());
         }
-    })
+    });
 
     const [total, setTotal] = useState(calculateTotal(cartItems, products))
     const [editID, setEditID] = useState(null)
@@ -59,7 +59,6 @@ export default function Checkout({ products }) {
                 products={products}
                 total={total}
                 editable={true}
-                removeFromCart={removeFromCart}
                 updateQuantity={updateQuantity}
                 editID={editID}
                 setEditID={setEditID}

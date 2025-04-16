@@ -3,10 +3,13 @@ import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
 
 export default function ProductList({ products }) {
-  const { addToCart, cartOpen, setCartOpen } = useCart();
+  const { updateQuantity, addToCart, cartItems, cartOpen, setCartOpen } = useCart();
 
   const handleAddToCart = (productId) => {
-    addToCart(productId);
+    const currentQty = cartItems.find(item => item.id === productId)?.quantity || 0;
+    updateQuantity(productId, currentQty + 1);
+    // addToCart(productId);
+    
     if (!cartOpen) {
       console.log('Cart is closed, opening now.');
       setCartOpen(true); // Only open the cart if it was closed

@@ -17,11 +17,11 @@ const Navbar = ({ initialUser, allProducts }) => {
   const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const { cartItems, addToCart, removeFromCart, updateQuantity, setCartOpen, cartOpen } = useCart();
+  const { cartItems, updateQuantity, setCartOpen, cartOpen } = useCart();
   const { replace } = useRouter()
   const pathname = usePathname()
 
-  const changeQuantity = getChangeQuantity({ addToCart, removeFromCart, updateQuantity })
+  const changeQuantity = getChangeQuantity({ updateQuantity })
 
   useEffect(() => {
     if (!initialUser) {
@@ -115,7 +115,7 @@ const Navbar = ({ initialUser, allProducts }) => {
                         {cartItems.map((item) => {
                           const itemName = allProducts.filter(product => product.id === item.id)[0].name
 
-                          return (<li key={item.lineItemId} className="grid grid-cols-[1fr_auto] border-b py-2 gap-1">
+                          return (<li key={`${item.id}-${item.lineItemId || "temp"}`} className="grid grid-cols-[1fr_auto] border-b py-2 gap-1">
                             <span>{itemName}</span>
                             <div className="m-auto">
                               <div className="text-center">x {item.quantity}</div>
