@@ -6,7 +6,7 @@ import { FaEdit } from "react-icons/fa"
 import getChangeQuantity from "../../lib/getChangeQuantity"
 
 export default function Checkout({ products }) {
-    const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart()
+    const { cartItems, updateQuantity } = useCart();
 
     const getItemInfo = item => {
         const itemInfo = products.filter(product => product.id === item.id)[0]
@@ -32,14 +32,14 @@ export default function Checkout({ products }) {
         return `$${dollars}.${cents.toString().padStart(2, '0')}`
     }
 
-    let changeQuantity = getChangeQuantity({ addToCart, removeFromCart, updateQuantity })
+    let changeQuantity = getChangeQuantity({ updateQuantity })
     changeQuantity.push({
         icon: FaEdit,
-        onClick: item => {
-            setEditID(item.id)
-            setNewQty(item.quantity.toString())
+        onClick: (item) => {
+            setEditID(item.id);
+            setNewQty(item.quantity.toString());
         }
-    })
+    });
 
     const [total, setTotal] = useState(calculateTotal)
     const [editID, setEditID] = useState(null)
