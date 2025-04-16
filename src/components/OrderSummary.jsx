@@ -2,7 +2,7 @@ import Image from "next/image"
 import ChangeQuantitySpans from "./ChangeQuantitySpans"
 import getItemInfo from "../../lib/getItemInfo"
 
-export default function CartItems({
+export default function OrderSummary({
     cartItems,
     products,
     total,

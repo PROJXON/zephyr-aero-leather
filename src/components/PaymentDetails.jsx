@@ -1,7 +1,7 @@
 "use client"
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import CartItems from "./CartItems"
+import OrderSummary from "./OrderSummary"
 import calculateTotal from "../../lib/calculateTotal"
 
 export default function PaymentDetails({ products }) {
@@ -24,7 +24,7 @@ export default function PaymentDetails({ products }) {
 
     return (<>
         {paymentDetails ? (<>
-            <CartItems cartItems={paymentDetails.items} products={products} total={total} />
+            <OrderSummary cartItems={paymentDetails.items} products={products} total={total} />
         </>) : <p>Loading your payment details...</p>}
     </>)
 }

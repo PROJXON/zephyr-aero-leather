@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa"
 import getChangeQuantity from "../../lib/getChangeQuantity"
 import calculateTotal from "../../lib/calculateTotal"
-import CartItems from "./CartItems"
+import OrderSummary from "./OrderSummary"
 import StripeForm from "./StripeForm"
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
@@ -25,11 +25,12 @@ export default function Checkout({ products }) {
     const [editID, setEditID] = useState(null)
     const [newQty, setNewQty] = useState('')
 
-    useEffect(() => setTotal(calculateTotal(cartItems, products)), [cartItems])
-
     const [clientSecret, setClientSecret] = useState('');
 
     useEffect(() => {
+        //Note: Pressing the + button doesn't cause the quantities to be updated on the payment-success page. It may be due to how slow the + button is now.
+        setTotal(calculateTotal(cartItems, products))
+
         if (total > 50) {
             fetch('/api/payment', {
                 method: 'POST',
@@ -41,7 +42,7 @@ export default function Checkout({ products }) {
             }).then(res => res.json())
                 .then(data => setClientSecret(data.clientSecret))
         }
-    }, [total])
+    }, [cartItems])
 
     const appearance = { theme: 'stripe' };
     const options = { clientSecret, appearance }
@@ -53,7 +54,7 @@ export default function Checkout({ products }) {
             {clientSecret && (<Elements stripe={stripePromise} options={options}>
                 <StripeForm />
             </Elements>)}
-            <CartItems
+            <OrderSummary
                 cartItems={cartItems}
                 products={products}
                 total={total}
