@@ -247,6 +247,28 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const clearCart = async () => {
+    if (isAuthenticated) {
+      try {
+        const response = await fetch("/api/cart/clear", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId }),
+        });
+  
+        if (!response.ok) throw new Error("Failed to clear cart");
+  
+        setCartItems([]);
+        await fetchUserCart();
+      } catch (error) {
+        console.error("Error clearing cart:", error.message);
+      }
+    } else {
+      localStorage.removeItem("guestCart");
+      setCartItems([]);
+    }
+  };
+
 
   const syncGuestCartToWooCommerce = async () => {
     if (isAuthenticated && orderId) {

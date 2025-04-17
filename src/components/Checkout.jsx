@@ -6,7 +6,7 @@ import { FaEdit } from "react-icons/fa"
 import getChangeQuantity from "../../lib/getChangeQuantity"
 
 export default function Checkout({ products }) {
-    const { cartItems, updateQuantity } = useCart();
+    const { cartItems, updateQuantity, clearCart } = useCart();
 
     const getItemInfo = item => {
         const itemInfo = products.filter(product => product.id === item.id)[0]
@@ -41,6 +41,30 @@ export default function Checkout({ products }) {
         }
     });
 
+    const handleClearCart = async () => {
+        try {
+          const response = await fetch("/api/checkout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ items: cartItems }) // or however your API expects this
+          });
+      
+          if (!response.ok) throw new Error("Order submission failed");
+      
+          const result = await response.json();
+      
+          if (result.success) {
+            clearCart();
+          } else {
+            console.error("Order was not successful:", result.message);
+          }
+        } catch (err) {
+          console.error("Order error:", err.message);
+        }
+      };
+
     const [total, setTotal] = useState(calculateTotal)
     const [editID, setEditID] = useState(null)
     const [newQty, setNewQty] = useState('')
@@ -49,7 +73,10 @@ export default function Checkout({ products }) {
 
     return (<>
         {cartItems?.length > 0 ? <div className="grid grid-cols-[60%_40%]">
-            <form>
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                handleClearCart();
+            }}>
                 Form elements go here
             </form>
             <div>
