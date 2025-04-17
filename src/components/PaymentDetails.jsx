@@ -23,8 +23,10 @@ export default function PaymentDetails({ products }) {
     }, [payment_intent])
 
     return (<>
-        {paymentDetails ? (<>
-            <OrderSummary cartItems={paymentDetails.items} products={products} total={total} />
-        </>) : <p>Loading your payment details...</p>}
+        {paymentDetails ? (<OrderSummary
+            cartItems={paymentDetails.items}
+            products={products}
+            total={total}
+        />) : <p>Loading your payment details...</p>}
     </>)
 }
