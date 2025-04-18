@@ -48,10 +48,7 @@ export default function OrderSummary({
                                     onChange={e => setNewQty(e.target.value)}
                                     onBlur={() => {
                                         const qty = parseInt(newQty)
-                                        if (!isNaN(qty)) {
-                                            if (qty == 0) updateQuantity(item.id, 0)
-                                            else if (qty > 0) updateQuantity(item.id, qty)
-                                        }
+                                        if (!isNaN(qty) && qty > 0) updateQuantity(item.id, qty)
                                         setEditID(null)
                                     }}
                                     onKeyDown={e => {
