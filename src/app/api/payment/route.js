@@ -5,12 +5,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export async function POST(req) {
     const { amount, items } = await req.json()
-    return addToCart(amount, items)
+    return await addToCart(amount, items)
 }
 
 export async function PUT(req) {
     const { amount, items, payment_intent_id } = await req.json()
-    return addToCart(amount, items, payment_intent_id)
+    return await addToCart(amount, items, payment_intent_id)
 }
 
 export async function GET(req) {
