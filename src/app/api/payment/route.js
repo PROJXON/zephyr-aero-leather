@@ -20,8 +20,6 @@ export async function GET(req) {
     try {
         const paymentIntent = await stripe.paymentIntents.retrieve(payment_intent)
 
-        //Code to empty the cart
-
         return new Response(JSON.stringify({
             amount: paymentIntent.amount,
             status: paymentIntent.status,
