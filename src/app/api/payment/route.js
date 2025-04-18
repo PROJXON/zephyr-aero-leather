@@ -1,16 +1,16 @@
 import Stripe from 'stripe'
-import addToCart from '../../../../lib/addToCart'
+import cartStripePayment from '../../../../lib/cartStripePayment'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export async function POST(req) {
     const { amount, items } = await req.json()
-    return await addToCart(amount, items)
+    return await cartStripePayment(amount, items)
 }
 
 export async function PUT(req) {
     const { amount, items, payment_intent_id } = await req.json()
-    return await addToCart(amount, items, payment_intent_id)
+    return await cartStripePayment(amount, items, payment_intent_id)
 }
 
 export async function GET(req) {
