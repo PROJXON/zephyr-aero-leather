@@ -134,13 +134,6 @@ const Navbar = ({ initialUser, allProducts }) => {
                       >
                         Checkout
                       </button>
-                      {/* Clear Cart Button */}
-                      <button
-                        className="w-full bg-red-500 text-white mt-2 p-2 rounded"
-                        onClick={clearCart}
-                      >
-                        Clear Cart
-                      </button>
                     </>
                   ) : (
                     <p className="text-sm text-gray-900">Your cart is empty.</p>

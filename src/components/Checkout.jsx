@@ -45,30 +45,6 @@ export default function Checkout({ products }) {
         }
     });
 
-    const handleClearCart = async () => {
-        try {
-          const response = await fetch("/api/checkout", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ items: cartItems }) // or however your API expects this
-          });
-      
-          if (!response.ok) throw new Error("Order submission failed");
-      
-          const result = await response.json();
-      
-          if (result.success) {
-            clearCart();
-          } else {
-            console.error("Order was not successful:", result.message);
-          }
-        } catch (err) {
-          console.error("Order error:", err.message);
-        }
-      };
-
     const [total, setTotal] = useState(calculateTotal)
     const [editID, setEditID] = useState(null)
     const [newQty, setNewQty] = useState('')
