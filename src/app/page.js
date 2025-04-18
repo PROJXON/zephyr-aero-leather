@@ -2,7 +2,9 @@ import fetchProducts from "../../lib/woocommerce.js";
 import Image from "next/image";
 
 export default async function Home() {
-  const products = await fetchProducts();
+  const response = await fetchProducts();
+  const products = Array.isArray(response) ? response : response.products || [];
+  
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4">WooCommerce Products</h1>
