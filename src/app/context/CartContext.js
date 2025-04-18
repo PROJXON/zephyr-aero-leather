@@ -250,8 +250,8 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     if (isAuthenticated) {
       try {
-        const response = await fetch("/api/cart/clear", {
-          method: "POST",
+        const response = await fetch("/api/cart", {
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId }),
         });
@@ -259,7 +259,7 @@ export const CartProvider = ({ children }) => {
         if (!response.ok) throw new Error("Failed to clear cart");
   
         setCartItems([]);
-        await fetchUserCart();
+        setOrderId(null);
       } catch (error) {
         console.error("Error clearing cart:", error.message);
       }
@@ -285,7 +285,7 @@ export const CartProvider = ({ children }) => {
   // }, [isAuthenticated, orderId]);
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, setCartOpen, cartOpen }}>
+    <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, setCartOpen, cartOpen, clearCart }}>
       {children}
     </CartContext.Provider>
   );

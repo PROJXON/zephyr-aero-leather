@@ -16,7 +16,7 @@ const Navbar = ({ initialUser, allProducts }) => {
   const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const { cartItems, updateQuantity, setCartOpen, cartOpen } = useCart();
+  const { cartItems, updateQuantity, setCartOpen, cartOpen, clearCart } = useCart();
   const { replace } = useRouter()
   const pathname = usePathname()
 
@@ -143,6 +143,13 @@ const Navbar = ({ initialUser, allProducts }) => {
                         onClick={() => replace("checkout")}
                       >
                         Checkout
+                      </button>
+                      {/* Clear Cart Button */}
+                      <button
+                        className="w-full bg-red-500 text-white mt-2 p-2 rounded"
+                        onClick={clearCart}
+                      >
+                        Clear Cart
                       </button>
                     </>
                   ) : (
