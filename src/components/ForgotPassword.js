@@ -1,8 +1,6 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+"use client"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 const backgroundImageUrl = "/ifr.jpg";
 
@@ -88,14 +86,13 @@ export default function ForgotPassword() {
                 />
               </div>
               <button
-              type="submit"
-              disabled={loading}
-              className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {loading ? "Resetting..." : "Reset Password"}
-            </button>
+                type="submit"
+                disabled={loading}
+                className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+              >
+                {loading ? "Resetting..." : "Reset Password"}
+              </button>
             </form>
           </div>
         </div>
