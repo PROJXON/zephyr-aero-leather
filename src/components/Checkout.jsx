@@ -10,7 +10,7 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 
 export default function Checkout({ products }) {
-    const { cartItems, updateQuantity, clearCart } = useCart();
+    const { cartItems, updateQuantity } = useCart();
 
     const getItemInfo = item => {
         const itemInfo = products.filter(product => product.id === item.id)[0]

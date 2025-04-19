@@ -17,7 +17,7 @@ const Navbar = ({ initialUser, allProducts }) => {
   const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const { cartItems, updateQuantity, setCartOpen, cartOpen, clearCart } = useCart();
+  const { cartItems, updateQuantity, setCartOpen, cartOpen } = useCart();
   const { replace } = useRouter()
   const pathname = usePathname()
 
