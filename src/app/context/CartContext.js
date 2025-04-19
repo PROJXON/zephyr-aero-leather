@@ -247,6 +247,28 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const clearCart = async () => {
+    if (isAuthenticated) {
+      try {
+        const response = await fetch("/api/cart", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId }),
+        });
+  
+        if (!response.ok) throw new Error("Failed to clear cart");
+  
+        setCartItems([]);
+        setOrderId(null);
+      } catch (error) {
+        console.error("Error clearing cart:", error.message);
+      }
+    } else {
+      localStorage.removeItem("guestCart");
+      setCartItems([]);
+    }
+  };
+
 
   const syncGuestCartToWooCommerce = async () => {
     if (isAuthenticated && orderId) {
@@ -263,7 +285,7 @@ export const CartProvider = ({ children }) => {
   // }, [isAuthenticated, orderId]);
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, setCartOpen, cartOpen }}>
+    <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, setCartOpen, cartOpen, clearCart }}>
       {children}
     </CartContext.Provider>
   );
