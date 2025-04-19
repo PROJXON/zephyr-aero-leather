@@ -21,7 +21,7 @@ export default function Checkout({ products }) {
         }
     });
 
-    const [total, setTotal] = useState(calculateTotal)
+    const [total, setTotal] = useState(calculateTotal(cartItems, products))
     const [editID, setEditID] = useState(null)
     const [newQty, setNewQty] = useState('')
     const [clientSecret, setClientSecret] = useState('')
@@ -66,13 +66,14 @@ export default function Checkout({ products }) {
                 cartItems={cartItems}
                 products={products}
                 total={total}
-                editable={true}
-                updateQuantity={updateQuantity}
-                editID={editID}
-                setEditID={setEditID}
-                newQty={newQty}
-                setNewQty={setNewQty}
-                changeQuantity={changeQuantity}
+                quantityControls={{
+                    updateQuantity,
+                    editID,
+                    setEditID,
+                    newQty,
+                    setNewQty,
+                    changeQuantity
+                }}
             />
         </div> : <p>Your cart is empty</p>}
     </>)
