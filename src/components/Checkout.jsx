@@ -12,30 +12,6 @@ import { loadStripe } from '@stripe/stripe-js'
 export default function Checkout({ products }) {
     const { cartItems, updateQuantity } = useCart();
 
-    const getItemInfo = item => {
-        const itemInfo = products.filter(product => product.id === item.id)[0]
-        const priceInCents = itemInfo.price * 100 * item.quantity
-
-        return [itemInfo, priceInCents]
-    }
-
-    const calculateTotal = () => {
-        let initialTotal = 0
-
-        cartItems.map(item => {
-            const priceInCents = getItemInfo(item)[1]
-            initialTotal += priceInCents
-        })
-
-        return initialTotal
-    }
-
-    const formatPrice = priceInCents => {
-        const dollars = Math.floor(priceInCents / 100)
-        const cents = priceInCents % 100
-        return `$${dollars}.${cents.toString().padStart(2, '0')}`
-    }
-
     let changeQuantity = getChangeQuantity({ updateQuantity })
     changeQuantity.push({
         icon: FaEdit,
