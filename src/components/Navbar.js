@@ -13,7 +13,7 @@ import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity"
 
 const Navbar = ({ initialUser, allProducts }) => {
-  const { isAuthenticated, user, login, logout, fetchUserFromServer } = useAuth();
+  const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth();
   const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
