@@ -2,18 +2,11 @@ import Image from "next/image"
 import ChangeQuantitySpans from "./ChangeQuantitySpans"
 import getItemInfo from "../../lib/getItemInfo"
 
-export default function OrderSummary({
-    cartItems,
-    products,
-    total,
-    editable = false,
-    updateQuantity,
-    editID,
-    setEditID,
-    newQty,
-    setNewQty,
-    changeQuantity
-}) {
+export default function OrderSummary({ cartItems, products, total, quantityControls = {} }) {
+    const { updateQuantity, editID, setEditID, newQty, setNewQty, changeQuantity } = quantityControls
+
+    const editable = Object.keys(quantityControls).length > 0
+
     const formatPrice = priceInCents => {
         const dollars = Math.floor(priceInCents / 100)
         const cents = priceInCents % 100

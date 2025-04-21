@@ -10,31 +10,7 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 
 export default function Checkout({ products }) {
-    const { cartItems, updateQuantity, clearCart } = useCart();
-
-    const getItemInfo = item => {
-        const itemInfo = products.filter(product => product.id === item.id)[0]
-        const priceInCents = itemInfo.price * 100 * item.quantity
-
-        return [itemInfo, priceInCents]
-    }
-
-    const calculateTotal = () => {
-        let initialTotal = 0
-
-        cartItems.map(item => {
-            const priceInCents = getItemInfo(item)[1]
-            initialTotal += priceInCents
-        })
-
-        return initialTotal
-    }
-
-    const formatPrice = priceInCents => {
-        const dollars = Math.floor(priceInCents / 100)
-        const cents = priceInCents % 100
-        return `$${dollars}.${cents.toString().padStart(2, '0')}`
-    }
+    const { cartItems, updateQuantity } = useCart();
 
     let changeQuantity = getChangeQuantity({ updateQuantity })
     changeQuantity.push({
@@ -45,7 +21,7 @@ export default function Checkout({ products }) {
         }
     });
 
-    const [total, setTotal] = useState(calculateTotal)
+    const [total, setTotal] = useState(calculateTotal(cartItems, products))
     const [editID, setEditID] = useState(null)
     const [newQty, setNewQty] = useState('')
     const [clientSecret, setClientSecret] = useState('')
@@ -90,13 +66,14 @@ export default function Checkout({ products }) {
                 cartItems={cartItems}
                 products={products}
                 total={total}
-                editable={true}
-                updateQuantity={updateQuantity}
-                editID={editID}
-                setEditID={setEditID}
-                newQty={newQty}
-                setNewQty={setNewQty}
-                changeQuantity={changeQuantity}
+                quantityControls={{
+                    updateQuantity,
+                    editID,
+                    setEditID,
+                    newQty,
+                    setNewQty,
+                    changeQuantity
+                }}
             />
         </div> : <p>Your cart is empty</p>}
     </>)
