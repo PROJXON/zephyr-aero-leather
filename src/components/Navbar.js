@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation"
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
-import { useAuth } from "@/app/context/AuthContext";
+import { useAuth } from "@/app/context/AuthContext"
 import NavButton from "./NavButton";
 import NavLoggedOutBtn from "./NavLoggedOutBtn";
 import ChangeQuantitySpans from "./ChangeQuantitySpans";
@@ -13,7 +13,7 @@ import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity"
 
 const Navbar = ({ initialUser, allProducts }) => {
-  const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth();
+  const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth()
   const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -27,7 +27,7 @@ const Navbar = ({ initialUser, allProducts }) => {
     if (!initialUser) {
       fetchUserFromServer();
     }
-  }, [initialUser]);
+  }, [initialUser])
 
   useEffect(() => {
     setCartOpen(false)

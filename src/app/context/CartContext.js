@@ -11,16 +11,14 @@ export const CartContext = createContext({
   updateQuantity: () => { },
 });
 
-
-
 export const CartProvider = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [orderId, setOrderId] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
 
-  const pendingUpdates = useRef({}); 
-  const updateTimers = useRef({}); 
+  const pendingUpdates = useRef({});
+  const updateTimers = useRef({});
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -47,7 +45,7 @@ export const CartProvider = ({ children }) => {
 
       const data = await response.json();
       setCartItems(
-        (data.items || []).map((item) => ({
+        (data.items || []).map(item => ({
           lineItemId: item.id,
           id: item.product_id,
           quantity: item.quantity,
@@ -59,14 +57,14 @@ export const CartProvider = ({ children }) => {
       setCartItems([]);
       setOrderId(null);
     }
-  };
+  }
 
   const addToCart = async (productId, quantity = 1) => {
     if (isAuthenticated) {
       setCartItems((prevItems) => {
         const updated = [...prevItems];
         const index = updated.findIndex((item) => item.id === productId);
-  
+
         if (index > -1) {
           updated[index] = {
             ...updated[index],
@@ -75,23 +73,23 @@ export const CartProvider = ({ children }) => {
         } else {
           updated.push({ id: productId, quantity });
         }
-  
+
         return updated;
       });
-  
+
       // Accumulate quantity in memory
       if (!pendingUpdates.current[productId]) pendingUpdates.current[productId] = 0;
       pendingUpdates.current[productId] += quantity;
 
-  
+
       // Reset timer if one is already running
       clearTimeout(updateTimers.current[productId]);
-  
+
       // Set new timer
       updateTimers.current[productId] = setTimeout(() => {
         const batchedQuantity = pendingUpdates.current[productId];
         delete pendingUpdates.current[productId];
-  
+
         fetch("/api/cart/item", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -127,40 +125,40 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = async (productId) => {
     if (isAuthenticated) {
-       // 1. Optimistically update UI
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+      // 1. Optimistically update UI
+      setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
 
-    // 2. Mark this product for removal
-    pendingRemovals[productId] = true;
+      // 2. Mark this product for removal
+      pendingRemovals[productId] = true;
 
-    // 3. Clear any existing timer
-    clearTimeout(removeTimers[productId]);
+      // 3. Clear any existing timer
+      clearTimeout(removeTimers[productId]);
 
-    // 4. Set new timer to debounce removal
-    removeTimers[productId] = setTimeout(() => {
-      delete pendingRemovals[productId];
+      // 4. Set new timer to debounce removal
+      removeTimers[productId] = setTimeout(() => {
+        delete pendingRemovals[productId];
 
-      fetch("/api/cart/item", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, productId }),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to remove item from cart");
-          return res.json();
+        fetch("/api/cart/item", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId, productId }),
         })
-        .then(() => {
-          fetchUserCart(); // Sync final cart state
-        })
-        .catch((err) => {
-          console.error("Error syncing cart removal with Woo:", err.message);
-        });
-    }, 300); // Same delay as addToCart
-  } else {
-    const updatedCart = cartItems.filter((item) => item.id !== productId);
-    saveGuestCart(updatedCart);
-  }
-};
+          .then((res) => {
+            if (!res.ok) throw new Error("Failed to remove item from cart");
+            return res.json();
+          })
+          .then(() => {
+            fetchUserCart(); // Sync final cart state
+          })
+          .catch((err) => {
+            console.error("Error syncing cart removal with Woo:", err.message);
+          });
+      }, 300); // Same delay as addToCart
+    } else {
+      const updatedCart = cartItems.filter((item) => item.id !== productId);
+      saveGuestCart(updatedCart);
+    }
+  };
 
   const updateQuantity = (productId, newQuantity) => {
     if (isAuthenticated) {
@@ -255,9 +253,9 @@ export const CartProvider = ({ children }) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId }),
         });
-  
+
         if (!response.ok) throw new Error("Failed to clear cart");
-  
+
         setCartItems([]);
         setOrderId(null);
       } catch (error) {
@@ -280,9 +278,9 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // useEffect(() => {
-  //   syncGuestCartToWooCommerce();
-  // }, [isAuthenticated, orderId]);
+  useEffect(() => {
+    syncGuestCartToWooCommerce()
+  }, [isAuthenticated, orderId])
 
   return (
     <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, setCartOpen, cartOpen, clearCart }}>

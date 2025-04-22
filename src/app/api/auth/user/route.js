@@ -1,15 +1,13 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { NextResponse } from "next/server"
+import getCookieInfo from "../../../../../lib/getCookieInfo";
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-    const userCookie = cookieStore.get("userData")?.value;
+    const [token, userCookie] = await getCookieInfo()
 
     if (userCookie) {
       try {
-        const decodedUserData = JSON.parse(atob(userCookie)); 
+        const decodedUserData = JSON.parse(atob(userCookie));
         return NextResponse.json({ isAuthenticated: true, user: decodedUserData });
       } catch (error) {
         console.error("Error parsing userData cookie:", error);

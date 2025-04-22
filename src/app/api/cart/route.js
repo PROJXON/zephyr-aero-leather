@@ -1,13 +1,11 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { NextResponse } from "next/server"
+import getCookieInfo from "../../../../lib/getCookieInfo"
 
 const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/orders`
 
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("token")?.value
-
+    const [token] = await getCookieInfo()
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     // Fetch user details
@@ -47,9 +45,7 @@ export async function GET() {
 
 export async function PUT(req) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
+    const token = getCookieInfo()[0]
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     // Fetch user details
