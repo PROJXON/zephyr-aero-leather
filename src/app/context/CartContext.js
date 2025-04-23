@@ -268,19 +268,19 @@ export const CartProvider = ({ children }) => {
   };
 
 
-  const syncGuestCartToWooCommerce = async () => {
-    if (isAuthenticated && orderId) {
-      const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
-      for (let item of guestCart) {
-        await addToCart(item.id, item.quantity);
-      }
-      localStorage.removeItem("guestCart");
-    }
-  };
+  // const syncGuestCartToWooCommerce = async () => {
+  //   if (isAuthenticated && orderId) {
+  //     const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
+  //     for (let item of guestCart) {
+  //       await addToCart(item.id, item.quantity);
+  //     }
+  //     localStorage.removeItem("guestCart");
+  //   }
+  // };
 
-  useEffect(() => {
-    syncGuestCartToWooCommerce()
-  }, [isAuthenticated, orderId])
+  // useEffect(() => {
+  //   syncGuestCartToWooCommerce()
+  // }, [isAuthenticated, orderId])
 
   return (
     <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, setCartOpen, cartOpen, clearCart }}>

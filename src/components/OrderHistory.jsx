@@ -2,16 +2,16 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/app/context/AuthContext"
 
-export default function OrderHistory({ token }) {
+export default function OrderHistory({ token, wcURL }) {
     const { user, isAuthenticated } = useAuth()
     const [orders, setOrders] = useState([])
 
     useEffect(() => {
         (async () => {
             if (isAuthenticated) {
-                //404 error
+                //Error: Failed to fetch
                 const ordersResponse = await fetch(
-                    `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/orders?customer=${user.id}`,
+                    `${wcURL}/wp-json/wc/v3/orders?customer=${user.id}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 )
 
