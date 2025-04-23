@@ -103,7 +103,7 @@ export async function POST(req) {
 export async function DELETE(req) {
   try {
     const { orderId, productId } = await req.json();
-    const token = getCookieInfo()[0]
+    const [token] = await getCookieInfo()
 
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!orderId) return NextResponse.json({ error: "No order ID provided" }, { status: 400 });
@@ -150,15 +150,13 @@ export async function DELETE(req) {
   }
 }
 
-
-
 export async function PUT(req) {
   try {
     const { orderId, line_items } = await req.json()
-    const token = getCookieInfo()[0]
+    const [token] = await getCookieInfo()
 
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (!orderId) return NextResponse.json({ error: "No pending order found" }, { status: 400 });
+    if (!orderId) return NextResponse.json({ error: "No pending order found" }, { status: 400 })
 
     // Fetch current order
     const orderRes = await fetch(`${API_BASE_URL}/${orderId}`, {
@@ -167,17 +165,17 @@ export async function PUT(req) {
           `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
         ).toString("base64")}`,
       },
-    });
+    })
 
-    if (!orderRes.ok) throw new Error("Failed to fetch order");
+    if (!orderRes.ok) throw new Error("Failed to fetch order")
 
-    const orderData = await orderRes.json();
+    const orderData = await orderRes.json()
 
     // ✅ Send only id and quantity, WooCommerce rejects extra fields
-    const updatedItems = orderData.line_items.map((item) => {
+    const updatedItems = orderData.line_items.map(item => {
       const match = line_items.find((li) => li.id === item.id);
       return match ? { id: item.id, quantity: match.quantity } : { id: item.id, quantity: item.quantity };
-    });
+    })
 
     const updateRes = await fetch(`${API_BASE_URL}/${orderId}`, {
       method: "PUT",
@@ -188,7 +186,7 @@ export async function PUT(req) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ line_items: updatedItems }),
-    });
+    })
 
     if (!updateRes.ok) {
       const errorText = await updateRes.text();
@@ -198,7 +196,6 @@ export async function PUT(req) {
 
     const updatedCart = await updateRes.json();
     return NextResponse.json({ success: true, cart: updatedCart });
-
   } catch (error) {
     console.error("Error updating cart item:", error.message);
     return NextResponse.json({ error: "Failed to update cart item" }, { status: 500 });

@@ -25,8 +25,16 @@ export default function OrderHistory({ token }) {
     }, [isAuthenticated])
 
     return (<>
-        {isAuthenticated ? <div>
-            Order History here
-        </div> : <p>Loading...</p>}
+        {isAuthenticated ? (<div>
+            {/* Saying "No orders found even if you do make an order" */}
+            {orders.length === 0 ?
+                <p>No orders found</p> :
+                <ul>
+                    {orders.map(order => (<li key={order.id}>
+                        An order
+                    </li>))}
+                </ul>
+            }
+        </div>) : <p>Loading...</p>}
     </>)
 }

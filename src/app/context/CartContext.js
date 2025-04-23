@@ -209,7 +209,7 @@ export const CartProvider = ({ children }) => {
             });
 
             // If removing, and it’s not in Woo yet, nothing to do
-            if (!existingItem && finalQuantity === 0) return;
+            if (!existingItem && finalQuantity === 0) return
 
             return fetch("/api/cart/item", {
               method: "PUT",
