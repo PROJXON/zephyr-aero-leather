@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import getCookieInfo from "../../../../../lib/getCookieInfo";
+import getCookieInfo from "../../../../../lib/getCookieInfo"
 
 export async function GET() {
   try {
