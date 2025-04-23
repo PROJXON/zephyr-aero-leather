@@ -45,7 +45,7 @@ export async function GET() {
 
 export async function PUT() {
   try {
-    const [token] = getCookieInfo()
+    const [token] = await getCookieInfo()
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     // Fetch user details
