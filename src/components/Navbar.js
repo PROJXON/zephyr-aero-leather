@@ -106,7 +106,7 @@ const Navbar = ({ initialUser, allProducts }) => {
                 text={isAuthenticated || serverUser ? "My Cart" : "Guest Cart"}
               />
               {(isAuthenticated || serverUser) && <NavButton
-                onClick={() => replace("order-history")}
+                onClick={() => replace("/order-history")}
                 srOnly="Order History"
                 d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8 M3 3v5h5 M12 7v5l4 2"
                 text="Order History"
@@ -136,7 +136,7 @@ const Navbar = ({ initialUser, allProducts }) => {
                       {/* Checkout Button */}
                       <button
                         className="w-full bg-blue-500 text-white mt-4 p-2 rounded"
-                        onClick={() => replace("checkout")}
+                        onClick={() => replace("/checkout")}
                       >
                         Checkout
                       </button>
