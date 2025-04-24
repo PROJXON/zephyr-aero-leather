@@ -42,9 +42,12 @@ export async function POST(req) {
     let userData = null
     const userDataError = "Failed to fetch user data"
 
-    userData = await fetchWooCommerce("wp/v2/users/me", userDataError, token)
-    if (!userData) return NextResponse.json({ error: userDataError }, { status: 500 })
-    const userId = userData.id;
+    try {
+      userData = await fetchWooCommerce("wp/v2/users/me", userDataError, token)
+    } catch {
+      return NextResponse.json({ error: userDataError }, { status: 500 })
+    }
+    const userId = userData.id
 
     let customerData = null
     // ✅ Step 3: Fetch WooCommerce customer data

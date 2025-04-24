@@ -32,7 +32,7 @@ export async function PUT() {
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     // Fetch user details
-    const userData = fetchWooCommerce("wp/v2/users/me", "Failed to fetch user", token)
+    const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch user", token)
     const userId = userData.id;
 
     // Fetch pending orders

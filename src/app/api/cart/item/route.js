@@ -2,8 +2,6 @@ import { NextResponse } from "next/server"
 import getCookieInfo from "../../../../../lib/getCookieInfo"
 import fetchWooCommerce from "../../../../../lib/fetchWooCommerce"
 
-const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/orders`
-
 export async function POST(req) {
   try {
     const { orderId, productId, quantity } = await req.json()
@@ -21,23 +19,11 @@ export async function POST(req) {
       const userData = await fetchWooCommerce("/wp/v2/users/me", "Failed to fetch user info", token)
 
       // Create a new pending order
-      const createRes = await fetch(`${API_BASE_URL}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-          ).toString("base64")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          customer_id: userData.id,
-          status: "pending",
-          line_items: [{ product_id: productId, quantity }],
-        }),
+      const newOrder = await fetchWooCommerce("wc/v3/orders", "Failed to create order", null, "POST", {
+        customer_id: userData.id,
+        status: "pending",
+        line_items: [{ product_id: productId, quantity }]
       })
-
-      if (!createRes.ok) throw new Error("Failed to create order")
-      const newOrder = await createRes.json()
       return NextResponse.json({ success: true, cart: newOrder, orderId: newOrder.id })
     }
 
@@ -58,24 +44,7 @@ export async function POST(req) {
       quantity: finalQuantity,
     };
 
-    const updateResponse = await fetch(`${API_BASE_URL}/${finalOrderId}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-        ).toString("base64")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ line_items: [updatedLineItem] }),
-    });
-
-    if (!updateResponse.ok) {
-      const errorText = await updateResponse.text()
-      console.error("WooCommerce response error:", errorText)
-      throw new Error("Failed to add item to cart")
-    }
-
-    const updatedCart = await updateResponse.json()
+    const updatedCart = await fetchWooCommerce("wc/v3/orders", "Failed to add item to cart", null, "PUT", { line_items: [updatedLineItem] })
     return NextResponse.json({ success: true, cart: updatedCart })
 
   } catch (error) {
@@ -101,22 +70,7 @@ export async function DELETE(req) {
       .map((item) => ({ id: item.id, quantity: item.quantity }));
 
     // ✅ PUT sanitized line_items back to Woo
-    const updateRes = await fetch(`${API_BASE_URL}/${orderId}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-        ).toString("base64")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ line_items: updatedItems }),
-    });
-
-    if (!updateRes.ok) {
-      const errorText = await updateRes.text();
-      console.error("Woo DELETE error:", errorText);
-      throw new Error("Failed to remove item");
-    }
+    await fetchWooCommerce("wc/v3/orders", "Failed to remove item", null, "PUT", { line_items: updatedItems })
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -126,6 +80,8 @@ export async function DELETE(req) {
 }
 
 export async function PUT(req) {
+  const updateErrorMessage = "Failed to update cart item"
+
   try {
     const { orderId, line_items } = await req.json()
     const [token] = await getCookieInfo()
@@ -142,27 +98,10 @@ export async function PUT(req) {
       return match ? { id: item.id, quantity: match.quantity } : { id: item.id, quantity: item.quantity };
     })
 
-    const updateRes = await fetch(`${API_BASE_URL}/${orderId}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-        ).toString("base64")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ line_items: updatedItems }),
-    })
-
-    if (!updateRes.ok) {
-      const errorText = await updateRes.text();
-      console.error("Woo PUT error:", errorText);
-      throw new Error("Failed to update cart item");
-    }
-
-    const updatedCart = await updateRes.json();
+    const updatedCart = await fetchWooCommerce("wc/v3/orders", updateErrorMessage, token, "PUT", { line_items: updatedItems })
     return NextResponse.json({ success: true, cart: updatedCart });
   } catch (error) {
     console.error("Error updating cart item:", error.message);
-    return NextResponse.json({ error: "Failed to update cart item" }, { status: 500 });
+    return NextResponse.json({ error: updateErrorMessage }, { status: 500 });
   }
 }

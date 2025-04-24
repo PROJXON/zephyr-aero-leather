@@ -14,11 +14,10 @@ async function getProduct(id) {
 }
 
 export default async function ProductPage({ params }) {
-  const product = await getProduct(params.id);
+  const p = await params
+  const product = await getProduct(p.id);
 
-  if (!product) {
-    notFound();
-  }
+  if (!product) notFound()
 
   return (
     <div className="container mx-auto px-4 py-8">
