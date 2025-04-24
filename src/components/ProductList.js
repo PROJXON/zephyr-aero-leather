@@ -4,12 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function ProductList({ products }) {
-  const { updateQuantity, addToCart, cartItems, cartOpen, setCartOpen } = useCart();
+  const { updateQuantity, cartItems, cartOpen, setCartOpen } = useCart();
 
   const handleAddToCart = (productId) => {
     const currentQty = cartItems.find(item => item.id === productId)?.quantity || 0;
     updateQuantity(productId, currentQty + 1);
-    
+
     if (!cartOpen) {
       setCartOpen(true);
     }

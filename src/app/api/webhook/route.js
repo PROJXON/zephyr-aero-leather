@@ -21,7 +21,7 @@ export async function POST(req) {
         case 'payment_intent.succeeded':
             const paymentIntent = event.data.object
             console.log(`Payment intent for ${paymentIntent.amount_received} was successful`)
-            //Update order status in WooCommerce to 'completed' and empty the cart
+            //Update order status in WooCommerce to 'completed'
             responseBody = { success: true }
             break
         case 'payment_intent.payment_failed':

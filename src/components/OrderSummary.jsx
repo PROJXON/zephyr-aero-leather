@@ -4,7 +4,6 @@ import getItemInfo from "../../lib/getItemInfo"
 
 export default function OrderSummary({ cartItems, products, total, quantityControls = {} }) {
     const { updateQuantity, editID, setEditID, newQty, setNewQty, changeQuantity } = quantityControls
-
     const editable = Object.keys(quantityControls).length > 0
 
     const formatPrice = priceInCents => {

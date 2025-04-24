@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation"
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
-import { useAuth } from "@/app/context/AuthContext";
+import { useAuth } from "@/app/context/AuthContext"
 import NavButton from "./NavButton";
 import NavLoggedOutBtn from "./NavLoggedOutBtn";
 import ChangeQuantitySpans from "./ChangeQuantitySpans";
@@ -13,7 +13,7 @@ import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity"
 
 const Navbar = ({ initialUser, allProducts }) => {
-  const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth();
+  const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth()
   const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -27,7 +27,7 @@ const Navbar = ({ initialUser, allProducts }) => {
     if (!initialUser) {
       fetchUserFromServer();
     }
-  }, [initialUser]);
+  }, [initialUser])
 
   useEffect(() => {
     setCartOpen(false)
@@ -54,7 +54,7 @@ const Navbar = ({ initialUser, allProducts }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [accountOpen, cartOpen]);
 
-  const navItems = ["Best Sellers", "Gift Ideas", "auth-test", "login"];
+  const navItems = ["Best Sellers", "Gift Ideas", "auth-test"]
 
   return (
     <nav className="bg-white antialiased">
@@ -93,7 +93,7 @@ const Navbar = ({ initialUser, allProducts }) => {
             </ul>
           </div>
 
-          <div className="flex items-center lg:space-x-2">
+          <div className="flex items-center">
             {/* Cart Dropdown */}
             <div id="cartBtn" className="relative">
               <NavButton
@@ -101,14 +101,20 @@ const Navbar = ({ initialUser, allProducts }) => {
                   setCartOpen(!cartOpen);
                   setAccountOpen(false);
                 }}
-                className="rounded-lg text-sm font-medium"
                 srOnly="Cart"
                 d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
                 text={isAuthenticated || serverUser ? "My Cart" : "Guest Cart"}
               />
+              {(isAuthenticated || serverUser) && <NavButton
+                onClick={() => replace("/order-history")}
+                srOnly="Order History"
+                d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8 M3 3v5h5 M12 7v5l4 2"
+                text="Order History"
+                fill="none"
+              />}
 
               {cartOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4">
+                <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
                   {cartItems?.length > 0 ? (
                     <>
                       <ul>
@@ -130,7 +136,7 @@ const Navbar = ({ initialUser, allProducts }) => {
                       {/* Checkout Button */}
                       <button
                         className="w-full bg-blue-500 text-white mt-4 p-2 rounded"
-                        onClick={() => replace("checkout")}
+                        onClick={() => replace("/checkout")}
                       >
                         Checkout
                       </button>
@@ -154,7 +160,6 @@ const Navbar = ({ initialUser, allProducts }) => {
                     setAccountOpen(!accountOpen);
                     setCartOpen(false);
                   }}
-                  className="rounded-lg text-sm font-medium"
                   d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                   text={serverUser?.first_name || user?.first_name}
                 />
@@ -174,7 +179,7 @@ const Navbar = ({ initialUser, allProducts }) => {
             {/* Mobile Menu Button */}
             <NavButton
               onClick={() => setMenuOpen(!menuOpen)}
-              className="lg:hidden rounded-md"
+              className="lg:hidden"
               srOnly="Open Menu"
               d="M5 7h14M5 12h14M5 17h14"
             />

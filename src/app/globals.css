@@ -18,7 +18,7 @@ body {
   color: #00FFC6;
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
-  
+
 }
 
 .nav-button-no-svg {
@@ -30,7 +30,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #0F0F0F; 
+  background: #0F0F0F;
   color: #FFFFFF;
   padding: 50px;
   border-radius: 10px;
@@ -43,7 +43,7 @@ body {
 
 .contact-info h2 {
   font-size: 2rem;
-  color: #00FFD1; 
+  color: #00FFD1;
   margin-bottom: 10px;
 }
 
@@ -75,7 +75,7 @@ body {
 
 .contact-form {
   width: 40%;
-  background: #1E1E1E; 
+  background: #1E1E1E;
   padding: 30px;
   position: relative;
   border-radius: 10px;
@@ -99,7 +99,7 @@ body {
   width: 100%;
   padding: 12px;
   background: transparent;
-  border: 2px solid #00FFD1; 
+  border: 2px solid #00FFD1;
   color: #FFFFFF;
   outline: none;
   font-size: 1rem;
@@ -123,17 +123,17 @@ body {
   transition: 0.3s ease-in-out;
 }
 
-.input-group input:focus + label,
-.input-group input:valid + label,
-.input-group textarea:focus + label,
-.input-group textarea:valid + label {
+.input-group input:focus+label,
+.input-group input:valid+label,
+.input-group textarea:focus+label,
+.input-group textarea:valid+label {
   top: 5px;
   font-size: 0.8rem;
   color: #00FFC6;
 }
 
 .contact-form button {
-  background: #00FFC6; 
+  background: #00FFC6;
   color: #0F0F0F;
   padding: 12px;
   border: none;
@@ -145,7 +145,7 @@ body {
 }
 
 .contact-form button:hover {
-  background: #00BFA6; 
+  background: #00BFA6;
 }
 
 /* Moving Border Animation */
@@ -166,15 +166,19 @@ body {
   0% {
     clip-path: inset(0px 0px 98% 0px);
   }
+
   25% {
     clip-path: inset(0px 98% 0px 0px);
   }
+
   50% {
     clip-path: inset(98% 0px 0px 0px);
   }
+
   75% {
     clip-path: inset(0px 0px 0px 98%);
   }
+
   100% {
     clip-path: inset(0px 0px 98% 0px);
   }
@@ -234,4 +238,5 @@ body {
     padding: 12px;
   }
 }
+
 /* End Contact Page Layout */

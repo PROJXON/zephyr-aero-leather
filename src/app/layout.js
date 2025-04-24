@@ -1,11 +1,11 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
-import { cookies } from "next/headers";
-import Footer from "@/components/Footer";
 import fetchProducts from "../../lib/woocommerce"
+import getCookieInfo from "../../lib/getCookieInfo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +28,7 @@ export default async function RootLayout({ children }) {
   const products = await fetchProducts();
 
   try {
-    const cookieStore = await cookies();
-    const userCookie = cookieStore.get("userData")?.value;
+    const [, userCookie] = await getCookieInfo()
     if (userCookie) {
       user = JSON.parse(atob(userCookie));
     }
