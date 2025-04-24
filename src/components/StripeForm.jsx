@@ -1,25 +1,33 @@
 "use client"
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 export default function StripeForm() {
     const stripe = useStripe()
     const elements = useElements()
     const [isProcessing, setIsProcessing] = useState(false)
     const [error, setError] = useState(null)
+    const router = useRouter()
 
     const handleSubmit = async e => {
         e.preventDefault()
         if (!stripe || !elements) return
 
         setIsProcessing(true)
+
+        const returnURL = `${window.location.origin}/payment-success`
+
         const { error } = await stripe.confirmPayment({
             elements,
-            confirmParams: { return_url: `${window.location.origin}/payment-success` }
+            confirmParams: { return_url: returnURL },
+            redirect: "always"
         })
 
-        if (error) setError(error.message)
-        setIsProcessing(false)
+        if (error) {
+            setError(error.message)
+            setIsProcessing(false)
+        }
     }
 
     return (
