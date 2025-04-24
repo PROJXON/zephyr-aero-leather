@@ -27,6 +27,7 @@ export async function GET() {
 }
 
 export async function PUT() {
+  const clearCartError = "Failed to clear cart"
   try {
     const [token] = await getCookieInfo()
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -44,7 +45,6 @@ export async function PUT() {
     }
 
     // Update the order to clear line items
-    const clearCartError = "Failed to clear cart"
     const result = await fetchWooCommerce(`wc/v3/orders/${pendingOrder.id}`, clearCartError, null, "PUT", { line_items: [] })
     return NextResponse.json({ message: "Cart cleared", data: result });
   } catch (error) {
