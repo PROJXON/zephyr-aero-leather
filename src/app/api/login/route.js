@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from "next/server"
+import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 
 export async function POST(req) {
   try {
@@ -35,42 +36,19 @@ export async function POST(req) {
     }
 
     const token = jwtData.token;
-
-    if (!token) {
-      return NextResponse.json({ error: "Authentication failed" }, { status: 401 });
-    }
+    if (!token) return NextResponse.json({ error: "Authentication failed" }, { status: 401 })
 
     // ✅ Step 2: Fetch WordPress user data
-    const userRes = await fetch(`${process.env.WOOCOMMERCE_API_URL}/wp-json/wp/v2/users/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    let userData = null
+    const userDataError = "Failed to fetch user data"
 
-    if (!userRes.ok) {
-      return NextResponse.json({ error: "Failed to fetch user data" }, { status: 500 });
-    }
-
-    const userData = await userRes.json();
+    userData = await fetchWooCommerce("wp/v2/users/me", userDataError, token)
+    if (!userData) return NextResponse.json({ error: userDataError }, { status: 500 })
     const userId = userData.id;
 
-    let customerData = null;
-
+    let customerData = null
     // ✅ Step 3: Fetch WooCommerce customer data
-    try {
-      const authHeader = `Basic ${Buffer.from(
-        `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-      ).toString("base64")}`;
-
-      const customerRes = await fetch(
-        `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/customers/${userId}`,
-        { headers: { Authorization: authHeader } }
-      );
-
-      if (customerRes.ok) {
-        customerData = await customerRes.json();
-      }
-    } catch (error) {
-      console.error("Error fetching WooCommerce customer data:", error);
-    }
+    customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Error fetching WooCommerce customer data:")
 
     if (!customerData) {
       return NextResponse.json({ error: "Failed to fetch WooCommerce customer Data" }, { status: 500 });

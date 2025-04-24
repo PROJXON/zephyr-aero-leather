@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import getCookieInfo from "../../../../lib/getCookieInfo"
-
-const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/orders`
+import fetchWooCommerce from "../../../../lib/fetchWooCommerce"
 
 export async function GET() {
   try {
@@ -9,27 +8,11 @@ export async function GET() {
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     // Fetch user details
-    const userResponse = await fetch(`${process.env.WOOCOMMERCE_API_URL}/wp-json/wp/v2/users/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-
-    if (!userResponse.ok) throw new Error("Failed to fetch user data")
-
-    const userData = await userResponse.json();
-    const userId = userData.id;
+    const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch user data", token)
+    const userId = userData.id
 
     // Fetch pending orders
-    const ordersResponse = await fetch(`${API_BASE_URL}?customer=${userId}&status=pending`, {
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-        ).toString("base64")}`,
-      },
-    })
-
-    if (!ordersResponse.ok) throw new Error("Failed to fetch orders")
-
-    const orders = await ordersResponse.json()
+    const orders = await fetchWooCommerce(`wc/v3/orders?customer=${userId}&status=pending`, "Failed to fetch orders")
     const pendingOrder = orders.find(order => order.status === "pending")
 
     if (pendingOrder) {
@@ -49,27 +32,11 @@ export async function PUT() {
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     // Fetch user details
-    const userResponse = await fetch(`${process.env.WOOCOMMERCE_API_URL}/wp-json/wp/v2/users/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!userResponse.ok) throw new Error("Failed to fetch user");
-
-    const userData = await userResponse.json();
+    const userData = fetchWooCommerce("wp/v2/users/me", "Failed to fetch user", token)
     const userId = userData.id;
 
     // Fetch pending orders
-    const ordersResponse = await fetch(`${API_BASE_URL}?customer=${userId}&status=pending`, {
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-        ).toString("base64")}`,
-      },
-    });
-
-    if (!ordersResponse.ok) throw new Error("Failed to fetch orders");
-
-    const orders = await ordersResponse.json();
+    const orders = await fetchWooCommerce(`wc/v3/orders?customer=${userId}&status=pending`, "Failed to fetch orders")
     const pendingOrder = orders.find(order => order.status === "pending");
 
     if (!pendingOrder) {
@@ -77,7 +44,7 @@ export async function PUT() {
     }
 
     // Update the order to clear line items
-    const clearResponse = await fetch(`${API_BASE_URL}/${pendingOrder.id}`, {
+    const clearResponse = await fetch(`${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/orders/${pendingOrder.id}`, {
       method: "PUT",
       headers: {
         Authorization: `Basic ${Buffer.from(

@@ -2,25 +2,11 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import ProductReviews from "@/components/ProductReviews";
 import AddToCartButton from "@/components/AddToCartButton";
+import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 
 async function getProduct(id) {
   try {
-    const response = await fetch(
-      `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/products/${id}`,
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(
-            `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-          ).toString("base64")}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Product not found");
-    }
-
-    return response.json();
+    return await fetchWooCommerce(`wc/v3/products/${id}`, "Product not found")
   } catch (error) {
     console.error("Error fetching product:", error);
     return null;

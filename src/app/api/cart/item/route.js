@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import getCookieInfo from "../../../../../lib/getCookieInfo"
+import fetchWooCommerce from "../../../../../lib/fetchWooCommerce"
 
 const API_BASE_URL = `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/orders`
 
@@ -17,14 +18,7 @@ export async function POST(req) {
     // 🧠 If no order exists, create one first
     if (!finalOrderId) {
       // Get the current user info
-      const userRes = await fetch(`${process.env.WOOCOMMERCE_API_URL}/wp-json/wp/v2/users/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (!userRes.ok) throw new Error("Failed to fetch user info")
-      const userData = await userRes.json()
+      const userData = await fetchWooCommerce("/wp/v2/users/me", "Failed to fetch user info", token)
 
       // Create a new pending order
       const createRes = await fetch(`${API_BASE_URL}`, {
@@ -48,17 +42,7 @@ export async function POST(req) {
     }
 
     // Fetch the current pending order
-    const orderResponse = await fetch(`${API_BASE_URL}/${finalOrderId}`, {
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-        ).toString("base64")}`,
-      },
-    })
-
-    if (!orderResponse.ok) throw new Error("Failed to fetch order")
-
-    const orderData = await orderResponse.json()
+    const orderData = await fetchWooCommerce(`wc/v3/orders/${finalOrderId}`, "Failed to fetch order")
 
     // ✅ Find existing Woo line item (if it exists)
     const existingItem = orderData.line_items.find((item) => item.product_id === productId);
@@ -109,16 +93,7 @@ export async function DELETE(req) {
     if (!orderId) return NextResponse.json({ error: "No order ID provided" }, { status: 400 });
 
     // Fetch current order
-    const orderRes = await fetch(`${API_BASE_URL}/${orderId}`, {
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-        ).toString("base64")}`,
-      },
-    });
-
-    if (!orderRes.ok) throw new Error("Failed to fetch order");
-    const orderData = await orderRes.json();
+    const orderData = await fetchWooCommerce(`wc/v3/orders/${orderId}`, "Failed to fetch order")
 
     // ❌ Remove the item and ✅ sanitize
     const updatedItems = orderData.line_items
@@ -159,17 +134,7 @@ export async function PUT(req) {
     if (!orderId) return NextResponse.json({ error: "No pending order found" }, { status: 400 })
 
     // Fetch current order
-    const orderRes = await fetch(`${API_BASE_URL}/${orderId}`, {
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-        ).toString("base64")}`,
-      },
-    })
-
-    if (!orderRes.ok) throw new Error("Failed to fetch order")
-
-    const orderData = await orderRes.json()
+    const orderData = await fetchWooCommerce(`wc/v3/orders/${orderId}`, "Failed to fetch order")
 
     // ✅ Send only id and quantity, WooCommerce rejects extra fields
     const updatedItems = orderData.line_items.map(item => {

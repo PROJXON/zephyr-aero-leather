@@ -1,27 +1,20 @@
 import { NextResponse } from "next/server"
 import getCookieInfo from "../../../../lib/getCookieInfo"
+import fetchWooCommerce from "../../../../lib/fetchWooCommerce"
 
 export async function GET(req) {
+    const { searchParams } = new URL(req.url)
+    const userID = searchParams.get("userID")
+
+    const [token] = await getCookieInfo()
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    const ordersError = "Error fetching orders"
+
     try {
-        const { searchParams } = new URL(req.url)
-        const userID = searchParams.get("userID")
-
-        const [token] = await getCookieInfo()
-        if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-
-        // console.log("userID", userID)
-        // console.log("token", token)
-
-        const ordersResponse = await fetch(
-            `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/orders?customer=${userID}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-        )
-        const orders = await ordersResponse.json()
-        //console.log("orders", orders)
-
+        const orders = await fetchWooCommerce(`wc/v3/orders?customer=${userID}`, ordersError, token)
         return NextResponse.json({ orders })
-    } catch (error) {
-        console.error("Error fetching orders:", error.message)
-        return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
+    } catch {
+        return NextResponse.json({ error: ordersError }, { status: 500 })
     }
 }

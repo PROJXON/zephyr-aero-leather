@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import getCookieInfo from "../../../../../lib/getCookieInfo"
+import fetchWooCommerce from "../../../../../lib/fetchWooCommerce"
 
 export async function GET() {
   try {
@@ -14,34 +15,12 @@ export async function GET() {
       }
     }
 
-    if (!token) {
-      return NextResponse.json({ isAuthenticated: false, user: null });
-    }
+    if (!token) return NextResponse.json({ isAuthenticated: false, user: null })
 
-    const userResponse = await fetch(
-      `${process.env.WOOCOMMERCE_API_URL}/wp-json/wp/v2/users/me`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    if (!userResponse.ok) throw new Error("Failed to fetch WordPress user");
-
-    const userData = await userResponse.json();
-    const userId = userData.id;
-
-    const authHeader = `Basic ${Buffer.from(
-      `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-    ).toString("base64")}`;
-
-    const customerResponse = await fetch(
-      `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/customers/${userId}`,
-      { headers: { Authorization: authHeader } }
-    );
-
-    if (!customerResponse.ok) throw new Error("Failed to fetch WooCommerce customer");
-
-    const customerData = await customerResponse.json();
-
-    const response = NextResponse.json({ isAuthenticated: true, user: customerData });
+    const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch WordPress user", token)
+    const userId = userData.id
+    const customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Failed to fetch WooCommerce customer")
+    const response = NextResponse.json({ isAuthenticated: true, user: customerData })
 
     response.cookies.set("userData", Buffer.from(JSON.stringify(customerData)).toString("base64"), {
       httpOnly: true,
