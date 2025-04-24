@@ -44,23 +44,11 @@ export async function PUT() {
     }
 
     // Update the order to clear line items
-    const clearResponse = await fetch(`${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/orders/${pendingOrder.id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-        ).toString("base64")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ line_items: [] }),
-    });
-
-    if (!clearResponse.ok) throw new Error("Failed to clear cart");
-
-    const result = await clearResponse.json();
+    const clearCartError = "Failed to clear cart"
+    const result = await fetchWooCommerce(`wc/v3/orders/${pendingOrder.id}`, clearCartError, null, "PUT", { line_items: [] })
     return NextResponse.json({ message: "Cart cleared", data: result });
   } catch (error) {
     console.error("Error clearing cart:", error.message);
-    return NextResponse.json({ error: "Failed to clear cart" }, { status: 500 });
+    return NextResponse.json({ error: clearCartError }, { status: 500 });
   }
 }
