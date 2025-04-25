@@ -1,9 +1,7 @@
-import Stripe from 'stripe'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import fetchWooCommerce from '../../../../lib/fetchWooCommerce'
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+import stripeObj from '../../../../lib/stripeObj'
 
 export async function POST(req) {
     const rawBody = await req.text()
@@ -13,7 +11,7 @@ export async function POST(req) {
     let event
     let responseBody = { received: true }
     try {
-        event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET)
+        event = stripeObj.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET)
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 400 })
     }
@@ -30,7 +28,13 @@ export async function POST(req) {
         case 'payment_intent.succeeded':
             console.log(`Payment intent for ${paymentIntent.amount_received} was successful`)
             if (wooOrderId) {
-                await fetchWooCommerce(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", { status: "completed" })
+                await fetchWooCommerce(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", {
+                    status: "completed",
+                    meta_data: [{
+                        key: "user_local_time",
+                        value: paymentIntent.metadata.user_local_time
+                    }]
+                })
             }
             responseBody = { success: true }
             break

@@ -13,7 +13,6 @@ export async function GET(req) {
 
     try {
         const orders = await fetchWooCommerce(`wc/v3/orders?customer=${userID}&status=completed`, ordersError, token)
-        console.log(orders)
         return NextResponse.json({ orders })
     } catch {
         return NextResponse.json({ error: ordersError }, { status: 500 })

@@ -45,7 +45,7 @@ export default function Checkout({ products }) {
                 }).then(res => res.json())
                     .then(data => {
                         setClientSecret(data.clientSecret)
-                        if (data.paymentIntentId) setPaymentIntentId(data.paymentIntentId)
+                        if (data.payment_intent_id) setPaymentIntentId(data.payment_intent_id)
                     })
             }, 500)
 
@@ -61,7 +61,7 @@ export default function Checkout({ products }) {
     return (<>
         {cartItems?.length > 0 ? <div className="grid grid-cols-[60%_40%] gap-2">
             {clientSecret && (<Elements stripe={stripePromise} options={options}>
-                <StripeForm />
+                <StripeForm paymentIntentId={paymentIntentId} />
             </Elements>)}
             <OrderSummary
                 cartItems={cartItems}

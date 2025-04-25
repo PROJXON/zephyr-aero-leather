@@ -1,24 +1,16 @@
-import Stripe from 'stripe'
 import cartStripePayment from '../../../../lib/cartStripePayment'
+import stripeObj from '../../../../lib/stripeObj'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+export const POST = cartStripePayment
 
-export async function POST(req) {
-    const { amount, items, woo_order_id } = await req.json()
-    return await cartStripePayment(amount, items, woo_order_id)
-}
-
-export async function PUT(req) {
-    const { amount, items, woo_order_id, payment_intent_id } = await req.json()
-    return await cartStripePayment(amount, items, woo_order_id, payment_intent_id)
-}
+export const PUT = cartStripePayment
 
 export async function GET(req) {
     const { searchParams } = new URL(req.url)
     const payment_intent = searchParams.get('payment_intent')
 
     try {
-        const paymentIntent = await stripe.paymentIntents.retrieve(payment_intent)
+        const paymentIntent = await stripeObj.paymentIntents.retrieve(payment_intent)
 
         return new Response(JSON.stringify({
             amount: paymentIntent.amount,

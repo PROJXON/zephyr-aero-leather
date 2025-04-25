@@ -7,13 +7,22 @@ import calculateTotal from "../../lib/calculateTotal"
 export default function OrderHistory({ products }) {
     const { user, isAuthenticated } = useAuth()
     const [orders, setOrders] = useState([])
+    const [localTimes, setLocalTimes] = useState([])
 
     useEffect(() => {
         (async () => {
             if (isAuthenticated) {
                 const orderResponse = await fetch(`/api/order?userID=${user.id}`)
                 const data = await orderResponse.json()
-                setOrders(data.orders || [])
+                const ordersArray = data.orders || []
+                setOrders(ordersArray)
+
+                let localTimesArray = []
+                ordersArray.forEach(order => {
+                    const timeString = order.meta_data.find(meta => meta.key === "user_local_time")?.value
+                    localTimesArray.push(new Date(timeString))
+                })
+                setLocalTimes(localTimesArray)
             }
         })()
     }, [isAuthenticated])
@@ -24,7 +33,7 @@ export default function OrderHistory({ products }) {
                 <p>No orders found</p> :
                 <ul>
                     {orders.map((order, i) => {
-                        const datePaid = new Date(order.date_paid)
+                        const datePaid = localTimes[i]
                         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
                         const items = order.line_items
                         const total = calculateTotal(items, products)
