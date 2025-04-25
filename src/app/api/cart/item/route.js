@@ -42,7 +42,7 @@ export async function POST(req) {
       quantity: finalQuantity,
     };
 
-    const updatedCart = await fetchWooCommerce("wc/v3/orders", "Failed to add item to cart", null, "PUT", { line_items: [updatedLineItem] })
+    const updatedCart = await fetchWooCommerce(`wc/v3/orders/${finalOrderId}`, "Failed to add item to cart", null, "PUT", { line_items: [updatedLineItem] })
     return NextResponse.json({ success: true, cart: updatedCart })
   } catch (error) {
     return NextResponse.json({ error: "Failed to add item" }, { status: 500 })
