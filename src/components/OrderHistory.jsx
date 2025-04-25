@@ -12,6 +12,7 @@ export default function OrderHistory() {
                 const orderResponse = await fetch(`/api/order?userID=${user.id}`)
                 const data = await orderResponse.json()
                 setOrders(data.orders || [])
+                console.log(data.orders)
             }
         })()
     }, [isAuthenticated])

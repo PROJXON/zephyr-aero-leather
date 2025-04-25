@@ -28,6 +28,7 @@ export async function GET() {
 
 export async function PUT() {
   const clearCartError = "Failed to clear cart"
+
   try {
     const [token] = await getCookieInfo()
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

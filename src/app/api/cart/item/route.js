@@ -7,16 +7,14 @@ export async function POST(req) {
     const { orderId, productId, quantity } = await req.json()
     const [token] = await getCookieInfo()
 
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     let finalOrderId = orderId
 
     // 🧠 If no order exists, create one first
     if (!finalOrderId) {
       // Get the current user info
-      const userData = await fetchWooCommerce("/wp/v2/users/me", "Failed to fetch user info", token)
+      const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch user info", token)
 
       // Create a new pending order
       const newOrder = await fetchWooCommerce("wc/v3/orders", "Failed to create order", null, "POST", {
@@ -46,9 +44,7 @@ export async function POST(req) {
 
     const updatedCart = await fetchWooCommerce("wc/v3/orders", "Failed to add item to cart", null, "PUT", { line_items: [updatedLineItem] })
     return NextResponse.json({ success: true, cart: updatedCart })
-
   } catch (error) {
-    console.error("Error adding item to cart:", error.message)
     return NextResponse.json({ error: "Failed to add item" }, { status: 500 })
   }
 }
@@ -94,11 +90,11 @@ export async function PUT(req) {
 
     // ✅ Send only id and quantity, WooCommerce rejects extra fields
     const updatedItems = orderData.line_items.map(item => {
-      const match = line_items.find((li) => li.id === item.id);
+      const match = line_items.find(li => li.id === item.id);
       return match ? { id: item.id, quantity: match.quantity } : { id: item.id, quantity: item.quantity };
     })
 
-    const updatedCart = await fetchWooCommerce("wc/v3/orders", updateErrorMessage, token, "PUT", { line_items: updatedItems })
+    const updatedCart = await fetchWooCommerce(`wc/v3/orders/${orderId}`, updateErrorMessage, token, "PUT", { line_items: updatedItems })
     return NextResponse.json({ success: true, cart: updatedCart });
   } catch (error) {
     console.error("Error updating cart item:", error.message);

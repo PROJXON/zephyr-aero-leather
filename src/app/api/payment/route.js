@@ -4,13 +4,13 @@ import cartStripePayment from '../../../../lib/cartStripePayment'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export async function POST(req) {
-    const { amount, items } = await req.json()
-    return await cartStripePayment(amount, items)
+    const { amount, items, woo_order_id } = await req.json()
+    return await cartStripePayment(amount, items, woo_order_id)
 }
 
 export async function PUT(req) {
-    const { amount, items, payment_intent_id } = await req.json()
-    return await cartStripePayment(amount, items, payment_intent_id)
+    const { amount, items, woo_order_id, payment_intent_id } = await req.json()
+    return await cartStripePayment(amount, items, woo_order_id, payment_intent_id)
 }
 
 export async function GET(req) {

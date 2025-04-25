@@ -10,12 +10,12 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 
 export default function Checkout({ products }) {
-    const { cartItems, updateQuantity } = useCart();
+    const { cartItems, updateQuantity, orderId } = useCart();
 
     let changeQuantity = getChangeQuantity({ updateQuantity })
     changeQuantity.push({
         icon: FaEdit,
-        onClick: (item) => {
+        onClick: item => {
             setEditID(item.id);
             setNewQty(item.quantity.toString());
         }
@@ -39,6 +39,7 @@ export default function Checkout({ products }) {
                     body: JSON.stringify({
                         amount: newTotal,
                         items: cartItems,
+                        woo_order_id: orderId,
                         payment_intent_id: paymentIntentId
                     })
                 }).then(res => res.json())
