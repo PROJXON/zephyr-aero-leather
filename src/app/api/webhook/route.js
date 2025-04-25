@@ -26,6 +26,7 @@ export async function POST(req) {
             if (wooOrderId) {
                 await fetchWooCommerce(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", { status: "processing" })
             }
+            break
         case 'payment_intent.succeeded':
             console.log(`Payment intent for ${paymentIntent.amount_received} was successful`)
             if (wooOrderId) {
