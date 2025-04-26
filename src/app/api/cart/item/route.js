@@ -85,8 +85,6 @@ export async function PUT(req) {
 
     // Fetch current order
     const orderData = await fetchWooCommerce(`wc/v3/orders/${orderId}`, "Failed to fetch order")
-
-    // ✅ Send only id and quantity, WooCommerce rejects extra fields
     const updatedItems = orderData.line_items.map(item => {
       const match = line_items.find(li => li.id === item.id)
       const quantity = match ? match.quantity : item.quantity
