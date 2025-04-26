@@ -42,7 +42,7 @@ export default async function ProductPage({ params }) {
             className="prose max-w-none mb-8"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
-          <AddToCartButton productId={product.id} />
+          <AddToCartButton productId={product.id} className="px-6 py-3 rounded-lg" />
         </div>
       </div>
 

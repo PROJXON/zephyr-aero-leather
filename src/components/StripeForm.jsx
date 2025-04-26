@@ -1,14 +1,12 @@
 "use client"
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 
-export default function StripeForm() {
+export default function StripeForm({ paymentIntentId }) {
     const stripe = useStripe()
     const elements = useElements()
     const [isProcessing, setIsProcessing] = useState(false)
     const [error, setError] = useState(null)
-    const router = useRouter()
 
     const handleSubmit = async e => {
         e.preventDefault()
@@ -16,8 +14,22 @@ export default function StripeForm() {
 
         setIsProcessing(true)
 
-        const returnURL = `${window.location.origin}/payment-success`
+        if (!paymentIntentId) {
+            setError("Missing payment intent ID")
+            setIsProcessing(false)
+            return
+        }
 
+        await fetch("/api/user-time", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                payment_intent_id: paymentIntentId,
+                user_local_time: new Date().toISOString()
+            })
+        })
+
+        const returnURL = `${window.location.origin}/payment-success`
         const { error } = await stripe.confirmPayment({
             elements,
             confirmParams: { return_url: returnURL },

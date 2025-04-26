@@ -9,13 +9,14 @@ export const CartContext = createContext({
   addToCart: () => { },
   removeFromCart: () => { },
   updateQuantity: () => { },
+  orderId: null
 });
 
 export const CartProvider = ({ children }) => {
   const { isAuthenticated, user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [orderId, setOrderId] = useState(null);
-  const [cartOpen, setCartOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false)
 
   const pendingUpdates = useRef({});
   const updateTimers = useRef({});
@@ -50,8 +51,8 @@ export const CartProvider = ({ children }) => {
           id: item.product_id,
           quantity: item.quantity,
         }))
-      );
-      setOrderId(data.orderId || null);
+      )
+      setOrderId(data.orderId || null)
     } catch (error) {
       console.error("Error fetching cart:", error.message);
       setCartItems([]);
@@ -187,9 +188,9 @@ export const CartProvider = ({ children }) => {
         delete pendingUpdates.current[productId];
 
         fetch("/api/cart")
-          .then((res) => res.json())
+          .then(res => res.json())
           .then(({ orderId: freshOrderId, items }) => {
-            const existingItem = items.find((item) => item.product_id === productId);
+            const existingItem = items.find(item => item.product_id === productId);
 
             if (!existingItem && finalQuantity > 0) {
               // 🆕 It's a new item — use POST
@@ -267,7 +268,6 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-
   // const syncGuestCartToWooCommerce = async () => {
   //   if (isAuthenticated && orderId) {
   //     const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
@@ -283,7 +283,15 @@ export const CartProvider = ({ children }) => {
   // }, [isAuthenticated, orderId])
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, updateQuantity, setCartOpen, cartOpen, clearCart }}>
+    <CartContext.Provider value={{
+      cartItems,
+      addToCart,
+      updateQuantity,
+      setCartOpen,
+      cartOpen,
+      clearCart,
+      orderId
+    }}>
       {children}
     </CartContext.Provider>
   );
