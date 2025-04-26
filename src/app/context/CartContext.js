@@ -268,7 +268,6 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-
   // const syncGuestCartToWooCommerce = async () => {
   //   if (isAuthenticated && orderId) {
   //     const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];

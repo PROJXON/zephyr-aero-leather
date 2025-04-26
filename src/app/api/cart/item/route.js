@@ -32,14 +32,12 @@ export async function POST(req) {
     const existingItem = orderData.line_items.find((item) => item.product_id === productId);
 
     console.log("Adding to existing order:", finalOrderId);
-    console.log("Client-sent quantity:", quantity);
-
-    const finalQuantity = (existingItem?.quantity || 0) + quantity;
+    console.log("Client-sent quantity:", quantity)
 
     const updatedLineItem = {
       id: existingItem?.id,
       product_id: productId,
-      quantity: finalQuantity,
+      quantity,
     };
 
     const updatedCart = await fetchWooCommerce(`wc/v3/orders/${finalOrderId}`, "Failed to add item to cart", null, "PUT", { line_items: [updatedLineItem] })
@@ -90,11 +88,27 @@ export async function PUT(req) {
 
     // ✅ Send only id and quantity, WooCommerce rejects extra fields
     const updatedItems = orderData.line_items.map(item => {
-      const match = line_items.find(li => li.id === item.id);
-      return match ? { id: item.id, quantity: match.quantity } : { id: item.id, quantity: item.quantity };
+      const match = line_items.find(li => li.id === item.id)
+      const quantity = match ? match.quantity : item.quantity
+      const price = parseFloat(item.subtotal) / item.quantity
+      const subtotal = price * quantity
+
+      return {
+        id: item.id,
+        quantity,
+        product_id: item.product_id,
+        variation_id: item.variation_id,
+        subtotal: subtotal.toFixed(2),
+        subtotal_tax: "0.00",
+        total: subtotal.toFixed(2),
+        total_tax: "0.00"
+      }
     })
 
-    const updatedCart = await fetchWooCommerce(`wc/v3/orders/${orderId}`, updateErrorMessage, token, "PUT", { line_items: updatedItems })
+    const updatedCart = await fetchWooCommerce(`wc/v3/orders/${orderId}`, updateErrorMessage, token, "PUT", {
+      line_items: updatedItems,
+      recalculate: true
+    })
     return NextResponse.json({ success: true, cart: updatedCart });
   } catch (error) {
     console.error("Error updating cart item:", error.message);
