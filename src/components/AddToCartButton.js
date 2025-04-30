@@ -11,12 +11,10 @@ export default function AddToCartButton({ productId, className }) {
     if (!cartOpen) setCartOpen(true)
   };
 
-  return (
-    <button
-      onClick={handleAddToCart}
-      className={`bg-blue-500 text-white hover:bg-blue-600 transition-colors addToCartBtn ${className}`}
-    >
-      Add to Cart
-    </button>
-  );
+  return (<button
+    onClick={handleAddToCart}
+    className={`bg-blue-500 text-white hover:bg-blue-600 transition-colors addToCartBtn ${className}`}
+  >
+    Add to Cart
+  </button>)
 } 

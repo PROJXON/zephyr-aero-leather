@@ -1,6 +1,8 @@
 import OrderHistory from "@/components/OrderHistory"
 import fetchProducts from "../../../lib/woocommerce"
 
+export const dynamic = 'force-dynamic'
+
 export default async function OrderHistoryPage() {
     const products = await fetchProducts()
 
