@@ -13,11 +13,13 @@ export default function ProductReviews({ productId }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [hasPurchased, setHasPurchased] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
 
   useEffect(() => {
     fetchReviews();
     if (isAuthenticated) {
       checkPurchaseStatus();
+      checkReviewStatus();
     }
   }, [productId, isAuthenticated]);
 
@@ -35,6 +37,17 @@ export default function ProductReviews({ productId }) {
       setHasPurchased(hasBought);
     } catch (error) {
       console.error("Error checking purchase status:", error);
+    }
+  };
+
+  const checkReviewStatus = async () => {
+    try {
+      const response = await fetch(`/api/reviews?productId=${productId}&userId=${user.id}`);
+      if (!response.ok) throw new Error("Failed to check review status");
+      const data = await response.json();
+      setHasReviewed(data.length > 0);
+    } catch (error) {
+      console.error("Error checking review status:", error);
     }
   };
 
@@ -89,7 +102,11 @@ export default function ProductReviews({ productId }) {
       setNewReview("");
       setRating(5);
     } catch (error) {
-      setError(error.message);
+      if (error.message === "You have already reviewed this product") {
+        setError("You have already reviewed this product. You can only leave one review per product.");
+      } else {
+        setError(error.message);
+      }
     }
   };
 
@@ -128,45 +145,49 @@ export default function ProductReviews({ productId }) {
 
       {isAuthenticated ? (
         hasPurchased ? (
-          <form onSubmit={handleSubmitReview} className="space-y-4">
-            <div>
-              <label className="block mb-2">Rating</label>
-              <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setRating(star)}
-                    className="text-2xl"
-                  >
-                    <FaStar
-                      className={star <= rating ? "text-yellow-400" : "text-gray-300"}
-                    />
-                  </button>
-                ))}
+          hasReviewed ? (
+            <p className="text-gray-600">You have already reviewed this product.</p>
+          ) : (
+            <form onSubmit={handleSubmitReview} className="space-y-4">
+              <div>
+                <label className="block mb-2">Rating</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className="text-2xl"
+                    >
+                      <FaStar
+                        className={star <= rating ? "text-yellow-400" : "text-gray-300"}
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label className="block mb-2">Your Review</label>
-              <textarea
-                value={newReview}
-                onChange={(e) => setNewReview(e.target.value)}
-                className="w-full p-2 border rounded"
-                rows="4"
-                required
-              />
-            </div>
+              <div>
+                <label className="block mb-2">Your Review</label>
+                <textarea
+                  value={newReview}
+                  onChange={(e) => setNewReview(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  rows="4"
+                  required
+                />
+              </div>
 
-            {error && <p className="text-red-500">{error}</p>}
+              {error && <p className="text-red-500">{error}</p>}
 
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Submit Review
-            </button>
-          </form>
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Submit Review
+              </button>
+            </form>
+          )
         ) : (
           <p className="text-gray-600">You must purchase this product before leaving a review.</p>
         )
