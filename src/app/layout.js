@@ -1,9 +1,11 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
 import { AuthProvider } from "./context/AuthContext";
-import { cookies } from "next/headers";
-import Footer from "@/components/Footer";
+import { CartProvider } from "./context/CartContext";
+import fetchProducts from "../../lib/woocommerce"
+import getCookieInfo from "../../lib/getCookieInfo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,9 +25,10 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   let user = null;
 
+  const products = await fetchProducts();
+
   try {
-    const cookieStore = await cookies(); 
-    const userCookie = cookieStore.get("userData")?.value;
+    const [, userCookie] = await getCookieInfo()
     if (userCookie) {
       user = JSON.parse(atob(userCookie));
     }
@@ -35,11 +38,13 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-[100dvh] grid grid-rows-[auto_1fr_auto]`}>
         <AuthProvider>
-          <Navbar initialUser={user} />
-          <main>{children}</main>
-          <Footer />
+          <CartProvider>
+            <Navbar initialUser={user} allProducts={products} />
+            <main>{children}</main>
+            <Footer />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

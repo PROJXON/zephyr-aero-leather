@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from "next/server"
+import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 
 export async function POST(req) {
   try {
@@ -15,59 +16,49 @@ export async function POST(req) {
       body: JSON.stringify({ username: email, password }),
     });
 
+    const rawJwtResponse = await jwtRes.text(); // get raw text
+    console.log("JWT raw response:", rawJwtResponse); // log it
+
     if (!jwtRes.ok) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
-    const jwtData = await jwtRes.json();
-    const token = jwtData.token;
-
-    if (!token) {
-      return NextResponse.json({ error: "Authentication failed" }, { status: 401 });
+    let jwtData;
+    try {
+      jwtData = JSON.parse(rawJwtResponse);
+    } catch (err) {
+      if (rawJwtResponse.includes('<!DOCTYPE html>')) {
+        console.error("Received HTML instead of JSON – likely Jetpack login screen.");
+      } else {
+        console.error("Failed to parse JWT response as JSON:", err);
+      }
+      return NextResponse.json({ error: "Unexpected response from auth server" }, { status: 500 });
     }
+
+    const token = jwtData.token;
+    if (!token) return NextResponse.json({ error: "Authentication failed" }, { status: 401 })
 
     // ✅ Step 2: Fetch WordPress user data
-    const userRes = await fetch(`${process.env.WOOCOMMERCE_API_URL}/wp-json/wp/v2/users/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    let userData = null
+    const userDataError = "Failed to fetch user data"
 
-    if (!userRes.ok) {
-      return NextResponse.json({ error: "Failed to fetch user data" }, { status: 500 });
-    }
-
-    const userData = await userRes.json();
-    const userId = userData.id;
-
-    let customerData = null;
-
-    // ✅ Step 3: Fetch WooCommerce customer data
     try {
-      const authHeader = `Basic ${Buffer.from(
-        `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
-      ).toString("base64")}`;
-
-      const customerRes = await fetch(
-        `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/customers/${userId}`,
-        { headers: { Authorization: authHeader } }
-      );
-
-      if (customerRes.ok) {
-        customerData = await customerRes.json();
-      }
-    } catch (error) {
-      console.error("Error fetching WooCommerce customer data:", error);
+      userData = await fetchWooCommerce("wp/v2/users/me", userDataError, token)
+    } catch {
+      return NextResponse.json({ error: userDataError }, { status: 500 })
     }
+    const userId = userData.id
 
-    const userResponseData = customerData || {
-      email: jwtData.user_email,
-      username: jwtData.user_nicename,
-      name: jwtData.user_display_name,
-      first_name: jwtData.user_display_name.split(" ")[0] || jwtData.user_display_name,
-      id: jwtData.user_id,
-    };
+    let customerData = null
+    // ✅ Step 3: Fetch WooCommerce customer data
+    customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Error fetching WooCommerce customer data:")
+
+    if (!customerData) {
+      return NextResponse.json({ error: "Failed to fetch WooCommerce customer Data" }, { status: 500 });
+    }
 
     // ✅ Step 4: Create response with cookies
-    const res = new NextResponse(JSON.stringify({ success: true, user: userResponseData }), {
+    const res = new NextResponse(JSON.stringify({ success: true, user: customerData }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -79,7 +70,7 @@ export async function POST(req) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
-    res.cookies.set("userData", Buffer.from(JSON.stringify(userResponseData)).toString("base64"), {
+    res.cookies.set("userData", Buffer.from(JSON.stringify(customerData)).toString("base64"), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
