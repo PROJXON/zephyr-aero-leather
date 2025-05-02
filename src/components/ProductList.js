@@ -5,30 +5,33 @@ import AddToCartButton from "./AddToCartButton"
 
 export default function ProductList({ products }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
       {products.length === 0 ? (
-        <p>No products found.</p>
+        <p className="text-neutral-medium">No products found.</p>
       ) : (
         products.map(product => (
-          <div key={product.id} className="border rounded-lg shadow-sm overflow-hidden">
-            <Link href={`/product/${product.id}`}>
-              <div className="relative aspect-square">
+          <div key={product.id} className="group">
+            <div className="relative aspect-square bg-card mb-3 overflow-hidden shadow-sm">
+              <Link href={`/product/${product.id}`}>
                 <Image
                   src={product.images[0]?.src || "/placeholder.jpg"}
                   alt={product.name}
                   fill
-                  className="object-cover"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-              </div>
-            </Link>
-            <div className="p-4">
-              <Link href={`/product/${product.id}`}>
-                <h2 className="text-lg font-semibold mb-2 hover:text-blue-600">{product.name}</h2>
               </Link>
-              <p className="text-gray-600 mb-4">
+            </div>
+            <div className="space-y-2">
+              <Link href={`/product/${product.id}`}>
+                <h3 className="text-neutral-dark font-medium hover:text-primary transition-colors">{product.name}</h3>
+              </Link>
+              <p className="text-neutral-medium">
                 {product.price ? `$${product.price}` : "Price not available"}
               </p>
-              <AddToCartButton productId={product.id} className="w-full py-2 px-4 rounded" />
+              <AddToCartButton 
+                productId={product.id} 
+                className="w-full bg-primary hover:bg-accent text-white rounded-none px-4 py-2 transition-colors" 
+              />
             </div>
           </div>
         ))

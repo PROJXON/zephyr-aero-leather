@@ -1,72 +1,87 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { FaFacebook, FaLinkedin, FaInstagram } from "react-icons/fa";
-import ZephyrLogo from "../../public/zephyrlogo.jpg";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 
-const Footer = () => {
+export default function Footer() {
   return (
-    <footer className="bg-black text-white py-12 mt-16">
-      <div className="max-w-screen-xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
-          {/* Logo & About Section */}
+    <footer className="border-t bg-background">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          {/* Shop */}
           <div>
-            <Link href="/">
-              <Image 
-                src={ZephyrLogo} 
-                alt="Zephyr Logo" 
-                width={150}
-                height={75}
-                className="mx-auto md:mx-0"
-              />
-            </Link>
-            <p className="mt-3 text-gray-400 text-sm leading-relaxed">
-              Your one-stop shop for premium quality products. Discover the latest trends with Zephyr.
-            </p>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
-            <ul className="space-y-3 text-gray-400 text-sm">
-              {["Home", "Shop", "About Us", "Contact"].map((item, index) => (
-                <li key={index}>
-                  <Link href={`/${item.toLowerCase().replace(/ /g, "-")}`} className="hover:text-gray-200 transition">
-                    {item}
-                  </Link>
-                </li>
-              ))}
+            <h3 className="mb-4 text-sm font-medium text-neutral-dark">Shop</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/best-sellers" className="text-sm text-neutral-medium hover:text-primary">
+                  Best Sellers
+                </Link>
+              </li>
+              <li>
+                <Link href="/gifts-idea" className="text-sm text-neutral-medium hover:text-primary">
+                  Gifts Idea
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Social Media Links */}
+          {/* About */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Follow Us</h3>
-            <div className="flex justify-center md:justify-start space-x-6">
-              <Link href="https://www.facebook.com/ZephyrAeroLeather/" className="text-gray-400 hover:text-gray-200 transition">
-                <FaFacebook size={26} />
+            <h3 className="mb-4 text-sm font-medium text-neutral-dark">About</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/our-story" className="text-sm text-neutral-medium hover:text-primary">
+                  Our Story
+                </Link>
+              </li>
+              <li>
+                <Link href="/sustainability" className="text-sm text-neutral-medium hover:text-primary">
+                  Sustainability
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Support */}
+          <div>
+            <h3 className="mb-4 text-sm font-medium text-neutral-dark">Support</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/contact" className="text-sm text-neutral-medium hover:text-primary">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-sm text-neutral-medium hover:text-primary">
+                  FAQ
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Connect */}
+          <div>
+            <h3 className="mb-4 text-sm font-medium text-neutral-dark">Connect</h3>
+            <div className="flex space-x-4">
+              <Link href="https://facebook.com" className="text-neutral-medium hover:text-primary">
+                <Facebook className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-gray-200 transition">
-                <FaLinkedin size={26} />
+              <Link href="https://instagram.com" className="text-neutral-medium hover:text-primary">
+                <Instagram className="h-5 w-5" />
               </Link>
-              <Link href="https://www.instagram.com/zephyr.aero.leather/" className="text-gray-400 hover:text-gray-200 transition">
-                <FaInstagram size={26} />
+              <Link href="https://twitter.com" className="text-neutral-medium hover:text-primary">
+                <Twitter className="h-5 w-5" />
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-gray-600 my-6"></div>
-
-        {/* Copyright Section */}
-        <div className="text-center text-gray-400 text-sm">
-          &copy; {new Date().getFullYear()} Zephyr. All rights reserved.
+        <div className="mt-12 border-t pt-8 text-center">
+          <p className="text-sm text-neutral-medium">
+            © {new Date().getFullYear()} Zephyr Aero Leather. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

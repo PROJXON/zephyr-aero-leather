@@ -1,51 +1,27 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
-import { AuthProvider } from "./context/AuthContext";
-import { CartProvider } from "./context/CartContext";
-import fetchProducts from "../../lib/woocommerce"
-import getCookieInfo from "../../lib/getCookieInfo";
+import { Inter } from "next/font/google";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { CartProvider } from "@/hooks/useCart";
+import FloatingCartButton from "@/components/FloatingCartButton";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Zephyr Aero Leather",
-  description: "Luxury Leather Goods",
+  description: "Premium leather goods and accessories",
 };
 
-export default async function RootLayout({ children }) {
-  let user = null;
-
-  const products = await fetchProducts();
-
-  try {
-    const [, userCookie] = await getCookieInfo()
-    if (userCookie) {
-      user = JSON.parse(atob(userCookie));
-    }
-  } catch (error) {
-    console.error("Error reading cookies on server:", error);
-  }
-
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-[100dvh] grid grid-rows-[auto_1fr_auto]`}>
-        <AuthProvider>
-          <CartProvider>
-            <Navbar initialUser={user} allProducts={products} />
-            <main>{children}</main>
-            <Footer />
-          </CartProvider>
-        </AuthProvider>
+      <body className={inter.className}>
+        <CartProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <FloatingCartButton />
+        </CartProvider>
       </body>
     </html>
   );
