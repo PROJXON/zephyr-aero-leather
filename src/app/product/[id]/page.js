@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import ProductReviews from "@/components/ProductReviews";
 import AddToCartButton from "@/components/AddToCartButton";
-import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
+import fetchWooCommerce from "../../../../lib/fetchWooCommerce"
+
+export const revalidate = 60
 
 async function getProduct(id) {
   try {
