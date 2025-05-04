@@ -1,11 +1,20 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+<<<<<<< HEAD
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import fetchProducts from "../../lib/woocommerce"
 import getCookieInfo from "../../lib/getCookieInfo";
+=======
+import { Inter } from "next/font/google";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { CartProvider } from "@/hooks/useCart";
+import FloatingCartButton from "@/components/FloatingCartButton";
+import { AuthProvider } from "@/app/context/AuthContext";
+>>>>>>> bf4f184 (Add design changes)
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,12 +47,22 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
+<<<<<<< HEAD
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-[100dvh] grid grid-rows-[auto_1fr_auto]`}>
         <AuthProvider>
           <CartProvider>
             <Navbar initialUser={user} allProducts={products} />
             <main>{children}</main>
             <Footer />
+=======
+      <body className={inter.className}>
+        <AuthProvider>
+          <CartProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <FloatingCartButton />
+>>>>>>> bf4f184 (Add design changes)
           </CartProvider>
         </AuthProvider>
       </body>
