@@ -102,24 +102,23 @@ export default function CategoryPage() {
     return result;
   }, [products, filters]);
 
-  // Calculate pagination
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
   const paginatedProducts = filteredProducts.slice(startIndex, startIndex + productsPerPage);
 
   const handleSortChange = (value) => {
     setFilters({ ...filters, sort: value });
-    setCurrentPage(1); // Reset to first page when changing sort
+    setCurrentPage(1); 
   };
 
   const handlePriceRangeChange = (value) => {
     setFilters({ ...filters, priceRange: value });
-    setCurrentPage(1); // Reset to first page when changing price range
+    setCurrentPage(1); 
   };
 
   const handleFilterChange = (filter) => {
     setFilters({ ...filters, [filter]: !filters[filter] });
-    setCurrentPage(1); // Reset to first page when changing filters
+    setCurrentPage(1); 
   };
 
   if (loading) {
