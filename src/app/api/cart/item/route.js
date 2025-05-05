@@ -83,7 +83,6 @@ export async function PUT(req) {
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!orderId) return NextResponse.json({ error: "No pending order found" }, { status: 400 })
 
-    // Fetch current order
     const updatedItems = line_items.map(item => ({
       id: item.id,
       quantity: item.quantity
