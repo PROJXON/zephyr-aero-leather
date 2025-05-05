@@ -84,31 +84,16 @@ export async function PUT(req) {
     if (!orderId) return NextResponse.json({ error: "No pending order found" }, { status: 400 })
 
     // Fetch current order
-    const orderData = await fetchWooCommerce(`wc/v3/orders/${orderId}`, "Failed to fetch order")
-    const updatedItems = orderData.line_items.map(item => {
-      const match = line_items.find(li => li.id === item.id)
-      const quantity = match ? match.quantity : item.quantity
-      const price = parseFloat(item.subtotal) / item.quantity
-      const subtotal = price * quantity
-
-      return {
-        id: item.id,
-        quantity,
-        product_id: item.product_id,
-        variation_id: item.variation_id,
-        subtotal: subtotal.toFixed(2),
-        subtotal_tax: "0.00",
-        total: subtotal.toFixed(2),
-        total_tax: "0.00"
-      }
-    })
+    const updatedItems = line_items.map(item => ({
+      id: item.id,
+      quantity: item.quantity
+    }))
 
     const updatedCart = await fetchWooCommerce('customcarteditor/v1/update-cart', updateErrorMessage, token, "POST", {
       orderId,
-      line_items: updatedItems,
-      recalculate: true
+      line_items: updatedItems
     })
-    return NextResponse.json({ success: true, cart: updatedCart });
+    return NextResponse.json({ success: true, cart: updatedCart })
   } catch (error) {
     console.error("Error updating cart item:", error.message);
     return NextResponse.json({ error: updateErrorMessage }, { status: 500 });
