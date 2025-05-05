@@ -103,7 +103,8 @@ export async function PUT(req) {
       }
     })
 
-    const updatedCart = await fetchWooCommerce(`wc/v3/orders/${orderId}`, updateErrorMessage, token, "PUT", {
+    const updatedCart = await fetchWooCommerce('customcarteditor/v1/update-cart', updateErrorMessage, token, "POST", {
+      orderId,
       line_items: updatedItems,
       recalculate: true
     })
