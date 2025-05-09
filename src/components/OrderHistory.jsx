@@ -8,6 +8,7 @@ export default function OrderHistory({ products }) {
     const { isAuthenticated } = useAuth()
     const [orders, setOrders] = useState([])
     const [localTimes, setLocalTimes] = useState([])
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
     useEffect(() => {
         (async () => {
@@ -34,7 +35,6 @@ export default function OrderHistory({ products }) {
                 <ul>
                     {orders.map((order, i) => {
                         const datePaid = localTimes[i]
-                        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
                         const items = order.items
                         const total = calculateTotal(items, products)
 
