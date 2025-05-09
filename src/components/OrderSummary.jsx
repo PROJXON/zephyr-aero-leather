@@ -19,10 +19,7 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
                 const [itemInfo, priceInCents] = getItemInfo(products, item)
                 const imageInfo = itemInfo.images[0]
 
-                return (<li
-                    key={item.product_id || item.id}
-                    className="grid grid-cols-[100px_auto] gap-2 mb-2"
-                >
+                return (<li key={item.id} className="grid grid-cols-[100px_auto] gap-2 mb-2">
                     <Image
                         src={imageInfo.src}
                         alt={imageInfo.alt}
