@@ -1,208 +1,162 @@
 "use client";
 
-import { useState, useEffect } from "react"
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation"
-import ZephyrLogo from "../../public/zephyrlogo.jpg";
-import { useAuth } from "@/app/context/AuthContext"
-import NavButton from "./NavButton";
-import NavLoggedOutBtn from "./NavLoggedOutBtn";
-import ChangeQuantitySpans from "./ChangeQuantitySpans";
-import { useCart } from "@/app/context/CartContext";
-import getChangeQuantity from "../../lib/getChangeQuantity"
+import { usePathname } from "next/navigation";
+import Image from "next/image";
+import { ShoppingBag, User, X, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SearchComponent } from "./Search";
+import { useCart } from "@/hooks/useCart";
 
-const Navbar = ({ initialUser, allProducts }) => {
-  const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth()
-  const [serverUser, setServerUser] = useState(initialUser || null)
-  const [menuOpen, setMenuOpen] = useState(false);
+export default function Navbar() {
+  const pathname = usePathname();
+  const { cart } = useCart();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [accountOpen, setAccountOpen] = useState(false);
-  const { cartItems, updateQuantity, setCartOpen, cartOpen } = useCart();
-  const { replace } = useRouter()
-  const pathname = usePathname()
-
-  const changeQuantity = getChangeQuantity({ updateQuantity })
 
   useEffect(() => {
-    if (!initialUser) {
-      fetchUserFromServer();
-    }
-  }, [initialUser])
-
-  useEffect(() => {
-    setCartOpen(false)
-  }, [pathname])
-
-  const handleLogout = async () => {
-    await logout();
-    setAccountOpen(false);
-    setServerUser(null);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = e => {
-      if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
-        setAccountOpen(false);
-      }
-      if (cartOpen && !document.getElementById("cartBtn")?.contains(e.target) && !e.target.classList.contains("addToCartBtn")) {
-        setCartOpen(false);
+    // Check if user is authenticated
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/check");
+        if (response.ok) {
+          const data = await response.json();
+          setIsAuthenticated(true);
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
       }
     };
+    checkAuth();
+  }, []);
 
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [accountOpen, cartOpen]);
-
-  const navItems = ["Best Sellers", "Gift Ideas", "auth-test"]
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setIsAuthenticated(false);
+      setUser(null);
+      setAccountOpen(false);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
-    <nav className="bg-white antialiased">
-      <div className="max-w-screen-xl px-4 mx-auto py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center space-x-8">
-            <div className="shrink-0">
-              <Link href="/">
-                <Image
-                  className="w-64 h-32 object-contain"
-                  src={ZephyrLogo}
-                  alt="Logo"
-                  width={128}
-                  height={64}
-                  priority={true}
-                />
-              </Link>
-
-            </div>
-
-            {/* Desktop Menu */}
-            <ul className="hidden lg:flex items-center gap-8 py-3 relative">
-              {navItems.map((item) => (
-                <li key={item} className="relative group overflow-hidden">
-                  <Link
-                    href={`/${item.toLowerCase().replace(/ /g, "-")}`}
-                    className="text-lg font-medium text-black transition-all duration-300"
-                  >
-                    {item}
-                  </Link>
-                  <span className="absolute left-0 bottom-0 w-full h-[2px] bg-black transition-transform duration-300 transform scale-x-0 group-hover:scale-x-100"></span>
-
-                </li>
-              ))}
-            </ul>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <div className="mr-4 hidden md:flex">
+          <Link href="/" className="mr-6 flex items-center space-x-2">
+            <Image
+              src="/zephyrlogo.jpg"
+              alt="Zephyr Aero Leather"
+              width={32}
+              height={32}
+              className="rounded-full"
+            />
+            <span className="hidden font-bold sm:inline-block">Zephyr</span>
+          </Link>
+          <nav className="flex items-center space-x-6 text-sm font-medium">
+            <Link
+              href="/"
+              className={`transition-colors hover:text-primary ${
+                pathname === "/" ? "text-primary" : "text-neutral-dark"
+              }`}
+            >
+              Home
+            </Link>
+            <Link
+              href="/categories"
+              className={`transition-colors hover:text-primary ${
+                pathname === "/categories" ? "text-primary" : "text-neutral-dark"
+              }`}
+            >
+              Categories
+            </Link>
+            <Link
+              href="/best-sellers"
+              className={`transition-colors hover:text-primary ${
+                pathname === "/best-sellers" ? "text-primary" : "text-neutral-dark"
+              }`}
+            >
+              Best Sellers
+            </Link>
+            <Link
+              href="/gifts-idea"
+              className={`transition-colors hover:text-primary ${
+                pathname === "/gifts-idea" ? "text-primary" : "text-neutral-dark"
+              }`}
+            >
+              Gifts Idea
+            </Link>
+          </nav>
+        </div>
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+            <SearchComponent />
           </div>
-
-          <div className="flex items-center">
-            {/* Cart Dropdown */}
-            <div id="cartBtn" className="relative">
-              <NavButton
-                onClick={() => {
-                  setCartOpen(!cartOpen);
-                  setAccountOpen(false);
-                }}
-                srOnly="Cart"
-                d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
-                text={isAuthenticated || serverUser ? "My Cart" : "Guest Cart"}
-              />
-              {(isAuthenticated || serverUser) && <NavButton
-                onClick={() => replace("/order-history")}
-                srOnly="Order History"
-                d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8 M3 3v5h5 M12 7v5l4 2"
-                text="Order History"
-                fill="none"
-              />}
-
-              {cartOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
-                  {cartItems?.length > 0 ? (
-                    <>
-                      <ul>
-                        {cartItems.map((item) => {
-                          const itemName = allProducts.filter(product => product.id === item.id)[0].name
-
-                          return (<li key={`${item.id}-${item.lineItemId || "temp"}`} className="grid grid-cols-[1fr_auto] border-b py-2 gap-1">
-                            <span>{itemName}</span>
-                            <div className="m-auto">
-                              <div className="text-center">x {item.quantity}</div>
-                              <div className="flex items-center flex-wrap gap-1">
-                                <ChangeQuantitySpans cqs={changeQuantity} item={item} />
-                              </div>
-                            </div>
-                          </li>)
-                        })}
-                      </ul>
-
-                      {/* Checkout Button */}
-                      <button
-                        className="w-full bg-blue-500 text-white mt-4 p-2 rounded"
-                        onClick={() => replace("/checkout")}
-                      >
-                        Checkout
-                      </button>
-                    </>
-                  ) : (
-                    <p className="text-sm text-gray-900">Your cart is empty.</p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {!isAuthenticated && !serverUser ? (
-              <ul className="text-sm font-medium text-gray-900 flex">
-                <NavLoggedOutBtn href="/login" text="Sign In" />
-                <NavLoggedOutBtn href="/register" text="Create Account" />
-              </ul>
-            ) : (
-              <div id="profileBtn" className="relative">
-                <NavButton
-                  onClick={() => {
-                    setAccountOpen(!accountOpen);
-                    setCartOpen(false);
-                  }}
-                  d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                  text={serverUser?.first_name || user?.first_name}
-                />
+          <nav className="flex items-center space-x-2">
+            <Link href="/cart">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingBag className="h-5 w-5" />
+                {cart.length > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-white">
+                    {cart.length}
+                  </span>
+                )}
+              </Button>
+            </Link>
+            {isAuthenticated ? (
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setAccountOpen(!accountOpen)}
+                  className="flex items-center gap-1"
+                >
+                  <User className="h-5 w-5" />
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
                 {accountOpen && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg p-2">
+                  <div className="absolute right-0 top-full mt-2 w-48 rounded-md border bg-white py-2 shadow-lg">
+                    <div className="px-4 py-2 text-sm text-neutral-dark">
+                      {user?.name}
+                    </div>
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-neutral-dark hover:bg-secondary"
+                      onClick={() => setAccountOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href="/orders"
+                      className="block px-4 py-2 text-sm text-neutral-dark hover:bg-secondary"
+                      onClick={() => setAccountOpen(false)}
+                    >
+                      Orders
+                    </Link>
                     <button
                       onClick={handleLogout}
-                      className="nav-button-no-svg w-full text-sm text-red-600"
+                      className="block w-full px-4 py-2 text-left text-sm text-neutral-dark hover:bg-secondary"
                     >
                       Logout
                     </button>
                   </div>
                 )}
               </div>
+            ) : (
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
+              </Link>
             )}
-
-            {/* Mobile Menu Button */}
-            <NavButton
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="lg:hidden"
-              srOnly="Open Menu"
-              d="M5 7h14M5 12h14M5 17h14"
-            />
-          </div>
+          </nav>
         </div>
-
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 mt-4">
-            <ul className="text-gray-900 text-sm font-medium space-y-3">
-              {["Best Sellers", "Gift Ideas", "Games", "Electronics", "Home & Garden"].map((item) => (
-                <li key={item}>
-                  <Link href={`/${item.toLowerCase().replace(/ /g, "-")}`} className="hover:text-primary-700">
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
-    </nav>
+    </header>
   );
-};
-
-export default Navbar;
+}
