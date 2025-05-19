@@ -4,6 +4,8 @@ import ProductReviews from "@/components/ProductReviews";
 import AddToCartButton from "@/components/AddToCartButton";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 
+export const revalidate = 60;
+
 async function getProduct(id) {
   try {
     return await fetchWooCommerce(`wc/v3/products/${id}`, "Product not found")
