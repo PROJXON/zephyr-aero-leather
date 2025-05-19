@@ -1,8 +1,13 @@
-import fetchProducts from "../../../lib/woocommerce"
+"use client";
+import { Suspense } from "react";
 import PaymentDetails from "@/components/PaymentDetails"
 
-export default async function PaymentSuccess() {
-  const products = await fetchProducts()
+export const dynamic = "force-dynamic";
 
-  return <PaymentDetails products={products} />
+export default function PaymentSuccess() {
+  return (
+    <Suspense fallback={<div className="p-4 text-center">Loading...</div>}>
+      <PaymentDetails />
+    </Suspense>
+  );
 }

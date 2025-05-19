@@ -23,25 +23,25 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  let user = null;
+  // let user = null;
 
   const products = await fetchProducts();
 
-  try {
-    const [, userCookie] = await getCookieInfo()
-    if (userCookie) {
-      user = JSON.parse(atob(userCookie));
-    }
-  } catch (error) {
-    console.error("Error reading cookies on server:", error);
-  }
+  // try {
+  //   const [, userCookie] = await getCookieInfo()
+  //   if (userCookie) {
+  //     user = JSON.parse(atob(userCookie));
+  //   }
+  // } catch (error) {
+  //   console.error("Error reading cookies on server:", error);
+  // }
 
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-[100dvh] grid grid-rows-[auto_1fr_auto]`}>
         <AuthProvider>
           <CartProvider>
-            <Navbar initialUser={user} allProducts={products} />
+            <Navbar allProducts={products} />
             <main>{children}</main>
             <Footer />
           </CartProvider>

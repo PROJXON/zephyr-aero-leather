@@ -1,6 +1,8 @@
 import fetchProducts from "../../../lib/woocommerce"
 import Checkout from "@/components/Checkout"
 
+export const dynamic = "force-dynamic";
+
 export default async function CheckoutPage() {
     const products = await fetchProducts()
 

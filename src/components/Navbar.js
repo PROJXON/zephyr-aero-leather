@@ -12,9 +12,9 @@ import ChangeQuantitySpans from "./ChangeQuantitySpans";
 import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity"
 
-const Navbar = ({ initialUser, allProducts }) => {
+const Navbar = ({ allProducts }) => {
   const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth()
-  const [serverUser, setServerUser] = useState(initialUser || null)
+  // const [serverUser, setServerUser] = useState(initialUser || null)
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const { cartItems, updateQuantity, setCartOpen, cartOpen } = useCart();
@@ -23,11 +23,15 @@ const Navbar = ({ initialUser, allProducts }) => {
 
   const changeQuantity = getChangeQuantity({ updateQuantity })
 
+  // useEffect(() => {
+  //   if (!initialUser) {
+  //     fetchUserFromServer();
+  //   }
+  // }, [initialUser])
+
   useEffect(() => {
-    if (!initialUser) {
-      fetchUserFromServer();
-    }
-  }, [initialUser])
+    fetchUserFromServer();
+  }, [])
 
   useEffect(() => {
     setCartOpen(false)
@@ -36,7 +40,7 @@ const Navbar = ({ initialUser, allProducts }) => {
   const handleLogout = async () => {
     await logout();
     setAccountOpen(false);
-    setServerUser(null);
+    // setServerUser(null);
   };
 
   useEffect(() => {
@@ -103,9 +107,9 @@ const Navbar = ({ initialUser, allProducts }) => {
                 }}
                 srOnly="Cart"
                 d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
-                text={isAuthenticated || serverUser ? "My Cart" : "Guest Cart"}
+                text={isAuthenticated ? "My Cart" : "Guest Cart"}
               />
-              {(isAuthenticated || serverUser) && <NavButton
+              {isAuthenticated && <NavButton
                 onClick={() => replace("/order-history")}
                 srOnly="Order History"
                 d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8 M3 3v5h5 M12 7v5l4 2"
@@ -148,7 +152,7 @@ const Navbar = ({ initialUser, allProducts }) => {
               )}
             </div>
 
-            {!isAuthenticated && !serverUser ? (
+            {!isAuthenticated? (
               <ul className="text-sm font-medium text-gray-900 flex">
                 <NavLoggedOutBtn href="/login" text="Sign In" />
                 <NavLoggedOutBtn href="/register" text="Create Account" />
@@ -161,7 +165,7 @@ const Navbar = ({ initialUser, allProducts }) => {
                     setCartOpen(false);
                   }}
                   d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                  text={serverUser?.first_name || user?.first_name}
+                  text={user?.first_name || user?.first_name}
                 />
                 {accountOpen && (
                   <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg p-2">

@@ -5,11 +5,12 @@ import { useCart } from "@/app/context/CartContext"
 import OrderSummary from "./OrderSummary"
 import calculateTotal from "../../lib/calculateTotal"
 
-export default function PaymentDetails({ products }) {
+export default function PaymentDetails() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const [paymentIntentId, setPaymentIntentId] = useState(null)
     const [paymentDetails, setPaymentDetails] = useState(null)
+    const [products, setProducts] = useState([]);
     const [total, setTotal] = useState(0)
     const [allowed, setAllowed] = useState(false)
     const { clearCart } = useCart()
@@ -34,6 +35,15 @@ export default function PaymentDetails({ products }) {
             setTimeout(() => localStorage.removeItem("cartCleared"), 1000)
         } else router.replace("/")
     }, [])
+
+    useEffect(() => {
+        const getProducts = async () => {
+          const res = await fetch("/api/products");
+          const data = await res.json();
+          setProducts(data);
+        };
+        getProducts();
+      }, []);
 
     useEffect(() => {
         if (paymentIntentId) {
