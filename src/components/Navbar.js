@@ -158,25 +158,16 @@ const Navbar = ({ allProducts }) => {
                 <NavLoggedOutBtn href="/register" text="Create Account" />
               </ul>
             ) : (
-              <div id="profileBtn" className="relative">
-                <NavButton
-                  onClick={() => {
-                    setAccountOpen(!accountOpen);
-                    setCartOpen(false);
-                  }}
-                  d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                  text={user?.first_name || user?.first_name}
-                />
-                {accountOpen && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg p-2">
-                    <button
-                      onClick={handleLogout}
-                      className="nav-button-no-svg w-full text-sm text-red-600"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                )}
+              <div className="flex items-center gap-4 ml-4">
+                <span className="text-sm font-medium text-gray-800">
+                  {user?.first_name || "User"}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="text-sm font-semibold text-red-600 hover:underline"
+                >
+                  Logout
+                </button>
               </div>
             )}
 
