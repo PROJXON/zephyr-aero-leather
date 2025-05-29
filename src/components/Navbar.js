@@ -58,22 +58,22 @@ const Navbar = ({ allProducts }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [accountOpen, cartOpen]);
 
-  const navItems = ["Best Sellers", "Gift Ideas", "auth-test"]
+  const navItems = ["Collections", "About Us"]
 
   return (
-    <nav className="bg-white antialiased">
-      <div className="max-w-screen-xl px-4 mx-auto py-4">
+    <nav className="bg-white antialiased sticky top-0 z-50">
+      <div className="max-w-screen-xl px-4 mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-8">
             <div className="shrink-0">
               <Link href="/">
                 <Image
-                  className="w-64 h-32 object-contain"
+                  className="w-[100px] object-contain"
                   src={ZephyrLogo}
                   alt="Logo"
-                  width={128}
-                  height={64}
+                  width={200}
+                  height={100}
                   priority={true}
                 />
               </Link>
@@ -109,13 +109,7 @@ const Navbar = ({ allProducts }) => {
                 d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
                 text={isAuthenticated ? "My Cart" : "Guest Cart"}
               />
-              {isAuthenticated && <NavButton
-                onClick={() => replace("/order-history")}
-                srOnly="Order History"
-                d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8 M3 3v5h5 M12 7v5l4 2"
-                text="Order History"
-                fill="none"
-              />}
+              
 
               {cartOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
@@ -169,12 +163,18 @@ const Navbar = ({ allProducts }) => {
                 />
                 {accountOpen && (
                   <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg p-2">
-                    <button
+                    {isAuthenticated && <NavButton
+                      onClick={() => replace("/order-history")}
+                      srOnly="Order History"
+                      text="Order History"
+                      fill="none"
+                    />}
+                    <NavButton
                       onClick={handleLogout}
-                      className="nav-button-no-svg w-full text-sm text-red-600"
-                    >
-                      Logout
-                    </button>
+                      srOnly="Logout"
+                      text="Logout"
+                      fill="none"
+                    />
                   </div>
                 )}
               </div>
