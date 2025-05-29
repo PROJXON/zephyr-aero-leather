@@ -58,7 +58,7 @@ const Navbar = ({ allProducts }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [accountOpen, cartOpen]);
 
-  const navItems = ["Best Sellers", "Gift Ideas", "auth-test"]
+  const navItems = ["Best Sellers", "Gift Ideas"]
 
   return (
     <nav className="bg-white antialiased">
