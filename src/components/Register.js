@@ -22,7 +22,6 @@ const Register = () => {
   
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const { setIsAuthenticated, setUser } = useAuth();
@@ -128,7 +127,13 @@ const Register = () => {
 
   return(
     // <section className="bg-gray-50 dark:bg-gray-900">
-    <section className="flex items-center justify-center min-h-screen bg-cover bg-center px-4" style={{backgroundImage: `url(${backgroundImageUrl})`}}>
+    <section className="relative flex items-center justify-center min-h-screen px-4">
+  {/* Background Image with 50% opacity overlay */}
+  <div
+    className="absolute inset-0 bg-cover bg-center opacity-50"
+    style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
+  />
+
         <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
 
           {/* Left: Already Have an Account? */}
@@ -185,7 +190,7 @@ const Register = () => {
                       <div className="relative w-full">
                           <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
                           <input 
-                            type="password" 
+                            type={showPassword ? "text" : "password"}
                             name="password" 
                             id="password" 
                             autoComplete="new-password"
@@ -206,7 +211,7 @@ const Register = () => {
                       <div className="relative w-full mt-4">
                           <label htmlFor="confirm-password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
                           <input 
-                            type="password" 
+                            type={showPassword ? "text" : "password"}
                             name="confirmPassword" 
                             id="confirm-password"
                             autoComplete="new-password"
@@ -219,9 +224,9 @@ const Register = () => {
                           />
                             <button
                                 type="button"
-                                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                                onClick={() => setShowPassword((prev) => !prev)}
                                 className="absolute inset-y-0 right-4 flex items-center text-sm text-[#605137] font-semibold hover:underline focus:outline-none">
-                              {showConfirmPassword ? "Hide" : "Show"}
+                              {showPassword ? "Hide" : "Show"}
                             </button>
                       </div>
                       <div className="flex items-start">

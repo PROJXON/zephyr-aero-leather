@@ -81,10 +81,12 @@ const Login = () => {
   };
 
   return (
-    <section
-      className="flex items-center justify-center min-h-screen bg-cover bg-center px-4"
-      style={{ backgroundImage: `url(${backgroundImageUrl})` }}
-    >
+    <section className="relative flex items-center justify-center min-h-screen px-4">
+  {/* Background Image with 50% opacity overlay */}
+  <div
+    className="absolute inset-0 bg-cover bg-center opacity-50"
+    style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
+  />
       <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Panel: Sign In Form */}
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-white bg-opacity-90 rounded-l-xl">
