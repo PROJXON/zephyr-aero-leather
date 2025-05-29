@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const backgroundImageUrl = "/ifr.jpg";
 
@@ -88,7 +89,9 @@ const Login = () => {
       <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Panel: Sign In Form */}
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-white bg-opacity-90 rounded-l-xl">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 mt-4">Sign in</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 mt-4">
+            Sign in
+          </h2>
 
           <form onSubmit={handleSubmit} className="w-full">
             {/* Email Input */}
@@ -121,7 +124,12 @@ const Login = () => {
                 className="absolute inset-y-0 right-4 flex items-center text-sm text-[#605137] font-semibold hover:underline focus:outline-none"
                 disabled={loading} // Disable toggle when loading
               >
-                {showPassword ? "Hide" : "Show"}
+                {" "}
+                {showPassword ? (
+                  <EyeSlashIcon className="h-6 w-6" />
+                ) : (
+                  <EyeIcon className="h-6 w-6" />
+                )}
               </button>
             </div>
 
@@ -131,7 +139,10 @@ const Login = () => {
             {/* Forgot Password */}
             <p className="text-sm text-gray-600 mb-4 mt-2">
               Forgot your password?{" "}
-              <Link href="/forgot-password" className="text-[#605137] font-semibold hover:text-[#30291C] transition">
+              <Link
+                href="/forgot-password"
+                className="text-[#605137] font-semibold hover:text-[#30291C] transition"
+              >
                 Click here
               </Link>
             </p>
@@ -152,7 +163,9 @@ const Login = () => {
         {/* Right Panel: Sign Up Prompt */}
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-[#605137] text-white rounded-r-xl">
           <h2 className="text-3xl font-bold">New Here?</h2>
-          <p className="text-center mt-2">Create an account to start shopping with us.</p>
+          <p className="text-center mt-2">
+            Create an account to start shopping with us.
+          </p>
 
           <Link href="/register">
             <button className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition">
