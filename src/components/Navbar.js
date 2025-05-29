@@ -61,7 +61,7 @@ const Navbar = ({ allProducts }) => {
   const navItems = ["Collections", "About Us"]
 
   return (
-    <nav className="bg-white antialiased sticky top-0 z-50">
+    <nav className="bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
       <div className="max-w-screen-xl px-4 mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -147,7 +147,7 @@ const Navbar = ({ allProducts }) => {
             </div>
 
             {!isAuthenticated? (
-              <ul className="text-sm font-medium text-gray-900 flex">
+              <ul className="font-medium text-gray-900 flex">
                 <NavLoggedOutBtn href="/login" text="Sign In" />
                 <NavLoggedOutBtn href="/register" text="Create Account" />
               </ul>
