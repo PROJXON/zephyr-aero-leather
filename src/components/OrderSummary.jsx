@@ -3,68 +3,87 @@ import ChangeQuantitySpans from "./ChangeQuantitySpans"
 import getItemInfo from "../../lib/getItemInfo"
 
 export default function OrderSummary({ cartItems, products, total, quantityControls = {} }) {
-    const { updateQuantity, editID, setEditID, newQty, setNewQty, changeQuantity } = quantityControls
-    const editable = Object.keys(quantityControls).length > 0
+  const { updateQuantity, editID, setEditID, newQty, setNewQty, changeQuantity } = quantityControls
+  const editable = Object.keys(quantityControls).length > 0
 
-    const formatPrice = priceInCents => {
-        const dollars = Math.floor(priceInCents / 100)
-        const cents = priceInCents % 100
-        return `$${dollars}.${cents.toString().padStart(2, '0')}`
-    }
+  const formatPrice = (priceInCents) => {
+    const dollars = Math.floor(priceInCents / 100)
+    const cents = priceInCents % 100
+    return `$${dollars}.${cents.toString().padStart(2, '0')}`
+  }
 
-    return (<div>
-        <h2 className="font-bold text-xl mb-2">Order Summary</h2>
-        <ul>
-            {cartItems.map(item => {
-                const [itemInfo, priceInCents] = getItemInfo(products, item)
-                const imageInfo = itemInfo.images[0]
+  return (
+    <div className="space-y-6 border p-6 rounded-lg shadow-sm">
+      <h2 className="text-2xl font-bold">Order Summary</h2>
 
-                return (<li key={item.id} className="grid grid-cols-[100px_auto] gap-2 mb-2">
-                    <Image
-                        src={imageInfo.src}
-                        alt={imageInfo.alt}
-                        width={100}
-                        height={100}
-                        className="object-cover aspect-square"
-                    />
-                    <div className="text-sm">
-                        <p>{itemInfo.name}</p>
-                        <div className="grid grid-cols-2">
-                            <div className="flex items-center flex-wrap gap-1">
-                                {editable && editID === item.id ? (<input
-                                    className="w-12 text-xs p-2 pr-0"
-                                    type="number"
-                                    min="0"
-                                    value={newQty}
-                                    autoFocus
-                                    onChange={e => setNewQty(e.target.value)}
-                                    onBlur={() => {
-                                        const qty = parseInt(newQty)
-                                        if (!isNaN(qty) && qty >= 0) updateQuantity(item.id, qty)
-                                        setEditID(null)
-                                    }}
-                                    onKeyDown={e => {
-                                        if (e.key === "Enter") e.target.blur()
-                                    }}
-                                />) : (<>
-                                    {item.quantity > 1 && (
-                                        <span className="text-zinc-300 mr-1 align-middle whitespace-nowrap">
-                                            x {item.quantity}
-                                        </span>
-                                    )}
-                                </>)}
-                                {editable && <ChangeQuantitySpans cqs={changeQuantity} item={item} />}
-                            </div>
-                            <p className="text-right text-green-600">{formatPrice(priceInCents)}</p>
-                        </div>
-                    </div>
-                </li>)
-            })}
-        </ul>
-        <hr />
-        <div className="grid grid-cols-2 text-sm mt-2">
-            <p className="font-bold">Total</p>
-            <p className="text-right">{formatPrice(total)}</p>
+      <div className="space-y-4">
+        {cartItems.map((item) => {
+          const [itemInfo, priceInCents] = getItemInfo(products, item)
+          const imageInfo = itemInfo.images[0]
+
+          return (
+            <div key={item.id} className="flex gap-4 border rounded-lg p-4">
+              <div className="relative w-24 h-24">
+                <Image
+                  src={imageInfo?.src || "/images/placeholder.svg"}
+                  alt={imageInfo?.alt || itemInfo.name}
+                  fill
+                  className="object-cover rounded"
+                />
+              </div>
+
+              <div className="flex-1">
+                <p className="font-medium">{itemInfo.name}</p>
+                <div className="flex justify-between mt-1 items-center">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {editable && editID === item.id ? (
+                      <input
+                        className="w-16 text-sm border px-2 py-1 rounded"
+                        type="number"
+                        min="0"
+                        value={newQty}
+                        autoFocus
+                        onChange={(e) => setNewQty(e.target.value)}
+                        onBlur={() => {
+                          const qty = parseInt(newQty)
+                          if (!isNaN(qty) && qty >= 0) updateQuantity(item.id, qty)
+                          setEditID(null)
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") e.target.blur()
+                        }}
+                      />
+                    ) : (
+                      <>
+                        {item.quantity > 1 && (
+                          <span className="text-gray-400 text-sm">x{item.quantity}</span>
+                        )}
+                      </>
+                    )}
+                    {editable && <ChangeQuantitySpans cqs={changeQuantity} item={item} />}
+                  </div>
+                  <p className="text-green-600 font-semibold text-sm">{formatPrice(priceInCents)}</p>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="space-y-2 text-sm pt-4 border-t">
+        <div className="flex justify-between">
+          <span>Subtotal</span>
+          <span>{formatPrice(total)}</span>
         </div>
-    </div>)
+        <div className="flex justify-between">
+          <span>Shipping</span>
+          <span>Calculated at checkout</span>
+        </div>
+        <div className="flex justify-between font-bold pt-2">
+          <span>Total</span>
+          <span>{formatPrice(total)}</span>
+        </div>
+      </div>
+    </div>
+  )
 }
