@@ -1,14 +1,27 @@
 import fetchProducts from "../../lib/woocommerce";
 import ProductList from "../components/ProductList";
-import FloatingCartButton from "@/components/FloatingCartButton";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Star } from "lucide-react";
 import Image from "next/image";
 
 export const revalidate = 60;
 
 export default async function Home() {
-  const products = await fetchProducts();
+  const [
+    wallets,
+    iphoneCases,
+    sunglasses,
+    belts,
+    bags,
+    moto,
+    holsters,
+  ] = await Promise.all([
+    fetchProducts({ category: "wallets" }),
+    fetchProducts({ category: "iphoneCases" }),
+    fetchProducts({ category: "sunglasses" }),
+    fetchProducts({ category: "belts" }),
+    fetchProducts({ category: "bags" }),
+    fetchProducts({ category: "moto" }),
+    fetchProducts({ category: "holsters" }),
+  ]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -37,20 +50,21 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Product Grid Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-10">
-            <h2 className="text-2xl text-neutral-dark font-normal">Our Products</h2>
-          </div>
-          <ProductList products={products} />
-        </div>
-      </section>
+      {/* Grouped Product Sections */}
+      <Section title="Wallets" products={wallets} link="/category/wallets" />
+      <Section title="iPhone Leather Cases" products={iphoneCases} link="/category/iphone-cases" />
+      <Section title="Sunglass Cases" products={sunglasses} link="/category/sunglasses" />
+      <Section title="Belts" products={belts} link="/category/belts" />
+      <Section title="Bags" products={bags} link="/category/bags" />
+      <Section title="Moto Guzzi Collection" products={moto} link="/category/moto-guzzi" />
+      <Section title="Shoulder Holsters" products={holsters} link="/category/shoulder-holsters" />
 
-       {/* Benefits Section */}
+      {/* Benefits Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-center text-2xl text-neutral-dark font-normal mb-12">Why Choose Zephyr Aero Leather</h2>
+          <h2 className="text-center text-2xl text-neutral-dark font-normal mb-12">
+            Why Choose Zephyr Aero Leather
+          </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
@@ -88,3 +102,20 @@ export default async function Home() {
     </div>
   );
 }
+
+// Reusable Section component
+const Section = ({ title, products, link }) => {
+  if (!products || products.length === 0) return null;
+
+  return (
+    <section className="py-16">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
+          <a href={link} className="text-sm text-blue-600 underline">View all</a>
+        </div>
+        <ProductList products={products} />
+      </div>
+    </section>
+  );
+};
