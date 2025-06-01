@@ -7,7 +7,7 @@ import ZephyrLogo from "../../public/zephyrlogo.jpg";
 
 const Footer = () => {
   return (
-    <footer className="bg-black text-white py-12 mt-16">
+    <footer className="bg-black text-white py-12">
       <div className="max-w-screen-xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
           {/* Logo & About Section */}

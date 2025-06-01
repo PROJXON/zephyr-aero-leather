@@ -39,7 +39,7 @@ export default function OrderHistory({ products }) {
                         const total = calculateTotal(items, products)
 
                         return (<li key={order.id}>
-                            <h2 className={"font-bold text-xl text-center underline"}>
+                            <h2 className={"font-bold text-xl text-center"}>
                                 <div className={`p-2${i !== 0 ? " border-t-2 border-black" : ""}`}>
                                     {months[datePaid.getMonth()]} {datePaid.getDate()}, {datePaid.getFullYear()} {datePaid.toLocaleString([], {
                                         hour: "numeric",
