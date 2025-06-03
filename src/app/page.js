@@ -1,6 +1,7 @@
 import fetchProducts from "../../lib/woocommerce";
 import ProductList from "../components/ProductList";
 import Image from "next/image";
+import Link from "next/link";
 
 export const revalidate = 60;
 
@@ -127,7 +128,12 @@ const Section = ({ title, products, link }) => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
-          <a href={link} className="text-sm text-blue-600 underline">View all</a>
+            <Link
+              href={link}
+              className="text-sm px-4 py-2 rounded bg-primary text-white hover:bg-accent transition-colors"
+            >
+              View All
+            </Link>        
         </div>
         <ProductList products={products} />
       </div>
