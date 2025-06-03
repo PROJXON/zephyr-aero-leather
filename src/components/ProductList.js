@@ -35,7 +35,6 @@ export default function ProductList({ products }) {
             </p>
             <AddToCartButton
               productId={product.id}
-              className="w-full py-2 px-4 rounded bg-primary text-white hover:bg-accent transition-colors"
             />
           </div>
         </div>
