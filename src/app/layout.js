@@ -42,7 +42,7 @@ export default async function RootLayout({ children }) {
         <AuthProvider>
           <CartProvider>
             <Navbar allProducts={products} />
-            <main>{children}</main>
+            <main className="relative z-0">{children}</main>
             <Footer />
           </CartProvider>
         </AuthProvider>
