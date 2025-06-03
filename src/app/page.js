@@ -38,14 +38,29 @@ export default async function Home() {
                 Discover our collection of handcrafted leather goods designed for the modern adventurer.
               </p>
             </div>
-            <div className="relative h-[400px] rounded-lg overflow-hidden">
-              <Image
-                src="/phelanhelicopter.jpg"
-                alt="Premium leather collection"
-                fill
-                className="object-contain"
-              />
-            </div>
+              <div className="relative h-[400px] rounded-lg overflow-hidden">
+                {/* First image (fades out) */}
+                <div className="absolute inset-0 animate-carousel z-10">
+                  <Image
+                    src="/phelanhelicopter.jpg"
+                    alt="Phelan Helicopter"
+                    fill
+                    className="object-cover object-top rounded-lg"
+                    priority
+                  />
+                </div>
+
+                {/* Second image (fades in) */}
+                <div className="absolute inset-0 z-0">
+                  <Image
+                    src="/phelanmotorcycle.jpg"
+                    alt="Phelan Motorcycle"
+                    fill
+                    className="object-cover object-center rounded-lg"
+                  />
+                </div>
+              </div>
+
           </div>
         </div>
       </section>
