@@ -40,10 +40,10 @@ export default async function Home() {
             </div>
             <div className="relative h-[400px] rounded-lg overflow-hidden">
               <Image
-                src="/images/hero-leather.svg"
+                src="/phelanhelicopter.jpg"
                 alt="Premium leather collection"
                 fill
-                className="object-cover"
+                className="object-contain"
               />
             </div>
           </div>
