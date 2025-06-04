@@ -44,13 +44,13 @@ export default async function Home() {
       />
 
       {/* Grouped Product Sections */}
-      <Section title="Wallets" products={wallets} link="/category/wallets" />
-      <Section title="iPhone Leather Cases" products={iphoneCases} link="/category/iphoneCases" />
-      <Section title="Sunglass Cases" products={sunglasses} link="/category/sunglasses" />
-      <Section title="Belts" products={belts} link="/category/belts" />
-      <Section title="Bags" products={bags} link="/category/bags" />
-      <Section title="Moto Guzzi Collection" products={moto} link="/category/moto" />
-      <Section title="Shoulder Holsters" products={holsters} link="/category/holsters" />
+      <Section title="Wallets" products={wallets} link="/categories/wallets" />
+      <Section title="iPhone Leather Cases" products={iphoneCases} link="/categories/iphoneCases" />
+      <Section title="Sunglass Cases" products={sunglasses} link="/categories/sunglasses" />
+      <Section title="Belts" products={belts} link="/categories/belts" />
+      <Section title="Bags" products={bags} link="/categories/bags" />
+      <Section title="Moto Guzzi Collection" products={moto} link="/categories/moto" />
+      <Section title="Shoulder Holsters" products={holsters} link="/categories/holsters" />
 
       {/* Benefits Section */}
       <section className="py-16">
