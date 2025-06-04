@@ -33,13 +33,13 @@ export default async function ProductPage({ params }) {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-8">
         <div className="relative aspect-square">
           <Image
             src={product.images[0]?.src || "/placeholder.jpg"}
             alt={product.name}
             fill
-            className="object-cover rounded-lg"
+            className="object-cover rounded-xl"
           />
         </div>
 
