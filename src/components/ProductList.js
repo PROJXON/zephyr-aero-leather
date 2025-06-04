@@ -30,12 +30,15 @@ export default function ProductList({ products }) {
             <Link href={`/product/${product.id}`}>
               <h3 className="text-neutral-dark font-medium hover:underline">{product.name}</h3>
             </Link>
-            <p className="text-neutral-medium mb-2">
+            <p className="text-neutral-medium mb-2 text-right w-full">
               {product.price ? `$${product.price}` : "Price not available"}
             </p>
-            <AddToCartButton
-              productId={product.id}
-            />
+            <div className="flex justify-end">
+              <AddToCartButton
+                productId={product.id}
+                className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+              />
+            </div>
           </div>
         </div>
       ))}

@@ -130,7 +130,7 @@ const Section = ({ title, products, link }) => {
           <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
             <Link
               href={link}
-              className="py-2 px-4 rounded bg-blue-500 text-white font-medium transition-colors hover:bg-blue-600"
+              className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
             >
               View All
             </Link>        
