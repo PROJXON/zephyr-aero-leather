@@ -47,7 +47,7 @@ const categoriesMap = {
   moto: {
     name: "Moto Guzzi Collection",
     description: "Inspired by the ride, designed for the road",
-    image: "/categories/moto.jpg",
+    image: "/categories/motoguzzi.webp",
     slugs: ["moto-guzzi"]
   }
 };
