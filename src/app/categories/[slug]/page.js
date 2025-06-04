@@ -16,13 +16,18 @@ export default async function CategoryPage({ params }) {
 
   const hero = categoryTitles[slug];
 
+  const carouselImages = products
+    .map((product) => product?.images?.[0]?.src)
+    .filter(Boolean)
+    .slice(0, 5);
+
   return (
     <div className="min-h-screen bg-background">
       {hero && (
         <Hero
           title={hero.title}
           subtitle={hero.subtitle}
-          images={hero.images}
+          images={carouselImages}
         />
       )}
 
