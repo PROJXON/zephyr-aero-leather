@@ -39,7 +39,9 @@ export default async function Home() {
         description="Premium handcrafted leather goods for aviators, adventurers, and everyday explorers"
         images={[
           "/phelanhelicopter.jpg",
-          "/phelanmotorcycle.jpg"
+          "/phelanmotorcycle.jpg",
+          "/phelandesert.jpg",
+          "/phelancar.jpg"
         ]}
       />
 
