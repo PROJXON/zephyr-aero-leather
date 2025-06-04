@@ -2,7 +2,7 @@ import collectionMap from "@/utils/collectionMap";
 import ProductList from "@/components/ProductList";
 import fetchProducts from "../../../../lib/woocommerce";
 import Image from "next/image";
-import HeroCarousel from "@/components/HeroCarousel";
+import Hero from "@/components/Hero";
 
 export async function generateStaticParams() {
   return Object.keys(collectionMap).map((slug) => ({ slug }));
@@ -25,20 +25,11 @@ export default async function CollectionPage({ params }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="relative bg-warm-bg">
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl font-light text-neutral-dark leading-tight">
-                {collection.name} <br />
-                <span className="font-normal">{collection.description}</span>
-              </h1>
-            </div>
-              <HeroCarousel images={images} altBase={collection.name} />
-          </div>
-        </div>
-      </section>
-
+      <Hero
+        title={collection.name}
+        subtitle={collection.description}
+        images={images}
+      />
 
       <section className="py-16">
         <div className="container mx-auto px-4">

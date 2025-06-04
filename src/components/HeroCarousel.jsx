@@ -37,7 +37,7 @@ const HeroCarousel = ({ images, altBase = "Hero" }) => {
 
   return (
     <div
-      className="relative w-full h-[350px] sm:h-[450px] max-w-[700px] mx-auto rounded-xl overflow-hidden shadow-md"
+      className="relative w-full h-[350px] sm:h-[450px] max-w-[550px] mx-auto rounded-xl overflow-hidden shadow-md"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
