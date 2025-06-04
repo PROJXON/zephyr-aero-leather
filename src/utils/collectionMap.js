@@ -20,6 +20,12 @@ const collectionMap = {
     description: "For the high-flyer: travel-ready leather essentials.",
     image: "/collections/aviatorcollection.jpg",
     productIds: [652, 614, 103, 104, 105], // Replace with real product IDs
+    carouselImages: [
+          "/collections/aviator/aviator1.jpg",
+          "/collections/aviator/aviator2.jpg",
+          "/collections/aviator/aviator3.jpg",
+          "/collections/aviator/aviator4.jpg",
+        ],
   },
   explorer: {
     name: "Explorer",

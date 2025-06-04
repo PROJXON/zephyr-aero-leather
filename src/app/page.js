@@ -2,6 +2,7 @@ import fetchProducts from "../../lib/woocommerce";
 import ProductList from "../components/ProductList";
 import Image from "next/image";
 import Link from "next/link";
+import Hero from "../components/Hero";
 
 export const revalidate = 60;
 
@@ -26,45 +27,14 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative bg-warm-bg">
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl font-light text-neutral-dark leading-tight">
-                Premium Leather <br />
-                <span className="font-normal">Crafted for Adventure</span>
-              </h1>
-              <p className="text-neutral-medium text-lg max-w-md">
-                Discover our collection of handcrafted leather goods designed for the modern adventurer.
-              </p>
-            </div>
-              <div className="relative h-[400px] rounded-lg overflow-hidden">
-                {/* First image (fades out) */}
-                <div className="absolute inset-0 animate-carousel z-10">
-                  <Image
-                    src="/phelanhelicopter.jpg"
-                    alt="Phelan Helicopter"
-                    fill
-                    className="object-cover object-top rounded-lg"
-                    priority
-                  />
-                </div>
-
-                {/* Second image (fades in) */}
-                <div className="absolute inset-0 z-0">
-                  <Image
-                    src="/phelanmotorcycle.jpg"
-                    alt="Phelan Motorcycle"
-                    fill
-                    className="object-cover object-center rounded-lg"
-                  />
-                </div>
-              </div>
-
-          </div>
-        </div>
-      </section>
+      <Hero
+        title="Premium Leather"
+        subtitle="Crafted for Adventure"
+        images={[
+          "/phelanhelicopter.jpg",
+          "/phelanmotorcycle.jpg"
+        ]}
+      />
 
       {/* Grouped Product Sections */}
       <Section title="Wallets" products={wallets} link="/category/wallets" />
