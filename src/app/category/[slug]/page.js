@@ -11,7 +11,7 @@ export async function generateStaticParams() {
 export const revalidate = 60;
 
 export default async function CategoryPage({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
   const products = await fetchProducts({ category: slug });
 
   const hero = categoryTitles[slug];

@@ -16,13 +16,13 @@ export default async function Home() {
     moto,
     holsters,
   ] = await Promise.all([
-    fetchProducts({ category: "wallets" }),
-    fetchProducts({ category: "iphoneCases" }),
-    fetchProducts({ category: "sunglasses" }),
-    fetchProducts({ category: "belts" }),
-    fetchProducts({ category: "bags" }),
-    fetchProducts({ category: "moto" }),
-    fetchProducts({ category: "holsters" }),
+     fetchProducts({ category: "wallets", per_page: 5 }),
+    fetchProducts({ category: "iphoneCases", per_page: 5 }),
+    fetchProducts({ category: "sunglasses", per_page: 5 }),
+    fetchProducts({ category: "belts", per_page: 5 }),
+    fetchProducts({ category: "bags", per_page: 5 }),
+    fetchProducts({ category: "moto", per_page: 5 }),
+    fetchProducts({ category: "holsters", per_page: 5 }),
   ]);
 
   return (

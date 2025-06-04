@@ -10,7 +10,7 @@ export async function generateStaticParams() {
 }
 
 export default async function CollectionPage({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
   const collection = collectionMap[slug];
   const images = collection?.carouselImages || [];
 
