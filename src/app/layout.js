@@ -19,8 +19,33 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Zephyr Aero Leather",
-  description: "Luxury Leather Goods",
+  description: "Luxury Leather Goods Designed for Flight. Made for Life",
+  icons: {
+    icon: "/favicon.png",
+  },
+  openGraph: {
+    title: "Zephyr Aero Leather",
+    description: "Handcrafted luxury leather goods for the modern explorer.",
+    url: "https://zephyraeroleather.com", 
+    siteName: "Zephyr Aero Leather",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Zephyr Aero Leather - Premium Leather Goods",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Zephyr Aero Leather",
+    description: "Handcrafted luxury leather goods for the modern explorer.",
+    images: ["/og-image.png"],
+  },
 };
+
 
 export default async function RootLayout({ children }) {
   // let user = null;

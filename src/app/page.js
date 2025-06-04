@@ -28,8 +28,15 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Hero
-        title="Premium Leather"
-        subtitle="Crafted for Adventure"
+        title="Zephyr Aero Leather"
+        subtitle={
+          <>
+            Designed for Flight
+            <br />
+            Made for Life
+          </>
+        }
+        description="Premium handcrafted leather goods for aviators, adventurers, and everyday explorers"
         images={[
           "/phelanhelicopter.jpg",
           "/phelanmotorcycle.jpg"
