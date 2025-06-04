@@ -35,7 +35,7 @@ const categoriesMap = {
   bags: {
     name: "Bags",
     description: "Functional luxury for your every journey",
-    image: "/categories/bags.jpg",
+    image: "/categories/bag.jpg",
     slugs: ["belt-bags", "tote-bags"]
   },
   holsters: {
