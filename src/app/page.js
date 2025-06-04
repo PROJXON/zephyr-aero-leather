@@ -28,17 +28,17 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="relative bg-warm-bg">
         <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="grid md:grid-cols-2 gap-8 items-center text-center md:text-left">
             <div className="space-y-6">
               <h1 className="text-4xl md:text-5xl font-light text-neutral-dark leading-tight">
                 Premium Leather <br />
                 <span className="font-normal">Crafted for Adventure</span>
               </h1>
-              <p className="text-neutral-medium text-lg max-w-md">
+              <p className="text-neutral-medium text-lg md:max-w-md">
                 Discover our collection of handcrafted leather goods designed for the modern adventurer.
               </p>
             </div>
-            <div className="relative h-[400px] rounded-lg overflow-hidden">
+            <div className="relative aspect-[5/3] lg:aspect-auto lg:h-[400px] rounded-lg overflow-hidden">
               {/* First image (fades out) */}
               <div className="absolute inset-0 animate-carousel z-10">
                 <Image
