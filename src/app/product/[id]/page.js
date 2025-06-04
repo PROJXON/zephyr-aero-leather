@@ -4,8 +4,6 @@ import ProductReviews from "@/components/ProductReviews";
 import AddToCartButton from "@/components/AddToCartButton";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 
-export const revalidate = 60;
-
 async function getProduct(id) {
   try {
     return await fetchWooCommerce(`wc/v3/products/${id}`, "Product not found")
@@ -35,16 +33,21 @@ export default async function ProductPage({ params }) {
         </div>
 
         {/* Detalles del producto */}
-        <div>
-          <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-          <p className="text-2xl font-semibold text-gray-800 mb-4">
+        <div className="py-10">
+          <h1 className="text-3xl mb-4 text-center">{product.name}</h1>
+          <p className="text-2xl text-gray-800 mb-4 text-right w-full">
             ${product.price}
           </p>
           <div
-            className="prose max-w-none mb-8"
+            className="prose max-w-none mb-8 text-right w-full"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
-          <AddToCartButton productId={product.id} className="px-6 py-3 rounded-lg" />
+          <div className="flex justify-end mt-6">
+            <AddToCartButton
+              productId={product.id}
+              className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+            />
+          </div>
         </div>
       </div>
 

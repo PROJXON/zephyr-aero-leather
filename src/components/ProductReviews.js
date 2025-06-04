@@ -124,11 +124,11 @@ export default function ProductReviews({ productId }) {
           reviews.map((review) => (
             <div key={review.id} className="border-b pb-4">
               <div className="flex items-center gap-2">
-                <div className="flex text-yellow-400">
+                <div className="flex">
                   {[...Array(5)].map((_, i) => (
                     <FaStar
                       key={i}
-                      className={i < review.rating ? "text-yellow-400" : "text-gray-300"}
+                      className={i < review.rating ? "text-neutral-dark" : "text-neutral-light"}
                     />
                   ))}
                 </div>
