@@ -10,7 +10,7 @@ const categoriesMap = {
   iphoneCases: {
     name: "iPhone Leather Cases",
     description: "Protection with style, designed for your device",
-    image: "/categories/iphonecases.jpg",
+    image: "/categories/iphonecase.jpg",
     slugs: ["iphone-cases"]
   },
   sunglasses: {
