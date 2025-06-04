@@ -18,31 +18,31 @@ const collectionMap = {
   aviator: {
     name: "Aviator",
     description: "For the high-flyer: travel-ready leather essentials.",
-    image: "/images/collections/aviator.jpg",
+    image: "/collections/aviatorcollection.jpg",
     productIds: [652, 614, 103, 104, 105], // Replace with real product IDs
   },
-  adventurer: {
-    name: "Adventurer",
+  explorer: {
+    name: "Explorer",
     description: "For the explorer: rugged leather staples built for the bold.",
-    image: "/images/collections/adventurer.jpg",
+    image: "/collections/explorercollection.jpg",
     productIds: [106, 107, 108, 109, 110],
   },
   traveler: {
     name: "Traveler",
     description: "For the jetsetter: sleek and practical leather designs.",
-    image: "/images/collections/traveler.jpg",
+    image: "/collections/travelercollection.jpg",
     productIds: [111, 112, 113, 114, 115],
   },
   commuter: {
     name: "Commuter",
     description: "For the city-goer: everyday leather carry refined.",
-    image: "/images/collections/commuter.jpg",
+    image: "/collections/commutercollection.jpg",
     productIds: [116, 117, 118, 119, 120],
   },
   minimalist: {
     name: "Minimalist",
     description: "For the sleek and simple: essentials, reimagined.",
-    image: "/images/collections/minimalist.jpg",
+    image: "/collections/minimalistcollection.jpg",
     productIds: [121, 122, 123, 124, 125],
   },
 };
