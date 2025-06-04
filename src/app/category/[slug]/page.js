@@ -1,6 +1,5 @@
 import fetchProducts from "../../../../lib/woocommerce";
 import ProductList from "../../../components/ProductList";
-
 import categoryMap from "@/utils/categoryMap";
 
 export async function generateStaticParams() {
