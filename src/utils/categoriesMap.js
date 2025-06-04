@@ -16,7 +16,7 @@ const categoriesMap = {
   sunglasses: {
     name: "Sunglass Cases",
     description: "Keep your shades safe in premium leather",
-    image: "/categories/sunglasses.jpg",
+    image: "/categories/sunglassescase.jpg",
     slugs: [
       "sunglasses-cases-small",
       "sunglasses-cases-medium",
