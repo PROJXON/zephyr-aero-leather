@@ -41,7 +41,7 @@ const categoriesMap = {
   holsters: {
     name: "Shoulder Holsters",
     description: "Tactical elegance meets everyday carry",
-    image: "/categories/holsters.jpg",
+    image: "/categories/holster.jpg",
     slugs: ["shoulder-holsters"]
   },
   moto: {
