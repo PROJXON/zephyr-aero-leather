@@ -16,13 +16,13 @@ export default async function Home() {
     moto,
     holsters,
   ] = await Promise.all([
-     fetchProducts({ category: "wallets", per_page: 4 }),
-    fetchProducts({ category: "iphoneCases", per_page: 4 }),
-    fetchProducts({ category: "sunglasses", per_page: 4 }),
-    fetchProducts({ category: "belts", per_page: 4 }),
-    fetchProducts({ category: "bags", per_page: 4 }),
-    fetchProducts({ category: "moto", per_page: 4 }),
-    fetchProducts({ category: "holsters", per_page: 4 }),
+    fetchProducts({ category: "wallets" }),
+    fetchProducts({ category: "iphoneCases" }),
+    fetchProducts({ category: "sunglasses" }),
+    fetchProducts({ category: "belts" }),
+    fetchProducts({ category: "bags" }),
+    fetchProducts({ category: "moto" }),
+    fetchProducts({ category: "holsters" }),
   ]);
 
   return (
@@ -38,12 +38,12 @@ export default async function Home() {
 
       {/* Grouped Product Sections */}
       <Section title="Wallets" products={wallets} link="/category/wallets" />
-      <Section title="iPhone Leather Cases" products={iphoneCases} link="/category/iphoneCases" />
+      <Section title="iPhone Leather Cases" products={iphoneCases} link="/category/iphone-cases" />
       <Section title="Sunglass Cases" products={sunglasses} link="/category/sunglasses" />
       <Section title="Belts" products={belts} link="/category/belts" />
       <Section title="Bags" products={bags} link="/category/bags" />
-      <Section title="Moto Guzzi Collection" products={moto} link="/category/moto" />
-      <Section title="Shoulder Holsters" products={holsters} link="/category/holsters" />
+      <Section title="Moto Guzzi Collection" products={moto} link="/category/moto-guzzi" />
+      <Section title="Shoulder Holsters" products={holsters} link="/category/shoulder-holsters" />
 
       {/* Benefits Section */}
       <section className="py-16">
