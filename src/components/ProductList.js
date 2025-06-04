@@ -15,7 +15,7 @@ export default function ProductList({ products }) {
         <div key={product.id} className="group">
           {/* Image Card */}
           <Link href={`/product/${product.id}`}>
-            <div className="relative aspect-square bg-card mb-3 overflow-hidden shadow-sm">
+            <div className="relative aspect-square bg-card mb-3 overflow-hidden shadow-sm rounded-xl">
               <Image
                 src={product.images[0]?.src || "/placeholder.jpg"}
                 alt={product.name}
