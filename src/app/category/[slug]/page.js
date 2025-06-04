@@ -11,7 +11,7 @@ export async function generateStaticParams() {
 export const revalidate = 60;
 
 export default async function CategoryPage({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
   const products = await fetchProducts({ category: slug });
 
   const hero = categoryTitles[slug];
@@ -27,10 +27,6 @@ export default async function CategoryPage({ params }) {
       )}
 
       <section className="container mx-auto px-4 py-16">
-        <h1 className="text-3xl font-semibold text-neutral-dark mb-6">
-          {hero?.title || slug.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
-        </h1>
-
         {products.length > 0 ? (
           <ProductList products={products} />
         ) : (
