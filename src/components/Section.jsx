@@ -1,10 +1,10 @@
 import Link from "next/link"
-import ProductList from "./ProductList"
+import ProductCarousel from "./ProductCarousel"
 
 export default function Section({ title, products, link }) {
     if (!products || products.length === 0) return null;
 
-    return (<section className="py-16">
+    return (<section className="py-8">
         <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
@@ -15,7 +15,7 @@ export default function Section({ title, products, link }) {
                     View All
                 </Link>
             </div>
-            <ProductList products={products} />
+            <ProductCarousel products={products} />
         </div>
     </section>)
 }

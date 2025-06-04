@@ -3,10 +3,10 @@ import Link from "next/link"
 import AddToCartButton from "./AddToCartButton"
 
 export default function Product({ product }) {
-    return (<div className="group">
+    return (<div className="group w-full">
         {/* Image Card */}
         <Link href={`/product/${product.id}`}>
-            <div className="relative aspect-square bg-card mb-3 overflow-hidden shadow-sm">
+            <div className="relative w-full aspect-square bg-card mb-3 overflow-hidden shadow-sm">
                 <Image
                     src={product.images[0]?.src || "/placeholder.jpg"}
                     alt={product.name}

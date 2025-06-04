@@ -56,6 +56,7 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -83,15 +84,19 @@ body {
   0% {
     clip-path: inset(0px 0px 98% 0px);
   }
+
   25% {
     clip-path: inset(0px 98% 0px 0px);
   }
+
   50% {
     clip-path: inset(98% 0px 0px 0px);
   }
+
   75% {
     clip-path: inset(0px 0px 0px 98%);
   }
+
   100% {
     clip-path: inset(0px 0px 98% 0px);
   }
@@ -147,8 +152,8 @@ body {
   @apply block text-sm font-medium text-neutral-dark mb-1;
 }
 
-.input-group input:focus + label,
-.input-group textarea:focus + label {
+.input-group input:focus+label,
+.input-group textarea:focus+label {
   @apply text-primary;
 }
 
@@ -165,11 +170,11 @@ body {
   .contact-container {
     @apply max-w-3xl;
   }
-  
+
   .contact-info {
     @apply mb-6;
   }
-  
+
   .contact-form {
     @apply p-4;
   }
@@ -179,29 +184,37 @@ body {
   .contact-container {
     @apply max-w-md;
   }
-  
+
   .contact-info {
     @apply mb-4;
   }
-  
+
   .contact-info h2 {
     @apply text-xl;
   }
-  
+
   .contact-form {
     @apply p-3;
   }
-  
+
   .input-group input,
   .input-group textarea {
     @apply py-1.5;
   }
-  
+
   .input-group label {
     @apply text-xs;
   }
-  
+
   .contact-form button {
     @apply py-1.5;
   }
+}
+
+.embla__container {
+  display: flex;
+}
+
+.embla__slide {
+  flex: 0 0 100%;
 }
