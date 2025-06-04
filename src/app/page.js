@@ -38,12 +38,12 @@ export default async function Home() {
 
       {/* Grouped Product Sections */}
       <Section title="Wallets" products={wallets} link="/category/wallets" />
-      <Section title="iPhone Leather Cases" products={iphoneCases} link="/category/iphone-cases" />
+      <Section title="iPhone Leather Cases" products={iphoneCases} link="/category/iphoneCases" />
       <Section title="Sunglass Cases" products={sunglasses} link="/category/sunglasses" />
       <Section title="Belts" products={belts} link="/category/belts" />
       <Section title="Bags" products={bags} link="/category/bags" />
-      <Section title="Moto Guzzi Collection" products={moto} link="/category/moto-guzzi" />
-      <Section title="Shoulder Holsters" products={holsters} link="/category/shoulder-holsters" />
+      <Section title="Moto Guzzi Collection" products={moto} link="/category/moto" />
+      <Section title="Shoulder Holsters" products={holsters} link="/category/holsters" />
 
       {/* Benefits Section */}
       <section className="py-16">

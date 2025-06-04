@@ -15,12 +15,12 @@ import { Sling as Hamburger } from "hamburger-react";
 
 const productCategories = [
   { name: "Wallets", slug: "wallets" },
-  { name: "iPhone Cases", slug: "iphone-cases" },
+  { name: "iPhone Leather Cases", slug: "iphoneCases" },
   { name: "Sunglass Cases", slug: "sunglasses" },
   { name: "Belts", slug: "belts" },
   { name: "Bags", slug: "bags" },
-  { name: "Shoulder Holsters", slug: "shoulder-holsters" },
-  { name: "Moto Guzzi", slug: "moto-guzzi" },
+  { name: "Shoulder Holsters", slug: "holsters" },
+  { name: "Moto Guzzi Collection", slug: "moto" },
 ];
 
 const Navbar = ({ allProducts }) => {
