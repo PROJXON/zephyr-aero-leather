@@ -4,7 +4,7 @@ const categoriesMap = {
   wallets: {
     name: "Wallets",
     description: "Crafted for durability and timeless elegance",
-    image: "/categories/wallets.jpg",
+    image: "/categories/wallet.jpg",
     slugs: ["wallets"]
   },
   iphoneCases: {
