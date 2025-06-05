@@ -1,7 +1,5 @@
 import fetchProducts from "../../lib/woocommerce"
-import Image from "next/image";
-import Hero from "../components/Hero";
-import fetchProducts from "../../lib/woocommerce"
+import Hero from "../components/Hero"
 import Section from "../components/Section"
 import Image from "next/image"
 
@@ -17,13 +15,13 @@ export default async function Home() {
     moto,
     holsters,
   ] = await Promise.all([
-    fetchProducts({ category: "wallets", per_page: 4 }),
-    fetchProducts({ category: "iphoneCases", per_page: 4 }),
-    fetchProducts({ category: "sunglasses", per_page: 4 }),
-    fetchProducts({ category: "belts", per_page: 4 }),
-    fetchProducts({ category: "bags", per_page: 4 }),
-    fetchProducts({ category: "moto", per_page: 4 }),
-    fetchProducts({ category: "holsters", per_page: 4 }),
+    fetchProducts({ category: "wallets" }),
+    fetchProducts({ category: "iphoneCases" }),
+    fetchProducts({ category: "sunglasses" }),
+    fetchProducts({ category: "belts" }),
+    fetchProducts({ category: "bags" }),
+    fetchProducts({ category: "moto" }),
+    fetchProducts({ category: "holsters" }),
   ]);
 
   return (
