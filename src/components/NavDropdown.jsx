@@ -12,7 +12,7 @@ const NavDropdown = ({ label, items, basePath, linkToBase = false }) => {
         <button className="text-lg font-medium text-black">{label}</button>
       )}
 
-      <div className="absolute left-0 mt-2 w-48 bg-white shadow-md rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
+      <div className="absolute left-0 w-48 bg-white shadow-md rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 pointer-events-none group-hover:pointer-events-auto">
         <ul className="py-2">
           {items.map((item) => (
             <li key={item.slug}>
