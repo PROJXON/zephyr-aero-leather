@@ -56,6 +56,7 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -83,15 +84,19 @@ body {
   0% {
     clip-path: inset(0px 0px 98% 0px);
   }
+
   25% {
     clip-path: inset(0px 98% 0px 0px);
   }
+
   50% {
     clip-path: inset(98% 0px 0px 0px);
   }
+
   75% {
     clip-path: inset(0px 0px 0px 98%);
   }
+
   100% {
     clip-path: inset(0px 0px 98% 0px);
   }
@@ -147,8 +152,8 @@ body {
   @apply block text-sm font-medium text-neutral-dark mb-1;
 }
 
-.input-group input:focus + label,
-.input-group textarea:focus + label {
+.input-group input:focus+label,
+.input-group textarea:focus+label {
   @apply text-primary;
 }
 
@@ -165,11 +170,11 @@ body {
   .contact-container {
     @apply max-w-3xl;
   }
-  
+
   .contact-info {
     @apply mb-6;
   }
-  
+
   .contact-form {
     @apply p-4;
   }
@@ -179,51 +184,37 @@ body {
   .contact-container {
     @apply max-w-md;
   }
-  
+
   .contact-info {
     @apply mb-4;
   }
-  
+
   .contact-info h2 {
     @apply text-xl;
   }
-  
+
   .contact-form {
     @apply p-3;
   }
-  
+
   .input-group input,
   .input-group textarea {
     @apply py-1.5;
   }
-  
+
   .input-group label {
     @apply text-xs;
   }
-  
+
   .contact-form button {
     @apply py-1.5;
   }
 }
-/* 
-@keyframes carouselScroll {
-  0% { transform: translateX(0%); }
-  20% { transform: translateX(0%); }
-  25% { transform: translateX(-100%); }
-  45% { transform: translateX(-100%); }
-  50% { transform: translateX(-200%); }
-  70% { transform: translateX(-200%); }
-  75% { transform: translateX(-300%); }
-  95% { transform: translateX(-300%); }
-  100% { transform: translateX(0%); }
-}
 
-.animate-carousel {
+.embla__container {
   display: flex;
-  width: 400%;
-  animation: carouselScroll 20s infinite ease-in-out;
 }
 
-.group:hover .animate-carousel {
-  animation-play-state: paused;
-} */
+.embla__slide {
+  flex: 0 0 100%;
+}

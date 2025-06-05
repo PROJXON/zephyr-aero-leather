@@ -1,8 +1,7 @@
-import fetchProducts from "../../lib/woocommerce";
-import ProductList from "../components/ProductList";
-import Image from "next/image";
-import Link from "next/link";
-import Hero from "../components/Hero";
+import fetchProducts from "../../lib/woocommerce"
+import Hero from "../components/Hero"
+import Section from "../components/Section"
+import Image from "next/image"
 
 export const revalidate = 60;
 
@@ -16,13 +15,13 @@ export default async function Home() {
     moto,
     holsters,
   ] = await Promise.all([
-     fetchProducts({ category: "wallets", per_page: 4 }),
-    fetchProducts({ category: "iphoneCases", per_page: 4 }),
-    fetchProducts({ category: "sunglasses", per_page: 4 }),
-    fetchProducts({ category: "belts", per_page: 4 }),
-    fetchProducts({ category: "bags", per_page: 4 }),
-    fetchProducts({ category: "moto", per_page: 4 }),
-    fetchProducts({ category: "holsters", per_page: 4 }),
+    fetchProducts({ category: "wallets" }),
+    fetchProducts({ category: "iphoneCases" }),
+    fetchProducts({ category: "sunglasses" }),
+    fetchProducts({ category: "belts" }),
+    fetchProducts({ category: "bags" }),
+    fetchProducts({ category: "moto" }),
+    fetchProducts({ category: "holsters" }),
   ]);
 
   return (
@@ -97,25 +96,3 @@ export default async function Home() {
     </div>
   );
 }
-
-// Reusable Section component
-const Section = ({ title, products, link }) => {
-  if (!products || products.length === 0) return null;
-
-  return (
-    <section className="py-16">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
-            <Link
-              href={link}
-              className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
-            >
-              View All
-            </Link>        
-        </div>
-        <ProductList products={products} />
-      </div>
-    </section>
-  );
-};
