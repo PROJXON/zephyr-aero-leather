@@ -1,20 +1,20 @@
 import Link from "next/link";
 import Image from "next/image";
-import collectionMap from "@/utils/collectionMap";
+import categoriesMap from "@/utils/categoriesMap";
 
-export default function CollectionsPage() {
+export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-center mb-12 text-neutral-dark">
-          Our Collections
+          Choose from our selection of High End Leather Products
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Object.entries(collectionMap).map(([slug, { name, description, image }]) => (
+          {Object.entries(categoriesMap).map(([slug, { name, description, image }]) => (
             <Link
               key={slug}
-              href={`/collections/${slug}`}
+              href={`/category/${slug}`}
               className="group bg-white shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-300"
             >
               <div className="relative aspect-[4/3] w-full">

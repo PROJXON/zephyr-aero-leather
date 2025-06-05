@@ -12,16 +12,25 @@ import ChangeQuantitySpans from "./ChangeQuantitySpans";
 import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import { Sling as Hamburger } from "hamburger-react";
+import NavDropdown from "./NavDropdown";
 
 const productCategories = [
   { name: "Wallets", slug: "wallets" },
-  { name: "iPhone Cases", slug: "iphone-cases" },
+  { name: "iPhone Leather Cases", slug: "iphoneCases" },
   { name: "Sunglass Cases", slug: "sunglasses" },
   { name: "Belts", slug: "belts" },
   { name: "Bags", slug: "bags" },
-  { name: "Shoulder Holsters", slug: "shoulder-holsters" },
-  { name: "Moto Guzzi", slug: "moto-guzzi" },
+  { name: "Shoulder Holsters", slug: "holsters" },
+  { name: "Moto Guzzi Collection", slug: "moto" },
 ];
+
+const collectionCategories = [
+  { name: "Aviator", slug: "aviator" },
+  { name: "Explorer", slug: "explorer" },
+  { name: "Traveler", slug: "traveler" },
+  { name: "Commuter", slug: "commuter" },
+  { name: "Minimalist", slug: "minimalist" }
+]
 
 const Navbar = ({ allProducts }) => {
   const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth();
@@ -67,7 +76,7 @@ const Navbar = ({ allProducts }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [accountOpen, cartOpen]);
 
-  const navItems = ["Collections", "About Us"];
+  const navItems = ["About Us"];
 
   return (
     <nav className="bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
@@ -100,25 +109,20 @@ const Navbar = ({ allProducts }) => {
                 </li>
               ))}
 
-              <li className="relative group">
-                <button className="text-lg font-medium text-black">
-                  Categories
-                </button>
-                <div className="absolute left-0 mt-2 w-48 bg-white shadow-md rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
-                  <ul className="py-2">
-                    {productCategories.map((cat) => (
-                      <li key={cat.slug}>
-                        <Link
-                          href={`/category/${cat.slug}`}
-                          className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800"
-                        >
-                          {cat.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
+              <NavDropdown
+                label="Collections"
+                items={collectionCategories}
+                basePath="collections"
+                linkToBase={true}
+              />
+              <NavDropdown
+                label="Categories"
+                items={productCategories}
+                basePath="categories"
+                linkToBase={true}
+              />
+
+
             </ul>
           </div>
 
@@ -226,21 +230,9 @@ const Navbar = ({ allProducts }) => {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 space-y-1 shadow-xl z-[9999]">
-            <Link href="/collections" onClick={() => setMenuOpen(false)} className="block text-lg">Collections</Link>
             <Link href="/about-us" onClick={() => setMenuOpen(false)} className="block text-lg">About Us</Link>
-
-            <div className="space-y-2">
-              <p className="text-lg">Categories</p>
-              <ul className="pl-2">
-                {productCategories.map((cat) => (
-                  <li key={cat.slug}>
-                    <Link href={`/category/${cat.slug}`} onClick={() => setMenuOpen(false)} className="text-gray-800 hover:text-blue-600">
-                      {cat.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <Link href="/collections" onClick={() => setMenuOpen(false)} className="block text-lg">Collections</Link>
+            <Link href="/categories" onClick={() => setMenuOpen(false)} className="block text-lg">Categories</Link>
 
             {!isAuthenticated ? (
               <div className="space-y-2">

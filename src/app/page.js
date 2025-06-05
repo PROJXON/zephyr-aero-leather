@@ -1,4 +1,7 @@
 import fetchProducts from "../../lib/woocommerce"
+import Image from "next/image";
+import Hero from "../components/Hero";
+import fetchProducts from "../../lib/woocommerce"
 import Section from "../components/Section"
 import Image from "next/image"
 
@@ -14,65 +17,43 @@ export default async function Home() {
     moto,
     holsters,
   ] = await Promise.all([
-    fetchProducts({ category: "wallets" }),
-    fetchProducts({ category: "iphoneCases" }),
-    fetchProducts({ category: "sunglasses" }),
-    fetchProducts({ category: "belts" }),
-    fetchProducts({ category: "bags" }),
-    fetchProducts({ category: "moto" }),
-    fetchProducts({ category: "holsters" }),
+    fetchProducts({ category: "wallets", per_page: 4 }),
+    fetchProducts({ category: "iphoneCases", per_page: 4 }),
+    fetchProducts({ category: "sunglasses", per_page: 4 }),
+    fetchProducts({ category: "belts", per_page: 4 }),
+    fetchProducts({ category: "bags", per_page: 4 }),
+    fetchProducts({ category: "moto", per_page: 4 }),
+    fetchProducts({ category: "holsters", per_page: 4 }),
   ]);
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative bg-warm-bg">
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="grid md:grid-cols-2 gap-8 items-center text-center md:text-left">
-            <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl font-light text-neutral-dark leading-tight">
-                Premium Leather <br />
-                <span className="font-normal">Crafted for Adventure</span>
-              </h1>
-              <p className="text-neutral-medium text-lg md:max-w-md">
-                Discover our collection of handcrafted leather goods designed for the modern adventurer.
-              </p>
-            </div>
-            <div className="relative aspect-[5/3] lg:aspect-auto lg:h-[400px] rounded-lg overflow-hidden">
-              {/* First image (fades out) */}
-              <div className="absolute inset-0 animate-carousel z-10">
-                <Image
-                  src="/phelanhelicopter.jpg"
-                  alt="Phelan Helicopter"
-                  fill
-                  className="object-cover object-top rounded-lg"
-                  priority
-                />
-              </div>
-
-              {/* Second image (fades in) */}
-              <div className="absolute inset-0 z-0">
-                <Image
-                  src="/phelanmotorcycle.jpg"
-                  alt="Phelan Motorcycle"
-                  fill
-                  className="object-cover object-center rounded-lg"
-                />
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
+      <Hero
+        title="Zephyr Aero Leather"
+        subtitle={
+          <>
+            Designed for Flight
+            <br />
+            Made for Life
+          </>
+        }
+        description="Premium handcrafted leather goods for aviators, adventurers, and everyday explorers"
+        images={[
+          "/phelanhelicopter.jpg",
+          "/phelanmotorcycle.jpg",
+          "/phelandesert.jpg",
+          "/phelancar.jpg"
+        ]}
+      />
 
       {/* Grouped Product Sections */}
-      <Section title="Wallets" products={wallets} link="/category/wallets" />
-      <Section title="iPhone Leather Cases" products={iphoneCases} link="/category/iphone-cases" />
-      <Section title="Sunglass Cases" products={sunglasses} link="/category/sunglasses" />
-      <Section title="Belts" products={belts} link="/category/belts" />
-      <Section title="Bags" products={bags} link="/category/bags" />
-      <Section title="Moto Guzzi Collection" products={moto} link="/category/moto-guzzi" />
-      <Section title="Shoulder Holsters" products={holsters} link="/category/shoulder-holsters" />
+      <Section title="Wallets" products={wallets} link="/categories/wallets" />
+      <Section title="iPhone Leather Cases" products={iphoneCases} link="/categories/iphoneCases" />
+      <Section title="Sunglass Cases" products={sunglasses} link="/categories/sunglasses" />
+      <Section title="Belts" products={belts} link="/categories/belts" />
+      <Section title="Bags" products={bags} link="/categories/bags" />
+      <Section title="Moto Guzzi Collection" products={moto} link="/categories/moto" />
+      <Section title="Shoulder Holsters" products={holsters} link="/categories/holsters" />
 
       {/* Benefits Section */}
       <section className="py-16">
