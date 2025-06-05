@@ -7,12 +7,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(request) {
     try {
         const body = await request.json()
-
         const { name, email, message } = body
-        console.log(name, email, message)
         const data = await resend.emails.send({
-            from: 'Acme <onboarding@resend.dev>',
-            to: ['zephyr.aero.leather1@gmail.com', email],
+            from: 'Zephyr Aero Leather <confirmation@zephyraeroleather.com>',
+            to: [email],
             subject: 'Confirmation Email',
             react: ConfirmationEmailTemplate({ name, email, message }),
         });

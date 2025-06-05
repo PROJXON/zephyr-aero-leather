@@ -9,10 +9,9 @@ export async function POST(request) {
         const body = await request.json()
 
         const { name, email, message } = body
-        console.log(name, email, message)
         const data = await resend.emails.send({
-            from: 'Acme <onboarding@resend.dev>',
-            to: ['zephyr.aero.leather1@gmail.com', email],
+            from: 'Zephyr Aero Leather <confirmation@zephyraeroleather.com>',
+            to: ['zephyr.aero.leather1@gmail.com'],
             subject: name + ' ' + 'Contact Us',
             react: EmailTemplate({ name, email, message }),
         });

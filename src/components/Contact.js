@@ -38,7 +38,6 @@ export default function Contact() {
     if (response.ok) {
       confirmationEmail();
       setIsSending(false);
-      alert("Message sent successfully!");
       setSent(true);
       setFormData({
         name: "",
@@ -47,72 +46,77 @@ export default function Contact() {
       });
     } else {
       setIsSending(false);
-      alert("Message failed to send. Please try again.");
     }
   };
 
   return (
-    <div className="contact-container text-white">
-      {/* Left Section - Contact Info */}
-      <div className="contact-info">
-        <h2 className="text-4xl font-bold text-[#90D3B6]">Contact Us</h2>
-        <p className="text-lg text-gray-300">We would love to hear from you! Please reach out with any questions or comments.</p>
-
-        <div className="info-item">
-  <div className="info-label">
-    <FiMapPin className="icon text-[#90D3B6] text-2xl" />
-    <span>Address:</span>
-  </div>
-  <span className="info-value">Las Vegas, NV</span>
-</div>
-
-<div className="info-item">
-  <div className="info-label">
-    <FiPhone className="icon text-[#90D3B6] text-2xl" />
-    <span>Phone:</span>
-  </div>
-  <span className="info-value">000-000-0000</span>
-</div>
-
-<div className="info-item">
-  <div className="info-label">
-    <FiMail className="icon text-[#90D3B6] text-2xl" />
-    <span>Email:</span>
-  </div>
-  <span className="info-value">test@gmail.com</span>
-</div>
-
-
-
-      </div>
-
-      {/* Right Section - Contact Form */}
-      <div className="contact-form bg-gray-900 p-6 rounded-lg mt-8">
-        <div className="border-animation"></div>
-
-        <h3 className="text-2xl font-bold text-white mb-4">Send Message</h3>
-
-        <form onSubmit={handleSubmit}>
-          <div className="input-group mb-4">
-            <input type="text" id="name" required onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full p-3 border border-gray-700 rounded-lg bg-gray-800 text-white"/>
-            <label htmlFor="name"  className="text-gray-400">Full Name</label>
+      <div className="contact-form bg-gray-900 p-8 rounded-lg my-24 max-w-2xl mx-auto shadow-xl">
+        <h3 className="text-3xl font-bold text-white mb-6 text-center">Contact Us</h3>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="relative">
+            <input 
+              type="text" 
+              id="name" 
+              value={formData.name} 
+              disabled={sent}
+              required 
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
+              className="w-full p-4 border border-gray-700 rounded-lg bg-gray-800 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
+              placeholder=" "
+            />
+            <label 
+              htmlFor="name"  
+              className="absolute left-4 top-4 text-gray-400 transition-all duration-200 pointer-events-none peer-focus:-top-2 peer-focus:text-sm peer-focus:text-blue-500 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
+            >
+              Full Name
+            </label>
           </div>
 
-          <div className="input-group mb-4">
-            <input type="email" id="email" onChange={(e) => setFormData({ ...formData, email: e.target.value })} required className="w-full p-3 border border-gray-700 rounded-lg bg-gray-800 text-white"/>
-            <label htmlFor="email"  className="text-gray-400">Email</label>
+          <div className="relative">
+            <input 
+              type="email" 
+              id="email" 
+              value={formData.email} 
+              disabled={sent}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required 
+              className="w-full p-4 border border-gray-700 rounded-lg bg-gray-800 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
+              placeholder=" "
+            />
+            <label 
+              htmlFor="email"  
+              className="absolute left-4 top-4 text-gray-400 transition-all duration-200 pointer-events-none peer-focus:-top-2 peer-focus:text-sm peer-focus:text-blue-500 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
+            >
+              Email
+            </label>
           </div>
 
-          <div className="input-group mb-4">
-            <textarea id="message" required onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="w-full p-3 border border-gray-700 rounded-lg bg-gray-800 text-white"></textarea>
-            <label htmlFor="message"  className="text-gray-400">Type your Message...</label>
+          <div className="relative">
+            <textarea 
+              id="message" 
+              required 
+              value={formData.message} 
+              disabled={sent}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })} 
+              className="w-full p-4 border border-gray-700 rounded-lg bg-gray-800 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200 min-h-[150px] resize-none"
+              placeholder=" "
+            ></textarea>
+            <label 
+              htmlFor="message"  
+              className="absolute left-4 top-4 text-gray-400 transition-all duration-200 pointer-events-none peer-focus:-top-2 peer-focus:text-sm peer-focus:text-blue-500 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base"
+            >
+              Type your Message...
+            </label>
           </div>
 
-          <button type="submit" disabled={isSending || sent} className={`w-full py-3 rounded-lg text-white font-bold ${isSending ? "bg-gray-600" : "bg-[#90D3B6] hover:bg-[#78C2A4] transition"} ${sent ? "bg-green-600 cursor-not-allowed" : ""}  `}>
-            {isSending ? "Sending..." : sent ? "Sent" : "Send"}
+          <button 
+            type="submit" 
+            disabled={isSending || sent} 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            {isSending ? "Sending..." : sent ? "Message Sent Successfully" : "Send Message"}
           </button>
         </form>
       </div>
-    </div>
   );
 }
