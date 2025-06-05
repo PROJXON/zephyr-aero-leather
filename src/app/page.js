@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Hero from "../components/Hero";
 
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+
 export const revalidate = 60;
 
 export default async function Home() {
@@ -38,10 +40,10 @@ export default async function Home() {
         }
         description="Premium handcrafted leather goods for aviators, adventurers, and everyday explorers"
         images={[
-          "/phelanhelicopter.jpg",
-          "/phelanmotorcycle.jpg",
-          "/phelandesert.jpg",
-          "/phelancar.jpg"
+          `${CDN_URL}/phelanhelicopter.jpg`,
+          `${CDN_URL}/phelanmotorcycle.jpg`,
+          `${CDN_URL}/phelandesert.jpg`,
+          `${CDN_URL}/phelancar.jpg`
         ]}
       />
 
