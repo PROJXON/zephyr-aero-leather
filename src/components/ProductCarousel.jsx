@@ -39,19 +39,17 @@ export default function ProductCarousel({ products }) {
 
     return (<div className="w-full">
         <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex embla__container">
+            <div className="embla__container">
                 {groupedProducts.map((group, index) => (<div
                     key={index}
-                    className="embla__slide flex justify-center gap-6"
-                    style={{ width: `${100 / groupedProducts.length}%` }}
+                    className="embla__slide box-border w-full"
                 >
-                    {group.map(product => (<div key={product.id} className="flex-1 min-w-0">
-                        <Product product={product} />
-                    </div>))}
-                    {Array.from({ length: slidesPerView - group.length }).map((_, idx) => (<div
-                        key={`empty-${idx}`}
-                        className="w-1/2 md:w-1/4"
-                    />))}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        {group.map(product => <Product key={product.id} product={product} />)}
+                        {Array.from({ length: slidesPerView - group.length }).map((_, i) => (<div
+                            key={`empty-${i}`}
+                        />))}
+                    </div>
                 </div>))}
             </div>
         </div>
