@@ -65,7 +65,7 @@ const collectionMap = {
   minimalist: {
     name: "Minimalist",
     description: "For the sleek and simple: essentials, reimagined",
-    image: "/collections/minimalistcollection.jpg",
+    image: `${CDN_URL}collections/minimalistcollection.jpg`,
     productIds: [121, 122, 123, 124, 125],
     carouselImages: [
           `${CDN_URL}/collections/minimalist/minimalist1.jpg`,

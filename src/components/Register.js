@@ -6,8 +6,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useAuth } from "@/app/context/AuthContext";
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
-const backgroundImageUrl = "/ifr.jpg"
+const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
 const Register = () => {
   const [formData, setFormdata] = useState({
