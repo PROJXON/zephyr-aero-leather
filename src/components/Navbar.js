@@ -169,12 +169,14 @@ const Navbar = ({ allProducts }) => {
                           );
                         })}
                       </ul>
-                      <button
-                        className="w-full bg-blue-500 text-white mt-4 p-2 rounded"
-                        onClick={() => replace("/checkout")}
-                      >
-                        Checkout
-                      </button>
+                      <div className="mt-4 flex justify-end">
+                        <button
+                          className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+                          onClick={() => replace("/checkout")}
+                        >
+                          Checkout
+                        </button>
+                      </div>
                     </>
                   ) : (
                     <p className="text-sm text-gray-900">Your cart is empty.</p>
