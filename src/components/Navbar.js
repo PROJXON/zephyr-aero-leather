@@ -29,8 +29,8 @@ const collectionCategories = [
   { name: "Explorer", slug: "explorer" },
   { name: "Traveler", slug: "traveler" },
   { name: "Commuter", slug: "commuter" },
-  { name: "Minimalist", slug: "minimalist" }
-]
+  { name: "Minimalist", slug: "minimalist" },
+];
 
 const Navbar = ({ allProducts }) => {
   const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth();
@@ -57,10 +57,7 @@ const Navbar = ({ allProducts }) => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (
-        accountOpen &&
-        !document.getElementById("profileBtn")?.contains(e.target)
-      ) {
+      if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
         setAccountOpen(false);
       }
       if (
@@ -82,7 +79,7 @@ const Navbar = ({ allProducts }) => {
     <nav className="bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
       <div className="max-w-screen-xl px-4 mx-auto">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo and Desktop Menu */}
           <div className="flex items-center space-x-8">
             <Link href="/">
               <Image
@@ -95,7 +92,6 @@ const Navbar = ({ allProducts }) => {
               />
             </Link>
 
-            {/* Desktop Menu */}
             <ul className="hidden lg:flex items-center gap-8 py-3 relative">
               {navItems.map((item) => (
                 <li key={item} className="relative group overflow-hidden">
@@ -121,77 +117,18 @@ const Navbar = ({ allProducts }) => {
                 basePath="categories"
                 linkToBase={true}
               />
-
-
             </ul>
           </div>
 
           {/* Right Buttons */}
           <div className="flex items-center gap-3">
-            {/* Cart - Desktop */}
-            <div id="cartBtn" className="relative hidden lg:block">
-              <NavButton
-                onClick={() => {
-                  setCartOpen(!cartOpen);
-                  setAccountOpen(false);
-                }}
-                srOnly="Cart"
-                d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
-                text={isAuthenticated ? "My Cart" : "Guest Cart"}
-              />
-              {cartOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
-                  {cartItems?.length > 0 ? (
-                    <>
-                      <ul>
-                        {cartItems.map((item) => {
-                          const itemName =
-                            allProducts.find((product) => product.id === item.id)
-                              ?.name || "Item";
-                          return (
-                            <li
-                              key={`${item.id}-${item.lineItemId || "temp"}`}
-                              className="grid grid-cols-[1fr_auto] border-b py-2 gap-1"
-                            >
-                              <span>{itemName}</span>
-                              <div className="m-auto">
-                                <div className="text-center">
-                                  x {item.quantity}
-                                </div>
-                                <div className="flex items-center flex-wrap gap-1">
-                                  <ChangeQuantitySpans
-                                    cqs={changeQuantity}
-                                    item={item}
-                                  />
-                                </div>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                      <div className="mt-4 flex justify-end">
-                        <button
-                          className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
-                          onClick={() => replace("/checkout")}
-                        >
-                          Checkout
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <p className="text-sm text-gray-900">Your cart is empty.</p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Auth - Desktop */}
-            <div className="hidden lg:block">
+            {/* Auth Buttons */}
+            <div className="hidden lg:flex gap-2" id="authButtons">
               {!isAuthenticated ? (
-                <div className="flex gap-2">
+                <>
                   <NavLoggedOutBtn href="/login" text="Sign In" />
                   <NavLoggedOutBtn href="/register" text="Create Account" />
-                </div>
+                </>
               ) : (
                 <div id="profileBtn" className="relative">
                   <NavButton
@@ -222,6 +159,66 @@ const Navbar = ({ allProducts }) => {
               )}
             </div>
 
+            {/* Cart Button */}
+            <div id="cartBtn" className="relative hidden lg:block">
+              <NavButton
+                onClick={() => {
+                  setCartOpen(!cartOpen);
+                  setAccountOpen(false);
+                }}
+                srOnly="Cart"
+                d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
+                text={isAuthenticated ? "My Cart" : "Guest Cart"}
+              />
+              {cartOpen && (
+                <div
+                  className="fixed top-[60px] w-64 bg-white shadow-lg rounded-lg p-4 z-50"
+                  style={{
+                    right: "max(calc((65vw - 1280px) / 2), 12px)",
+                  }}
+                >
+                  {cartItems?.length > 0 ? (
+                    <>
+                      <ul>
+                        {cartItems.map((item) => {
+                          const itemName =
+                            allProducts.find((product) => product.id === item.id)
+                              ?.name || "Item";
+                          return (
+                            <li
+                              key={`${item.id}-${item.lineItemId || "temp"}`}
+                              className="grid grid-cols-[1fr_auto] border-b py-2 gap-1"
+                            >
+                              <span>{itemName}</span>
+                              <div className="m-auto">
+                                <div className="text-center">x {item.quantity}</div>
+                                <div className="flex items-center flex-wrap gap-1">
+                                  <ChangeQuantitySpans
+                                    cqs={changeQuantity}
+                                    item={item}
+                                  />
+                                </div>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      <div className="mt-4 flex justify-end">
+                        <button
+                          className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+                          onClick={() => replace("/checkout")}
+                        >
+                          Checkout
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-900">Your cart is empty.</p>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Hamburger - Mobile Only */}
             <div className="lg:hidden">
               <Hamburger toggled={menuOpen} toggle={setMenuOpen} />
@@ -232,26 +229,47 @@ const Navbar = ({ allProducts }) => {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 space-y-1 shadow-xl z-[9999]">
-            <Link href="/about-us" onClick={() => setMenuOpen(false)} className="block text-lg">About Us</Link>
-            <Link href="/collections" onClick={() => setMenuOpen(false)} className="block text-lg">Collections</Link>
-            <Link href="/categories" onClick={() => setMenuOpen(false)} className="block text-lg">Categories</Link>
+            <Link href="/about-us" onClick={() => setMenuOpen(false)} className="block text-lg">
+              About Us
+            </Link>
+            <Link href="/collections" onClick={() => setMenuOpen(false)} className="block text-lg">
+              Collections
+            </Link>
+            <Link href="/categories" onClick={() => setMenuOpen(false)} className="block text-lg">
+              Categories
+            </Link>
 
             {!isAuthenticated ? (
               <div className="space-y-2">
-                <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-lg">Sign In</Link>
-                <Link href="/register" onClick={() => setMenuOpen(false)} className="block text-lg">Create Account</Link>
+                <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-lg">
+                  Sign In
+                </Link>
+                <Link href="/register" onClick={() => setMenuOpen(false)} className="block text-lg">
+                  Create Account
+                </Link>
               </div>
             ) : (
               <div className="space-y-2">
-                <button onClick={() => { replace("/order-history"); setMenuOpen(false); }} className="block w-full text-left text-blue-600">Order History</button>
-                <button onClick={handleLogout} className="block w-full text-left text-red-600">Logout</button>
+                <button
+                  onClick={() => {
+                    replace("/order-history");
+                    setMenuOpen(false);
+                  }}
+                  className="block w-full text-left text-blue-600"
+                >
+                  Order History
+                </button>
+                <button onClick={handleLogout} className="block w-full text-left text-red-600">
+                  Logout
+                </button>
               </div>
             )}
 
-            <Link href="/checkout" onClick={() => setMenuOpen(false)} className="block text-lg">View Cart</Link>
+            <Link href="/checkout" onClick={() => setMenuOpen(false)} className="block text-lg">
+              View Cart
+            </Link>
           </div>
         )}
-
       </div>
     </nav>
   );
