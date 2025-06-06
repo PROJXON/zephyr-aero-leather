@@ -5,6 +5,7 @@ import Link from "next/link";
 import Hero from "../components/Hero";
 import { GiDiamondHard, GiHandSaw } from "react-icons/gi";
 import { FaLeaf } from "react-icons/fa";
+import AOSWrapper from "../components/AOSWrapper"; 
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
@@ -31,6 +32,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-background">
+      <AOSWrapper />
       <Hero
         title="Zephyr Aero Leather"
         subtitle={
@@ -107,7 +109,7 @@ const Section = ({ title, products, link }) => {
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="py-16">
+    <section className="py-16" data-aos="fade-up">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
