@@ -12,7 +12,7 @@ import ChangeQuantitySpans from "./ChangeQuantitySpans";
 import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import { Sling as Hamburger } from "hamburger-react"
-import NavbarLink from "./NavbarLink"
+import TopNavLink from "./TopNavLink"
 
 const productCategories = [
   { name: "Wallets", slug: "wallets" },
@@ -105,29 +105,17 @@ const Navbar = ({ allProducts }) => {
             </Link>
 
             <ul className="hidden lg:flex items-center gap-8 py-3 relative">
-              {navItems.map(item => (<NavbarLink
+              {navItems.map(item => (<TopNavLink
                 key={item}
                 href={`/${item.toLowerCase().replace(/ /g, "-")}`}
                 label={item}
               />))}
-              {navItemsWithDropdown.map(item => (<NavbarLink
+              {navItemsWithDropdown.map(item => (<TopNavLink
                 key={item.label}
                 href={item.basePath}
                 label={item.label}
-              >
-                <div className="absolute left-0 mt-2 w-48 bg-white shadow-md rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
-                  <ul className="py-2">
-                    {item.items.map(dropdownItem => (<li key={dropdownItem.slug}>
-                      <Link
-                        href={`/${item.basePath}/${dropdownItem.slug}`}
-                        className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800"
-                      >
-                        {dropdownItem.name}
-                      </Link>
-                    </li>))}
-                  </ul>
-                </div>
-              </NavbarLink>))}
+                dropdownItems={item.items}
+              />))}
             </ul>
           </div>
 
