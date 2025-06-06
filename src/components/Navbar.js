@@ -252,42 +252,13 @@ const Navbar = ({ allProducts }) => {
                 Categories
               </Link>
 
-              {!isAuthenticated ? (
-                <>
-                  <Link
-                    href="/login"
-                    onClick={() => setMenuOpen(false)}
-                    className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setMenuOpen(false)}
-                    className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-                  >
-                    Create Account
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      replace("/order-history");
-                      setMenuOpen(false);
-                    }}
-                    className="block text-lg font-medium px-3 py-2 w-full text-left rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-                  >
-                    Order History
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="block text-lg font-medium px-3 py-2 w-full text-left rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-                  >
-                    Log Out
-                  </button>
-                </>
-              )}
+              {!isAuthenticated ? (<>
+                <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-lg">Sign In</Link>
+                <Link href="/register" onClick={() => setMenuOpen(false)} className="block text-lg">Create Account</Link>
+              </>) : (<>
+                <button onClick={() => { replace("/order-history"); setMenuOpen(false); }} className="block w-full text-left text-blue-600">Order History</button>
+                <button onClick={handleLogout} className="block w-full text-left text-red-600">Logout</button>
+              </>)}
 
               <Link
                 href="/checkout"
