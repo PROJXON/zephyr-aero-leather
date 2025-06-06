@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import fetchProducts from "../../lib/woocommerce"
 import getCookieInfo from "../../lib/getCookieInfo";
+import AOSWrapper from "@/components/AOSWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,6 +67,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-[100dvh] grid grid-rows-[auto_1fr_auto]`}>
+        <AOSWrapper />
         <AuthProvider>
           <CartProvider>
             <Navbar allProducts={products} />

@@ -107,7 +107,7 @@ const Section = ({ title, products, link }) => {
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="py-16">
+    <section className="py-16" data-aos="fade-up">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
