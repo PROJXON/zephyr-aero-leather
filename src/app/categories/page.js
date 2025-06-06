@@ -14,7 +14,7 @@ export default function CategoriesPage() {
           {Object.entries(categoriesMap).map(([slug, { name, description, image }]) => (
             <Link
               key={slug}
-              href={`/category/${slug}`}
+              href={`/categories/${slug}`}
               className="group bg-white shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-300"
             >
               <div className="relative aspect-[4/3] w-full">
