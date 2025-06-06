@@ -172,7 +172,7 @@ const Navbar = ({ allProducts }) => {
               />
               {cartOpen && (
                 <div
-                  className="fixed top-[60px] w-64 bg-white shadow-lg rounded-lg p-4 z-50"
+                  className="fixed top-[60px] w-64 max-h-[70vh] overflow-y-auto bg-white shadow-lg rounded-lg p-4 z-50"
                   style={{
                     right: "max(calc((65vw - 1280px) / 2), 12px)",
                   }}
