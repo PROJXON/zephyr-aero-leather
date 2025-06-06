@@ -81,7 +81,7 @@ export default function Checkout({ products }) {
             <div className="flex justify-end">
               <div className="w-full max-w-md">
                 <Elements stripe={stripePromise} options={options}>
-                  <StripeForm paymentIntentId={paymentIntentId} />
+                  <StripeForm clientSecret={clientSecret} />
                 </Elements>
               </div>
             </div>

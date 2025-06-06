@@ -2,51 +2,59 @@
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js"
 import { useState } from "react"
 
-export default function StripeForm({ paymentIntentId }) {
+export default function StripeForm({ clientSecret }) {
   const stripe = useStripe()
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState(null)
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!stripe || !elements) return
+  e.preventDefault()
+  if (!stripe || !elements) return
 
-    setIsProcessing(true)
+  setIsProcessing(true)
 
-    if (!paymentIntentId) {
-      setError("Missing payment intent ID")
-      setIsProcessing(false)
-      return
-    }
-
-    await fetch("/api/user-time", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        payment_intent_id: paymentIntentId,
-        user_local_time: new Date().toISOString()
-      })
-    })
-
-    const returnURL = `${window.location.origin}/payment-success`
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: { return_url: returnURL },
-      redirect: "always"
-    })
-
-    if (error) {
-      setError(error.message)
-      setIsProcessing(false)
-    }
+  if (!clientSecret) {
+    setError("Missing client secret")
+    setIsProcessing(false)
+    return
   }
+
+  await fetch("/api/user-time", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      payment_intent_id: clientSecret.split("_secret")[0],
+      user_local_time: new Date().toISOString()
+    })
+  })
+
+  const returnURL = `${window.location.origin}/payment-success`
+
+  const result = await stripe.confirmCardPayment(clientSecret, {
+    payment_method: {
+      card: elements.getElement(CardElement),
+    },
+    return_url: returnURL,
+  })
+
+  console.log("Stripe result:", result)
+
+  if (result.error) {
+    setError(result.error.message)
+    setIsProcessing(false)
+  } else if (result.paymentIntent?.status === "succeeded") {
+    sessionStorage.setItem("payment_success", "true")
+    sessionStorage.setItem("payment_intent", result.paymentIntent.id)
+    window.location.href = returnURL
+  }
+}
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
         <div className="border border-gray-300 rounded-md p-4 bg-white shadow-sm">
             <CardElement
-            options={{
+              options={{
                 style: {
                 base: {
                     fontSize: '16px',
