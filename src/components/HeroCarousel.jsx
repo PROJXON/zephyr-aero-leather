@@ -43,7 +43,7 @@ const HeroCarousel = ({ images, altBase = "Hero" }) => {
     >
       {images.map((src, index) => (
         <div
-          key={src}
+          key={`${src}-${index}`}
           className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
             index === current ? "opacity-100 z-10" : "opacity-0 z-0"
           }`}

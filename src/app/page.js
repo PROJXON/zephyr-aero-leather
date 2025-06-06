@@ -5,7 +5,6 @@ import Link from "next/link";
 import Hero from "../components/Hero";
 import { GiDiamondHard, GiHandSaw } from "react-icons/gi";
 import { FaLeaf } from "react-icons/fa";
-import AOSWrapper from "../components/AOSWrapper"; 
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
@@ -32,7 +31,6 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <AOSWrapper />
       <Hero
         title="Zephyr Aero Leather"
         subtitle={
