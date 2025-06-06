@@ -11,8 +11,8 @@ import NavLoggedOutBtn from "./NavLoggedOutBtn";
 import ChangeQuantitySpans from "./ChangeQuantitySpans";
 import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity";
-import { Sling as Hamburger } from "hamburger-react";
-import NavDropdown from "./NavDropdown";
+import { Sling as Hamburger } from "hamburger-react"
+import NavbarLink from "./NavbarLink"
 
 const productCategories = [
   { name: "Wallets", slug: "wallets" },
@@ -73,7 +73,19 @@ const Navbar = ({ allProducts }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [accountOpen, cartOpen]);
 
-  const navItems = ["About Us"];
+  const navItems = ["About Us"]
+  const navItemsWithDropdown = [
+    {
+      label: "Collections",
+      items: collectionCategories,
+      basePath: "collections"
+    },
+    {
+      label: "Categories",
+      items: productCategories,
+      basePath: "categories"
+    }
+  ]
 
   return (
     <nav className="bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
@@ -93,30 +105,29 @@ const Navbar = ({ allProducts }) => {
             </Link>
 
             <ul className="hidden lg:flex items-center gap-8 py-3 relative">
-              {navItems.map((item) => (
-                <li key={item} className="relative group overflow-hidden">
-                  <Link
-                    href={`/${item.toLowerCase().replace(/ /g, "-")}`}
-                    className="text-lg font-medium text-black transition-all duration-300"
-                  >
-                    {item}
-                  </Link>
-                  <span className="absolute left-0 bottom-0 w-full h-[2px] bg-black transition-transform duration-300 transform scale-x-0 group-hover:scale-x-100"></span>
-                </li>
-              ))}
-
-              <NavDropdown
-                label="Collections"
-                items={collectionCategories}
-                basePath="collections"
-                linkToBase={true}
-              />
-              <NavDropdown
-                label="Categories"
-                items={productCategories}
-                basePath="categories"
-                linkToBase={true}
-              />
+              {navItems.map(item => (<NavbarLink
+                key={item}
+                href={`/${item.toLowerCase().replace(/ /g, "-")}`}
+                label={item}
+              />))}
+              {navItemsWithDropdown.map(item => (<NavbarLink
+                key={item.label}
+                href={item.basePath}
+                label={item.label}
+              >
+                <div className="absolute left-0 mt-2 w-48 bg-white shadow-md rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
+                  <ul className="py-2">
+                    {item.items.map(dropdownItem => (<li key={dropdownItem.slug}>
+                      <Link
+                        href={`/${item.basePath}/${dropdownItem.slug}`}
+                        className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800"
+                      >
+                        {dropdownItem.name}
+                      </Link>
+                    </li>))}
+                  </ul>
+                </div>
+              </NavbarLink>))}
             </ul>
           </div>
 
