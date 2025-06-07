@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -13,6 +12,7 @@ import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import { Sling as Hamburger } from "hamburger-react"
 import TopNavLink from "./TopNavLink"
+import NavLink from "./NavLink"
 
 const productCategories = [
   { name: "Wallets", slug: "wallets" },
@@ -87,6 +87,58 @@ const Navbar = ({ allProducts }) => {
       label: "Categories",
       items: productCategories,
       basePath: "categories"
+    }
+  ]
+
+  const mobileMenuLinks = [
+    {
+      label: "About Us",
+      unique: "/about-us",
+      show: true
+    },
+    {
+      label: "Collections",
+      unique: "/collections",
+      show: true
+    },
+    {
+      label: "Categories",
+      unique: "/categories",
+      show: true
+    },
+    {
+      label: "Sign In",
+      unique: "/login",
+      show: !isAuthenticated
+    },
+    {
+      label: "Create Account",
+      unique: "/register",
+      show: !isAuthenticated
+    },
+    {
+      label: "Order History",
+      unique: {
+        function: () => {
+          replace("/order-history")
+          setMenuOpen(false)
+        },
+        classes: "block w-full text-left text-blue-600"
+      },
+      show: isAuthenticated
+    },
+    {
+      label: "Logout",
+      unique: {
+        function: handleLogout,
+        classes: "block w-full text-left text-red-600"
+      },
+      show: isAuthenticated
+    },
+    {
+      label: "View Cart",
+      unique: "/checkout",
+      show: true
     }
   ]
 
@@ -227,19 +279,14 @@ const Navbar = ({ allProducts }) => {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 space-y-1 shadow-xl z-[9999]">
-            <Link href="/about-us" onClick={() => setMenuOpen(false)} className="block text-lg">About Us</Link>
-            <Link href="/collections" onClick={() => setMenuOpen(false)} className="block text-lg">Collections</Link>
-            <Link href="/categories" onClick={() => setMenuOpen(false)} className="block text-lg">Categories</Link>
-
-            {!isAuthenticated ? (<>
-              <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-lg">Sign In</Link>
-              <Link href="/register" onClick={() => setMenuOpen(false)} className="block text-lg">Create Account</Link>
-            </>) : (<>
-              <button onClick={() => { replace("/order-history"); setMenuOpen(false); }} className="block w-full text-left text-blue-600">Order History</button>
-              <button onClick={handleLogout} className="block w-full text-left text-red-600">Logout</button>
-            </>)}
-
-            <Link href="/checkout" onClick={() => setMenuOpen(false)} className="block text-lg">View Cart</Link>
+            {mobileMenuLinks.map(link => (<Fragment key={link.label}>
+              {link.show && <>
+                {typeof link.unique === "string" ?
+                  <NavLink href={link.unique} onClick={() => setMenuOpen(false)} classes="block text-lg" label={link.label} /> :
+                  <button onClick={unique.function} className={unique.classes}>{link.label}</button>
+                }
+              </>}
+            </Fragment>))}
           </div>
         )}
 
