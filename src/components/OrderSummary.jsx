@@ -6,10 +6,9 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
   const { updateQuantity, editID, setEditID, newQty, setNewQty, changeQuantity } = quantityControls
   const editable = Object.keys(quantityControls).length > 0
 
-  const formatPrice = (priceInCents) => {
-    const dollars = Math.floor(priceInCents / 100)
-    const cents = priceInCents % 100
-    return `$${dollars}.${cents.toString().padStart(2, '0')}`
+  const formatPrice = priceInCents => {
+    const price = (priceInCents / 100).toFixed(2)
+    return `$${price}`
   }
 
   return (
