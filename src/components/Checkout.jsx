@@ -5,7 +5,8 @@ import { FaEdit } from "react-icons/fa";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import calculateTotal from "../../lib/calculateTotal";
 import OrderSummary from "./OrderSummary";
-import StripeForm from "./StripeForm";
+import ShippingDetails from "./ShippingDetails"
+import StripeForm from "./StripeForm"
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
@@ -60,36 +61,31 @@ export default function Checkout({ products }) {
   const options = { clientSecret, appearance };
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-  return (
-    <>
-      {cartItems?.length > 0 ? (
-        <div className="flex flex-col gap-8">
-          <OrderSummary
-            cartItems={cartItems}
-            products={products}
-            total={total}
-            quantityControls={{
-              updateQuantity,
-              editID,
-              setEditID,
-              newQty,
-              setNewQty,
-              changeQuantity,
-            }}
-          />
-          {clientSecret && (
-            <div className="flex justify-end">
-              <div className="w-full max-w-md">
-                <Elements stripe={stripePromise} options={options}>
-                  <StripeForm paymentIntentId={paymentIntentId} />
-                </Elements>
-              </div>
-            </div>
-          )}
+  return (<>
+    {cartItems?.length > 0 ? (<div className="flex flex-col gap-8">
+      <OrderSummary
+        cartItems={cartItems}
+        products={products}
+        total={total}
+        quantityControls={{
+          updateQuantity,
+          editID,
+          setEditID,
+          newQty,
+          setNewQty,
+          changeQuantity,
+        }}
+      />
+      {clientSecret && (
+        <div className="flex place-content-between">
+          <ShippingDetails />
+          <div className="w-full max-w-md">
+            <Elements stripe={stripePromise} options={options}>
+              <StripeForm paymentIntentId={paymentIntentId} />
+            </Elements>
+          </div>
         </div>
-      ) : (
-        <p>Your cart is empty</p>
       )}
-    </>
-  );
+    </div>) : <p>Your cart is empty</p>}
+  </>)
 }
