@@ -1,6 +1,6 @@
 "use client"
 import { useContext } from "react"
-import { ChangeContext } from "./ShippingDetails"
+import { ChangeContext } from "./Checkout"
 
 export default function ShippingFormInput({ name, placeholder, value }) {
     const onChange = useContext(ChangeContext)
