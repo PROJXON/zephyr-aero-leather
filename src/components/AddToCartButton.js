@@ -13,7 +13,7 @@ export default function AddToCartButton({ productId, className = "" }) {
   return (
     <button
       onClick={handleAddToCart}
-      className={className}
+      className={`addToCartBtn ${className}`}
     >
       Add to Cart
     </button>
