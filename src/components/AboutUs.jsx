@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
 export default function AboutUs() {
   const [activeTab, setActiveTab] = useState("shop");
@@ -129,7 +130,7 @@ export default function AboutUs() {
           </div>
           <div>
             <Image
-              src="/about-us/why-choose.png"
+              src={`${CDN_URL}/collections/minimalist/minimalist2.jpg`}
               alt="Why choose Zephyr"
               width={600}
               height={400}
