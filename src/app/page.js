@@ -1,5 +1,6 @@
 import fetchProducts from "../../lib/woocommerce";
 import ProductList from "../components/ProductList";
+import ProductCarousel from "@/components/ProductCarousel";
 import Image from "next/image";
 import Link from "next/link";
 import Hero from "../components/Hero";
@@ -118,7 +119,7 @@ const Section = ({ title, products, link }) => {
               View All
             </Link>        
         </div>
-        <ProductList products={products} />
+        <ProductCarousel products={products} />
       </div>
     </section>
   );
