@@ -13,7 +13,7 @@ export default function ShippingFormInput({ name, placeholder, value, span, type
             value={value}
             onChange={onChange}
         >
-            <option value="">Select a state</option>
+            <option value="">{placeholder}</option>
             {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
         </select> : <input
             className={classes}

@@ -25,12 +25,12 @@ const reducer = (details, action) => {
     case "ADDRESS1":
       return {
         ...details,
-        address: { ...details.address, line1: action.address1 }
+        address: { ...details.address, line1: action.value }
       }
     case "ADDRESS2":
       return {
         ...details,
-        address: { ...details.address, line2: action.address2 }
+        address: { ...details.address, line2: action.value }
       }
     case "CITY":
       return { ...details, city: action.value }
