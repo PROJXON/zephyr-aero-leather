@@ -42,7 +42,7 @@ export default function StripeForm({ paymentIntentId }) {
     }
   }
 
-  return (<form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+  return (<form onSubmit={handleSubmit} className="space-y-4 lg:max-w-md">
     <div className="border border-gray-300 rounded-md p-4 bg-white shadow-sm">
       <CardElement
         options={{

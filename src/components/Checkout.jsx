@@ -22,14 +22,22 @@ const reducer = (details, action) => {
         ...details,
         name: { ...details.name, last: action.value }
       }
-    case "ADDRESS":
-      return { ...details, address: action.value }
+    case "ADDRESS1":
+      return {
+        ...details,
+        address: { ...details.address, line1: action.address1 }
+      }
+    case "ADDRESS2":
+      return {
+        ...details,
+        address: { ...details.address, line2: action.address2 }
+      }
     case "CITY":
       return { ...details, city: action.value }
-    case "POSTALCODE":
-      return { ...details, postalCode: action.value }
-    case "COUNTRY":
-      return { ...details, country: action.value }
+    case "ZIPCODE":
+      return { ...details, zipCode: action.value }
+    case "STATE":
+      return { ...details, state: action.value }
     default:
       return details
   }
@@ -49,10 +57,13 @@ export default function Checkout({ products }) {
       first: "",
       last: ""
     },
-    address: "",
+    address: {
+      line1: "",
+      line2: ""
+    },
     city: "",
-    postalCode: "",
-    country: ""
+    zipCode: "",
+    state: ""
   })
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
@@ -116,11 +127,11 @@ export default function Checkout({ products }) {
         changeQuantity,
       }}
       />
-      {clientSecret && (<div className="flex place-content-between">
+      {clientSecret && (<div className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between">
         <ChangeContext.Provider value={handleChange}>
           <ShippingDetails details={shippingDetails} />
         </ChangeContext.Provider>
-        <div className="w-full max-w-md">
+        <div className="w-full lg:max-w-md">
           <Elements stripe={stripePromise} options={options}>
             <StripeForm paymentIntentId={paymentIntentId} />
           </Elements>
