@@ -52,6 +52,8 @@ export default function Checkout({ products }) {
   const [newQty, setNewQty] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [paymentIntentId, setPaymentIntentId] = useState(null)
+  const [formError, setFormError] = useState(null)
+  const [shippingErrors, setShippingErrors] = useState({})
   const [shippingDetails, dispatch] = useReducer(reducer, {
     name: {
       first: "",
@@ -65,6 +67,8 @@ export default function Checkout({ products }) {
     zipCode: "",
     state: ""
   })
+
+  const states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
   changeQuantity.push({
@@ -109,10 +113,33 @@ export default function Checkout({ products }) {
   const options = { clientSecret, appearance };
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
+  const validateShipping = () => {
+    const errors = {}
+
+    if (!shippingDetails.name.first.trim()) errors.firstName = "Enter your first name"
+    if (!shippingDetails.name.last.trim()) errors.lastName = "Enter your last name"
+    if (!shippingDetails.address.line1.trim()) errors.address = "Enter your address"
+    if (!shippingDetails.city.trim()) errors.city = "Enter your city"
+    if (!/^\d{5}$/.test(shippingDetails.zipCode.trim())) errors.zipCode = "Enter a valid ZIP code"
+    const statesSet = new Set(states)
+    if (!statesSet.has(shippingDetails.state)) errors.state = "Select a valid state"
+
+    return errors
+  }
+
   const handleChange = e => {
+    const { name, value } = e.target
+
     dispatch({
-      type: e.target.name.toUpperCase(),
-      value: e.target.value
+      type: name.toUpperCase(),
+      value: value
+    })
+
+    setShippingErrors(prev => {
+      const newErrors = { ...prev }
+      if (name === "address1") delete newErrors["address"]
+      else delete newErrors[name]
+      return newErrors
     })
   }
 
@@ -129,11 +156,17 @@ export default function Checkout({ products }) {
       />
       {clientSecret && (<div className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between">
         <ChangeContext.Provider value={handleChange}>
-          <ShippingDetails details={shippingDetails} />
+          <ShippingDetails details={shippingDetails} errors={shippingErrors} states={states} />
         </ChangeContext.Provider>
         <div className="w-full lg:max-w-md">
           <Elements stripe={stripePromise} options={options}>
-            <StripeForm paymentIntentId={paymentIntentId} />
+            <StripeForm
+              paymentIntentId={paymentIntentId}
+              formError={formError}
+              setFormError={setFormError}
+              validateShipping={validateShipping}
+              setShippingErrors={setShippingErrors}
+            />
           </Elements>
         </div>
       </div>)}

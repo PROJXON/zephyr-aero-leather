@@ -2,20 +2,27 @@
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js"
 import { useState } from "react"
 
-export default function StripeForm({ paymentIntentId }) {
+export default function StripeForm({ paymentIntentId, formError, setFormError, validateShipping, setShippingErrors }) {
   const stripe = useStripe()
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
-  const [error, setError] = useState(null)
 
   const handleSubmit = async e => {
     e.preventDefault()
     if (!stripe || !elements) return
 
+    const errors = validateShipping()
+    if (Object.keys(errors).length > 0) {
+      setShippingErrors(errors)
+      setFormError("Fix the error(s) in the shipping form")
+      return
+    }
+
+    setFormError(null)
     setIsProcessing(true)
 
     if (!paymentIntentId) {
-      setError("Missing payment intent ID")
+      setFormError("Missing payment intent ID")
       setIsProcessing(false)
       return
     }
@@ -37,7 +44,7 @@ export default function StripeForm({ paymentIntentId }) {
     })
 
     if (error) {
-      setError(error.message)
+      setFormError(error.message)
       setIsProcessing(false)
     }
   }
@@ -64,7 +71,7 @@ export default function StripeForm({ paymentIntentId }) {
       />
     </div>
 
-    {error && <p className="text-red-500 text-sm">{error}</p>}
+    {formError && <p className="text-red-500 text-sm">{formError}</p>}
 
     <button
       type="submit"

@@ -2,9 +2,18 @@
 import { useContext } from "react"
 import { ChangeContext } from "./Checkout"
 
-export default function ShippingFormInput({ name, placeholder, value, span, type = "text", options = [] }) {
+export default function ShippingFormInput({
+    name,
+    placeholder,
+    value,
+    span,
+    error,
+    type = "text",
+    options = []
+}) {
     const onChange = useContext(ChangeContext)
-    const classes = `w-full p-2 border rounded col-span-${span}`
+    const classes = `w-full p-2 border rounded col-span-${span}${error ? " border-red-400 placeholder-red-300" : ""}`
+    const displayPlaceholder = error || placeholder
 
     return (<>
         {type === "select" ? <select
@@ -13,14 +22,14 @@ export default function ShippingFormInput({ name, placeholder, value, span, type
             value={value}
             onChange={onChange}
         >
-            <option value="">{placeholder}</option>
+            <option value="">{displayPlaceholder}</option>
             {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
         </select> : <input
             className={classes}
             type={type}
             name={name}
-            placeholder={placeholder}
-            value={value}
+            placeholder={displayPlaceholder}
+            value={error ? "" : value}
             onChange={onChange}
         />}
     </>)
