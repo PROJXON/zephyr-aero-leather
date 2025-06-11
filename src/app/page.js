@@ -3,6 +3,10 @@ import ProductList from "../components/ProductList";
 import Image from "next/image";
 import Link from "next/link";
 import Hero from "../components/Hero";
+import { GiDiamondHard, GiHandSaw } from "react-icons/gi";
+import { FaLeaf } from "react-icons/fa";
+
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
 export const revalidate = 60;
 
@@ -38,10 +42,10 @@ export default async function Home() {
         }
         description="Premium handcrafted leather goods for aviators, adventurers, and everyday explorers"
         images={[
-          "/phelanhelicopter.jpg",
-          "/phelanmotorcycle.jpg",
-          "/phelandesert.jpg",
-          "/phelancar.jpg"
+          `${CDN_URL}/phelanhelicopter.jpg`,
+          `${CDN_URL}/phelanmotorcycle.jpg`,
+          `${CDN_URL}/phelandesert.jpg`,
+          `${CDN_URL}/phelancar.jpg`
         ]}
       />
 
@@ -64,7 +68,7 @@ export default async function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full">
-                <Image src="/images/premium-icon.svg" alt="Premium Materials" width={32} height={32} />
+                <GiDiamondHard className="text-5xl text-neutral-dark"/>
               </div>
               <h3 className="text-lg font-medium mb-2 text-neutral-dark">Premium Materials</h3>
               <p className="text-neutral-medium">
@@ -74,7 +78,7 @@ export default async function Home() {
 
             <div className="text-center">
               <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full">
-                <Image src="/images/handcrafted-icon.svg" alt="Handcrafted" width={32} height={32} />
+                <GiHandSaw className="text-5xl text-neutral-dark"/>
               </div>
               <h3 className="text-lg font-medium mb-2 text-neutral-dark">Handcrafted</h3>
               <p className="text-neutral-medium">
@@ -84,7 +88,7 @@ export default async function Home() {
 
             <div className="text-center">
               <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full">
-                <Image src="/images/sustainable-icon.svg" alt="Sustainable" width={32} height={32} />
+                <FaLeaf className="text-4xl text-neutral-dark"/>
               </div>
               <h3 className="text-lg font-medium mb-2 text-neutral-dark">Sustainable</h3>
               <p className="text-neutral-medium">
@@ -103,7 +107,7 @@ const Section = ({ title, products, link }) => {
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="py-16">
+    <section className="py-16" data-aos="fade-up">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>

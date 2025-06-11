@@ -6,8 +6,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useAuth } from "@/app/context/AuthContext";
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
-const backgroundImageUrl = "/ifr.jpg"
+const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
 const Register = () => {
   const [formData, setFormdata] = useState({
@@ -244,7 +245,7 @@ const Register = () => {
                             />
                           </div>
                           <div className="ml-3 text-sm">
-                            <label htmlFor="terms" className="font-light text-gray-500 dark:text-gray-300">I accept the <a className="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">Terms and Conditions</a></label>
+                            <label htmlFor="terms" className="font-light text-gray-500 dark:text-gray-300">I accept the <a className="font-medium text-primary-600 hover:underline dark:text-primary-500" href="/terms">Terms and Conditions</a></label>
                           </div>
                       </div>
                       <button

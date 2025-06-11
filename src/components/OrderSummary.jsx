@@ -11,6 +11,7 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
     return `$${price}`
   }
 
+
   return (
     <div className="space-y-6 border p-6 rounded-lg shadow-sm">
       <h2 className="text-2xl font-bold">Order Summary</h2>

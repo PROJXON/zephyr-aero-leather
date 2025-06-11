@@ -2,7 +2,7 @@
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js"
 import { useState } from "react"
 
-export default function StripeForm({ paymentIntentId, formError, setFormError, validateShipping, setShippingErrors }) {
+export default function StripeForm({ clientSecret, formError, setFormError, validateShipping, setShippingErrors }) {
   const stripe = useStripe()
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
@@ -21,8 +21,8 @@ export default function StripeForm({ paymentIntentId, formError, setFormError, v
     setFormError(null)
     setIsProcessing(true)
 
-    if (!paymentIntentId) {
-      setFormError("Missing payment intent ID")
+    if (!clientSecret) {
+      setFormError("Missing client secret")
       setIsProcessing(false)
       return
     }
@@ -31,21 +31,29 @@ export default function StripeForm({ paymentIntentId, formError, setFormError, v
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        payment_intent_id: paymentIntentId,
+        payment_intent_id: clientSecret.split("_secret")[0],
         user_local_time: new Date().toISOString()
       })
     })
 
     const returnURL = `${window.location.origin}/payment-success`
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: { return_url: returnURL },
-      redirect: "always"
+
+    const result = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement),
+      },
+      return_url: returnURL,
     })
 
-    if (error) {
-      setFormError(error.message)
+    console.log("Stripe result:", result)
+
+    if (result.error) {
+      setFormError(result.error.message)
       setIsProcessing(false)
+    } else if (result.paymentIntent?.status === "succeeded") {
+      sessionStorage.setItem("payment_success", "true")
+      sessionStorage.setItem("payment_intent", result.paymentIntent.id)
+      window.location.href = returnURL
     }
   }
 

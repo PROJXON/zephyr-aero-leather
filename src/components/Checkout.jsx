@@ -161,7 +161,7 @@ export default function Checkout({ products }) {
         <div className="w-full lg:max-w-md">
           <Elements stripe={stripePromise} options={options}>
             <StripeForm
-              paymentIntentId={paymentIntentId}
+              clientSecret={clientSecret}
               formError={formError}
               setFormError={setFormError}
               validateShipping={validateShipping}

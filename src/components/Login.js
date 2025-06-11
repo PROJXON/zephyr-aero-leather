@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
 
-const backgroundImageUrl = "/ifr.jpg";
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
 const Login = () => {
   const [formData, setFormData] = useState({
