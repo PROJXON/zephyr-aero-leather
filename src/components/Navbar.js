@@ -149,9 +149,10 @@ const Navbar = ({ allProducts }) => {
                       />
                       <NavButton
                         onClick={handleLogout}
-                        srOnly="Logout"
-                        text="Logout"
+                        srOnly="Log Out"
+                        text="Log Out"
                         fill="none"
+                        className="justify-center"
                       />
                     </div>
                   )}
@@ -228,48 +229,78 @@ const Navbar = ({ allProducts }) => {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 space-y-1 shadow-xl z-[9999]">
-            <Link href="/about-us" onClick={() => setMenuOpen(false)} className="block text-lg">
-              About Us
-            </Link>
-            <Link href="/collections" onClick={() => setMenuOpen(false)} className="block text-lg">
-              Collections
-            </Link>
-            <Link href="/categories" onClick={() => setMenuOpen(false)} className="block text-lg">
-              Categories
-            </Link>
+          <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 shadow-xl z-[9999]">
+            <div>
+              <Link
+                href="/about-us"
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+              >
+                About Us
+              </Link>
+              <Link
+                href="/collections"
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+              >
+                Collections
+              </Link>
+              <Link
+                href="/categories"
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+              >
+                Categories
+              </Link>
 
-            {!isAuthenticated ? (
-              <div className="space-y-2">
-                <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-lg">
-                  Sign In
-                </Link>
-                <Link href="/register" onClick={() => setMenuOpen(false)} className="block text-lg">
-                  Create Account
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <button
-                  onClick={() => {
-                    replace("/order-history");
-                    setMenuOpen(false);
-                  }}
-                  className="block w-full text-left text-blue-600"
-                >
-                  Order History
-                </button>
-                <button onClick={handleLogout} className="block w-full text-left text-red-600">
-                  Logout
-                </button>
-              </div>
-            )}
+              {!isAuthenticated ? (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setMenuOpen(false)}
+                    className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+                  >
+                    Create Account
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      replace("/order-history");
+                      setMenuOpen(false);
+                    }}
+                    className="block text-lg font-medium px-3 py-2 w-full text-left rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+                  >
+                    Order History
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="block text-lg font-medium px-3 py-2 w-full text-left rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+                  >
+                    Log Out
+                  </button>
+                </>
+              )}
 
-            <Link href="/checkout" onClick={() => setMenuOpen(false)} className="block text-lg">
-              View Cart
-            </Link>
+              <Link
+                href="/checkout"
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+              >
+                View Cart
+              </Link>
+            </div>
           </div>
         )}
+
       </div>
     </nav>
   );
