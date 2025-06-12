@@ -37,6 +37,7 @@ export default function OrderHistory({ products }) {
                         const datePaid = localTimes[i]
                         const items = order.items
                         const total = calculateTotal(items, products)
+                        const shipping = order.shipping
 
                         return (<li key={order.id}>
                             <h2 className={"font-bold text-xl text-center"}>
@@ -47,6 +48,10 @@ export default function OrderHistory({ products }) {
                                     })}
                                 </div>
                             </h2>
+                            <div className="text-sm text-gray-700 px-4 py-2">
+                                <h3 className="font-semibold text-lg">Shipping Details</h3>
+                                <p>{JSON.stringify(shipping)}</p>
+                            </div>
                             <OrderSummary
                                 cartItems={items}
                                 products={products}
