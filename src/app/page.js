@@ -11,6 +11,16 @@ const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
 export const revalidate = 60;
 
+const FeatureIcon = ({ icon: Icon, title, description }) => (
+  <div className="text-center">
+    <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full transition duration-300 transform hover:-translate-y-1 hover:shadow-lg">
+      <Icon className="text-5xl text-neutral-dark" />
+    </div>
+    <h3 className="text-lg font-medium mb-2 text-neutral-dark">{title}</h3>
+    <p className="text-neutral-medium">{description}</p>
+  </div>
+);
+
 export default async function Home() {
   const [
     wallets,
@@ -65,37 +75,22 @@ export default async function Home() {
           <h2 className="text-center text-2xl text-neutral-dark font-normal mb-12">
             Why Choose Zephyr Aero Leather
           </h2>
-
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full">
-                <GiDiamondHard className="text-5xl text-neutral-dark"/>
-              </div>
-              <h3 className="text-lg font-medium mb-2 text-neutral-dark">Premium Materials</h3>
-              <p className="text-neutral-medium">
-                Made with top-grain leather sourced from sustainable tanneries worldwide.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full">
-                <GiHandSaw className="text-5xl text-neutral-dark"/>
-              </div>
-              <h3 className="text-lg font-medium mb-2 text-neutral-dark">Handcrafted</h3>
-              <p className="text-neutral-medium">
-                Each piece is meticulously crafted by skilled artisans with decades of experience.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full">
-                <FaLeaf className="text-4xl text-neutral-dark"/>
-              </div>
-              <h3 className="text-lg font-medium mb-2 text-neutral-dark">Sustainable</h3>
-              <p className="text-neutral-medium">
-                Committed to ethical production and environmentally responsible practices.
-              </p>
-            </div>
+            <FeatureIcon
+              icon={GiDiamondHard}
+              title="Premium Materials"
+              description="Made with top-grain leather sourced from sustainable tanneries worldwide."
+            />
+            <FeatureIcon
+              icon={GiHandSaw}
+              title="Handcrafted"
+              description="Each piece is meticulously crafted by skilled artisans with decades of experience."
+            />
+            <FeatureIcon
+              icon={FaLeaf}
+              title="Sustainable"
+              description="Committed to ethical production and environmentally responsible practices."
+            />
           </div>
         </div>
       </section>
