@@ -15,7 +15,9 @@ export default function OrderHistory({ products }) {
             if (isAuthenticated) {
                 const orderResponse = await fetch("/api/order")
                 const data = await orderResponse.json()
-                const ordersArray = data.orders || []
+                let ordersArray = data.orders || []
+
+                ordersArray = ordersArray.reverse()
                 setOrders(ordersArray)
 
                 let localTimesArray = []

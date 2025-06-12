@@ -290,7 +290,9 @@ export const CartProvider = ({ children }) => {
       setCartOpen,
       cartOpen,
       clearCart,
-      orderId
+      orderId,
+      fetchUserCart,
+      setCartItems
     }}>
       {children}
     </CartContext.Provider>

@@ -19,6 +19,15 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
       <div className="space-y-4">
         {cartItems.map((item) => {
           const [itemInfo, priceInCents] = getItemInfo(products, item)
+
+          if (!itemInfo) {
+            return (
+              <div key={item.id} className="flex gap-4 border rounded-lg p-4">
+                <p className="text-red-500">Product no longer available (ID: {item.id})</p>
+              </div>
+            )
+          }
+
           const imageInfo = itemInfo.images[0]
 
           return (
