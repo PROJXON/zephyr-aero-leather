@@ -79,17 +79,17 @@ export default async function Home() {
             <FeatureIcon
               icon={GiDiamondHard}
               title="Premium Materials"
-              description="Made with top-grain leather sourced from sustainable tanneries worldwide."
+              description="Made with top-grain leather sourced from sustainable tanneries worldwide"
             />
             <FeatureIcon
               icon={GiHandSaw}
               title="Handcrafted"
-              description="Each piece is meticulously crafted by skilled artisans with decades of experience."
+              description="Each piece is meticulously crafted by skilled artisans with decades of experience"
             />
             <FeatureIcon
               icon={FaLeaf}
               title="Sustainable"
-              description="Committed to ethical production and environmentally responsible practices."
+              description="Committed to ethical production and environmentally responsible practices"
             />
           </div>
         </div>
