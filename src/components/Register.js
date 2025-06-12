@@ -25,7 +25,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { setIsAuthenticated, setUser } = useAuth();
+  const { setIsAuthenticated, setUser, login } = useAuth();
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -104,8 +104,7 @@ const Register = () => {
       });
 
       const loginData = await loginResponse.json();
-      setIsAuthenticated(true);
-      setUser(loginData.user)
+      login(loginData.user);
   
       if (!loginResponse.ok) {
         setError(loginData.error || "Failed to log in");

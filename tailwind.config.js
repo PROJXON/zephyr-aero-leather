@@ -7,6 +7,7 @@ module.exports = {
     './app/**/*.{js,jsx}',
     './src/**/*.{js,jsx}',
   ],
+  safelist: ["col-span-3"],
   theme: {
     container: {
       center: true,
@@ -73,9 +74,9 @@ module.exports = {
           to: { height: 0 },
         },
         carousel: {
-        '0%, 45%': { opacity: '1' },
-        '50%, 95%': { opacity: '0' },
-        '100%': { opacity: '1' },
+          '0%, 45%': { opacity: '1' },
+          '50%, 95%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
       },
       animation: {
