@@ -13,7 +13,6 @@ export async function GET(req) {
   try {
     const intent = await stripe.paymentIntents.retrieve(intentId)
     const wooOrderId = intent.metadata?.woo_order_id
-    console.log("Intent metadata:", intent.metadata);
     let items = []
 
     if (wooOrderId) {

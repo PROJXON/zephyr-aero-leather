@@ -16,7 +16,7 @@ export default function PaymentDetails() {
   const [total, setTotal] = useState(0);
   const [allowed, setAllowed] = useState(false);
 
-  const { clearCart, fetchUserCart } = useCart();
+  const { clearCart, fetchUserCart, refreshCart } = useCart();
   const queryIntent = searchParams.get("payment_intent");
   const { isAuthenticated } = useAuth();
 
@@ -37,9 +37,21 @@ export default function PaymentDetails() {
         sessionStorage.removeItem("payment_intent");
       }, 500);
 
-      // 🧹 Clear cart and sync UI
-      await clearCart(); // Clears Woo or localStorage
-      await fetchUserCart(); // Syncs latest state for signed-in users
+      await clearCart();
+
+      for (let i = 0; i < 10; i++) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        const res = await fetch("/api/cart");
+        const data = await res.json();
+
+        if (!data.items || data.items.length === 0) {
+            break;
+        }
+
+        if (i === 9) console.warn("⚠️ Woo cart still not empty after polling");
+        }
+
+      await refreshCart();
     };
 
     run();
