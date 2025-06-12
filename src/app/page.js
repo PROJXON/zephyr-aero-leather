@@ -1,5 +1,6 @@
 import fetchProducts from "../../lib/woocommerce";
 import ProductList from "../components/ProductList";
+import ProductCarousel from "@/components/ProductCarousel";
 import Image from "next/image";
 import Link from "next/link";
 import Hero from "../components/Hero";
@@ -20,13 +21,13 @@ export default async function Home() {
     moto,
     holsters,
   ] = await Promise.all([
-     fetchProducts({ category: "wallets", per_page: 4 }),
-    fetchProducts({ category: "iphoneCases", per_page: 4 }),
-    fetchProducts({ category: "sunglasses", per_page: 4 }),
-    fetchProducts({ category: "belts", per_page: 4 }),
-    fetchProducts({ category: "bags", per_page: 4 }),
-    fetchProducts({ category: "moto", per_page: 4 }),
-    fetchProducts({ category: "holsters", per_page: 4 }),
+     fetchProducts({ category: "wallets", per_page: 8 }),
+    fetchProducts({ category: "iphoneCases", per_page: 8 }),
+    fetchProducts({ category: "sunglasses", per_page: 8 }),
+    fetchProducts({ category: "belts", per_page: 8 }),
+    fetchProducts({ category: "bags", per_page: 8 }),
+    fetchProducts({ category: "moto", per_page: 8 }),
+    fetchProducts({ category: "holsters", per_page: 8 }),
   ]);
 
   return (
@@ -109,7 +110,7 @@ const Section = ({ title, products, link }) => {
   return (
     <section className="py-16" data-aos="fade-up">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-6">
+        <div className="max-w-screen-xl mx-auto mb-6 flex justify-between items-center">
           <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
             <Link
               href={link}
@@ -118,7 +119,10 @@ const Section = ({ title, products, link }) => {
               View All
             </Link>        
         </div>
-        <ProductList products={products} />
+        <div className="max-w-screen-xl mx-auto">
+          <ProductCarousel products={products} link={link} />
+        </div>
+
       </div>
     </section>
   );
