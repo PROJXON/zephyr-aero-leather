@@ -15,21 +15,22 @@ export default function CollectionsPage() {
             <Link
               key={slug}
               href={`/collections/${slug}`}
-              className="bg-white shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-300"
+              className="group bg-white shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-300"
             >
-              <div className="relative h-60">
+              <div className="relative aspect-[4/3] w-full">
                 <Image
                   src={image}
                   alt={name}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </div>
               <div className="p-4">
                 <h2 className="text-xl font-semibold text-neutral-dark mb-2">
                   {name}
                 </h2>
-                <p className="text-neutral-medium text-sm">
+                <p className="text-neutral-medium text-lg">
                   {description}
                 </p>
               </div>

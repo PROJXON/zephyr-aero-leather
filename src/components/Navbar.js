@@ -12,15 +12,24 @@ import ChangeQuantitySpans from "./ChangeQuantitySpans";
 import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import { Sling as Hamburger } from "hamburger-react";
+import NavDropdown from "./NavDropdown";
 
 const productCategories = [
   { name: "Wallets", slug: "wallets" },
-  { name: "iPhone Cases", slug: "iphone-cases" },
+  { name: "iPhone Leather Cases", slug: "iphoneCases" },
   { name: "Sunglass Cases", slug: "sunglasses" },
   { name: "Belts", slug: "belts" },
   { name: "Bags", slug: "bags" },
-  { name: "Shoulder Holsters", slug: "shoulder-holsters" },
-  { name: "Moto Guzzi", slug: "moto-guzzi" },
+  { name: "Shoulder Holsters", slug: "holsters" },
+  { name: "Moto Guzzi Collection", slug: "moto" },
+];
+
+const collectionCategories = [
+  { name: "Aviator", slug: "aviator" },
+  { name: "Explorer", slug: "explorer" },
+  { name: "Traveler", slug: "traveler" },
+  { name: "Commuter", slug: "commuter" },
+  { name: "Minimalist", slug: "minimalist" },
 ];
 
 const Navbar = ({ allProducts }) => {
@@ -48,10 +57,7 @@ const Navbar = ({ allProducts }) => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (
-        accountOpen &&
-        !document.getElementById("profileBtn")?.contains(e.target)
-      ) {
+      if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
         setAccountOpen(false);
       }
       if (
@@ -67,13 +73,13 @@ const Navbar = ({ allProducts }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [accountOpen, cartOpen]);
 
-  const navItems = ["Collections", "About Us"];
+  const navItems = ["About Us"];
 
   return (
     <nav className="bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
       <div className="max-w-screen-xl px-4 mx-auto">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo and Desktop Menu */}
           <div className="flex items-center space-x-8">
             <Link href="/">
               <Image
@@ -86,7 +92,6 @@ const Navbar = ({ allProducts }) => {
               />
             </Link>
 
-            {/* Desktop Menu */}
             <ul className="hidden lg:flex items-center gap-8 py-3 relative">
               {navItems.map((item) => (
                 <li key={item} className="relative group overflow-hidden">
@@ -100,92 +105,30 @@ const Navbar = ({ allProducts }) => {
                 </li>
               ))}
 
-              <li className="relative group">
-                <button className="text-lg font-medium text-black">
-                  Categories
-                </button>
-                <div className="absolute left-0 mt-2 w-48 bg-white shadow-md rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
-                  <ul className="py-2">
-                    {productCategories.map((cat) => (
-                      <li key={cat.slug}>
-                        <Link
-                          href={`/category/${cat.slug}`}
-                          className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800"
-                        >
-                          {cat.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
+              <NavDropdown
+                label="Collections"
+                items={collectionCategories}
+                basePath="collections"
+                linkToBase={true}
+              />
+              <NavDropdown
+                label="Categories"
+                items={productCategories}
+                basePath="categories"
+                linkToBase={true}
+              />
             </ul>
           </div>
 
           {/* Right Buttons */}
           <div className="flex items-center gap-3">
-            {/* Cart - Desktop */}
-            <div id="cartBtn" className="relative hidden lg:block">
-              <NavButton
-                onClick={() => {
-                  setCartOpen(!cartOpen);
-                  setAccountOpen(false);
-                }}
-                srOnly="Cart"
-                d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
-                text={isAuthenticated ? "My Cart" : "Guest Cart"}
-              />
-              {cartOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg p-4 z-50">
-                  {cartItems?.length > 0 ? (
-                    <>
-                      <ul>
-                        {cartItems.map((item) => {
-                          const itemName =
-                            allProducts.find((product) => product.id === item.id)
-                              ?.name || "Item";
-                          return (
-                            <li
-                              key={`${item.id}-${item.lineItemId || "temp"}`}
-                              className="grid grid-cols-[1fr_auto] border-b py-2 gap-1"
-                            >
-                              <span>{itemName}</span>
-                              <div className="m-auto">
-                                <div className="text-center">
-                                  x {item.quantity}
-                                </div>
-                                <div className="flex items-center flex-wrap gap-1">
-                                  <ChangeQuantitySpans
-                                    cqs={changeQuantity}
-                                    item={item}
-                                  />
-                                </div>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                      <button
-                        className="w-full bg-blue-500 text-white mt-4 p-2 rounded"
-                        onClick={() => replace("/checkout")}
-                      >
-                        Checkout
-                      </button>
-                    </>
-                  ) : (
-                    <p className="text-sm text-gray-900">Your cart is empty.</p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Auth - Desktop */}
-            <div className="hidden lg:block">
+            {/* Auth Buttons */}
+            <div className="hidden lg:flex gap-2" id="authButtons">
               {!isAuthenticated ? (
-                <div className="flex gap-2">
+                <>
                   <NavLoggedOutBtn href="/login" text="Sign In" />
                   <NavLoggedOutBtn href="/register" text="Create Account" />
-                </div>
+                </>
               ) : (
                 <div id="profileBtn" className="relative">
                   <NavButton
@@ -206,11 +149,72 @@ const Navbar = ({ allProducts }) => {
                       />
                       <NavButton
                         onClick={handleLogout}
-                        srOnly="Logout"
-                        text="Logout"
+                        srOnly="Log Out"
+                        text="Log Out"
                         fill="none"
+                        className="justify-center"
                       />
                     </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Cart Button */}
+            <div id="cartBtn" className="relative hidden lg:block">
+              <NavButton
+                onClick={() => {
+                  setCartOpen(!cartOpen);
+                  setAccountOpen(false);
+                }}
+                srOnly="Cart"
+                d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
+                text={isAuthenticated ? "My Cart" : "Guest Cart"}
+              />
+              {cartOpen && (
+                <div
+                  className="fixed top-[60px] w-64 max-h-[70vh] overflow-y-auto bg-white shadow-lg rounded-lg p-4 z-50"
+                  style={{
+                    right: "max(calc((65vw - 1280px) / 2), 12px)",
+                  }}
+                >
+                  {cartItems?.length > 0 ? (
+                    <>
+                      <ul>
+                        {cartItems.map((item) => {
+                          const itemName =
+                            allProducts.find((product) => product.id === item.id)
+                              ?.name || "Item";
+                          return (
+                            <li
+                              key={`${item.id}-${item.lineItemId || "temp"}`}
+                              className="grid grid-cols-[1fr_auto] border-b py-2 gap-1"
+                            >
+                              <span>{itemName}</span>
+                              <div className="m-auto">
+                                <div className="text-center">x {item.quantity}</div>
+                                <div className="flex items-center flex-wrap gap-1">
+                                  <ChangeQuantitySpans
+                                    cqs={changeQuantity}
+                                    item={item}
+                                  />
+                                </div>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      <div className="mt-4 flex justify-end">
+                        <button
+                          className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+                          onClick={() => replace("/checkout")}
+                        >
+                          Checkout
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-900">Your cart is empty.</p>
                   )}
                 </div>
               )}
@@ -225,36 +229,75 @@ const Navbar = ({ allProducts }) => {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 space-y-1 shadow-xl z-[9999]">
-            <Link href="/collections" onClick={() => setMenuOpen(false)} className="block text-lg">Collections</Link>
-            <Link href="/about-us" onClick={() => setMenuOpen(false)} className="block text-lg">About Us</Link>
+          <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 shadow-xl z-[9999]">
+            <div>
+              <Link
+                href="/about-us"
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+              >
+                About Us
+              </Link>
+              <Link
+                href="/collections"
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+              >
+                Collections
+              </Link>
+              <Link
+                href="/categories"
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+              >
+                Categories
+              </Link>
 
-            <div className="space-y-2">
-              <p className="text-lg">Categories</p>
-              <ul className="pl-2">
-                {productCategories.map((cat) => (
-                  <li key={cat.slug}>
-                    <Link href={`/category/${cat.slug}`} onClick={() => setMenuOpen(false)} className="text-gray-800 hover:text-blue-600">
-                      {cat.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              {!isAuthenticated ? (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setMenuOpen(false)}
+                    className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+                  >
+                    Create Account
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      replace("/order-history");
+                      setMenuOpen(false);
+                    }}
+                    className="block text-lg font-medium px-3 py-2 w-full text-left rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+                  >
+                    Order History
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="block text-lg font-medium px-3 py-2 w-full text-left rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+                  >
+                    Log Out
+                  </button>
+                </>
+              )}
+
+              <Link
+                href="/checkout"
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+              >
+                View Cart
+              </Link>
             </div>
-
-            {!isAuthenticated ? (
-              <div className="space-y-2">
-                <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-lg">Sign In</Link>
-                <Link href="/register" onClick={() => setMenuOpen(false)} className="block text-lg">Create Account</Link>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <button onClick={() => { replace("/order-history"); setMenuOpen(false); }} className="block w-full text-left text-blue-600">Order History</button>
-                <button onClick={handleLogout} className="block w-full text-left text-red-600">Logout</button>
-              </div>
-            )}
-
-            <Link href="/checkout" onClick={() => setMenuOpen(false)} className="block text-lg">View Cart</Link>
           </div>
         )}
 

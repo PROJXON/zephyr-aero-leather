@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 :root {
   --foreground-rgb: 51, 51, 51;
   --background-rgb: 250, 249, 246;
@@ -152,14 +153,6 @@ body {
   @apply text-primary;
 }
 
-.contact-form button {
-  @apply w-full bg-primary hover:bg-accent text-white py-2 px-4 rounded-md transition-colors;
-}
-
-.contact-form button:hover {
-  @apply bg-accent;
-}
-
 /* Responsive styles */
 @media (max-width: 1024px) {
   .contact-container {
@@ -200,8 +193,28 @@ body {
   .input-group label {
     @apply text-xs;
   }
-  
-  .contact-form button {
-    @apply py-1.5;
-  }
 }
+
+
+/* 
+@keyframes carouselScroll {
+  0% { transform: translateX(0%); }
+  20% { transform: translateX(0%); }
+  25% { transform: translateX(-100%); }
+  45% { transform: translateX(-100%); }
+  50% { transform: translateX(-200%); }
+  70% { transform: translateX(-200%); }
+  75% { transform: translateX(-300%); }
+  95% { transform: translateX(-300%); }
+  100% { transform: translateX(0%); }
+}
+
+.animate-carousel {
+  display: flex;
+  width: 400%;
+  animation: carouselScroll 20s infinite ease-in-out;
+}
+
+.group:hover .animate-carousel {
+  animation-play-state: paused;
+} */

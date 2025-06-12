@@ -17,24 +17,36 @@ export default function PaymentDetails() {
     const queryIntent = searchParams.get("payment_intent")
 
     useEffect(() => {
+        const intentFromURL = queryIntent
+        const intentFromSession = sessionStorage.getItem("payment_intent")
         const paid = sessionStorage.getItem("payment_success")
-        const intent = sessionStorage.getItem("payment_intent") || queryIntent
 
-        if (paid === "true" || queryIntent) {
-            sessionStorage.removeItem("payment_success")
-            sessionStorage.removeItem("payment_intent")
+        const intent = intentFromURL || intentFromSession
+
+        if (intent) {
+            // Allow page to render
             setPaymentIntentId(intent)
             setAllowed(true)
 
+            // Clean up sessionStorage, but do it **after** rendering begins
+            setTimeout(() => {
+            sessionStorage.removeItem("payment_success")
+            sessionStorage.removeItem("payment_intent")
+            }, 500)
+
+            // Clear guest cart
             const alreadyCleared = localStorage.getItem("cartCleared")
             if (!alreadyCleared) {
-                clearCart()
-                localStorage.setItem("cartCleared", "true")
-            }
-
+            clearCart()
+            localStorage.setItem("cartCleared", "true")
             setTimeout(() => localStorage.removeItem("cartCleared"), 1000)
-        } else router.replace("/")
-    }, [])
+            }
+        } else {
+            // No valid intent, redirect to homepage
+            router.replace("/")
+        }
+        }, [])
+
 
     useEffect(() => {
         const getProducts = async () => {
@@ -46,7 +58,7 @@ export default function PaymentDetails() {
       }, []);
 
     useEffect(() => {
-        if (paymentIntentId) {
+        if (paymentIntentId && products.length > 0) {
             fetch(`/api/payment?payment_intent=${paymentIntentId}`)
                 .then(res => res.json())
                 .then(data => {
@@ -55,12 +67,12 @@ export default function PaymentDetails() {
                 })
                 .catch(err => console.error(err))
         }
-    }, [paymentIntentId])
+    }, [paymentIntentId, products])
 
     return (<>
         {allowed && (<div className="container mx-auto p-6">
             <h1 className="text-3xl font-bold mb-4">Payment Successful! 🎉</h1>
-            <p>Thank you for your purchase.</p>
+            <p className="mb-6">Thank you for your purchase!</p>
             {paymentDetails ? (<OrderSummary
                 cartItems={paymentDetails.items}
                 products={products}

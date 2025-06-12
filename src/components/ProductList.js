@@ -12,10 +12,14 @@ export default function ProductList({ products }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
       {products.map((product) => (
-        <div key={product.id} className="group">
+        <div 
+          key={product.id} 
+          className="group"
+          data-aos="fade-up"
+        >
           {/* Image Card */}
           <Link href={`/product/${product.id}`}>
-            <div className="relative aspect-square bg-card mb-3 overflow-hidden shadow-sm">
+            <div className="relative aspect-square bg-card mb-3 overflow-hidden shadow-sm rounded-xl">
               <Image
                 src={product.images[0]?.src || "/placeholder.jpg"}
                 alt={product.name}
@@ -30,12 +34,15 @@ export default function ProductList({ products }) {
             <Link href={`/product/${product.id}`}>
               <h3 className="text-neutral-dark font-medium hover:underline">{product.name}</h3>
             </Link>
-            <p className="text-neutral-medium mb-2">
+            <p className="text-neutral-medium mb-2 text-right w-full">
               {product.price ? `$${product.price}` : "Price not available"}
             </p>
-            <AddToCartButton
-              productId={product.id}
-            />
+            <div className="flex justify-end">
+              <AddToCartButton
+                productId={product.id}
+                className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+              />
+            </div>
           </div>
         </div>
       ))}

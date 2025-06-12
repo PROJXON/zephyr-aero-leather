@@ -1,9 +1,25 @@
 import fetchProducts from "../../lib/woocommerce";
 import ProductList from "../components/ProductList";
+import ProductCarousel from "@/components/ProductCarousel";
 import Image from "next/image";
 import Link from "next/link";
+import Hero from "../components/Hero";
+import { GiDiamondHard, GiHandSaw } from "react-icons/gi";
+import { FaLeaf } from "react-icons/fa";
+
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
 export const revalidate = 60;
+
+const FeatureIcon = ({ icon: Icon, title, description }) => (
+  <div className="text-center">
+    <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full transition duration-300 transform hover:-translate-y-1 hover:shadow-lg">
+      <Icon className="text-5xl text-neutral-dark" />
+    </div>
+    <h3 className="text-lg font-medium mb-2 text-neutral-dark">{title}</h3>
+    <p className="text-neutral-medium">{description}</p>
+  </div>
+);
 
 export default async function Home() {
   const [
@@ -15,65 +31,43 @@ export default async function Home() {
     moto,
     holsters,
   ] = await Promise.all([
-    fetchProducts({ category: "wallets" }),
-    fetchProducts({ category: "iphoneCases" }),
-    fetchProducts({ category: "sunglasses" }),
-    fetchProducts({ category: "belts" }),
-    fetchProducts({ category: "bags" }),
-    fetchProducts({ category: "moto" }),
-    fetchProducts({ category: "holsters" }),
+     fetchProducts({ category: "wallets", per_page: 8 }),
+    fetchProducts({ category: "iphoneCases", per_page: 8 }),
+    fetchProducts({ category: "sunglasses", per_page: 8 }),
+    fetchProducts({ category: "belts", per_page: 8 }),
+    fetchProducts({ category: "bags", per_page: 8 }),
+    fetchProducts({ category: "moto", per_page: 8 }),
+    fetchProducts({ category: "holsters", per_page: 8 }),
   ]);
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative bg-warm-bg">
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl font-light text-neutral-dark leading-tight">
-                Premium Leather <br />
-                <span className="font-normal">Crafted for Adventure</span>
-              </h1>
-              <p className="text-neutral-medium text-lg max-w-md">
-                Discover our collection of handcrafted leather goods designed for the modern adventurer.
-              </p>
-            </div>
-              <div className="relative h-[400px] rounded-lg overflow-hidden">
-                {/* First image (fades out) */}
-                <div className="absolute inset-0 animate-carousel z-10">
-                  <Image
-                    src="/phelanhelicopter.jpg"
-                    alt="Phelan Helicopter"
-                    fill
-                    className="object-cover object-top rounded-lg"
-                    priority
-                  />
-                </div>
-
-                {/* Second image (fades in) */}
-                <div className="absolute inset-0 z-0">
-                  <Image
-                    src="/phelanmotorcycle.jpg"
-                    alt="Phelan Motorcycle"
-                    fill
-                    className="object-cover object-center rounded-lg"
-                  />
-                </div>
-              </div>
-
-          </div>
-        </div>
-      </section>
+      <Hero
+        title="Zephyr Aero Leather"
+        subtitle={
+          <>
+            Designed for Flight
+            <br />
+            Made for Life
+          </>
+        }
+        description="Premium handcrafted leather goods for aviators, adventurers, and everyday explorers"
+        images={[
+          `${CDN_URL}/phelanhelicopter.jpg`,
+          `${CDN_URL}/phelanmotorcycle.jpg`,
+          `${CDN_URL}/phelandesert.jpg`,
+          `${CDN_URL}/phelancar.jpg`
+        ]}
+      />
 
       {/* Grouped Product Sections */}
-      <Section title="Wallets" products={wallets} link="/category/wallets" />
-      <Section title="iPhone Leather Cases" products={iphoneCases} link="/category/iphone-cases" />
-      <Section title="Sunglass Cases" products={sunglasses} link="/category/sunglasses" />
-      <Section title="Belts" products={belts} link="/category/belts" />
-      <Section title="Bags" products={bags} link="/category/bags" />
-      <Section title="Moto Guzzi Collection" products={moto} link="/category/moto-guzzi" />
-      <Section title="Shoulder Holsters" products={holsters} link="/category/shoulder-holsters" />
+      <Section title="Wallets" products={wallets} link="/categories/wallets" />
+      <Section title="iPhone Leather Cases" products={iphoneCases} link="/categories/iphoneCases" />
+      <Section title="Sunglass Cases" products={sunglasses} link="/categories/sunglasses" />
+      <Section title="Belts" products={belts} link="/categories/belts" />
+      <Section title="Bags" products={bags} link="/categories/bags" />
+      <Section title="Moto Guzzi Collection" products={moto} link="/categories/moto" />
+      <Section title="Shoulder Holsters" products={holsters} link="/categories/holsters" />
 
       {/* Benefits Section */}
       <section className="py-16">
@@ -81,37 +75,22 @@ export default async function Home() {
           <h2 className="text-center text-2xl text-neutral-dark font-normal mb-12">
             Why Choose Zephyr Aero Leather
           </h2>
-
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full">
-                <Image src="/images/premium-icon.svg" alt="Premium Materials" width={32} height={32} />
-              </div>
-              <h3 className="text-lg font-medium mb-2 text-neutral-dark">Premium Materials</h3>
-              <p className="text-neutral-medium">
-                Made with top-grain leather sourced from sustainable tanneries worldwide.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full">
-                <Image src="/images/handcrafted-icon.svg" alt="Handcrafted" width={32} height={32} />
-              </div>
-              <h3 className="text-lg font-medium mb-2 text-neutral-dark">Handcrafted</h3>
-              <p className="text-neutral-medium">
-                Each piece is meticulously crafted by skilled artisans with decades of experience.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full">
-                <Image src="/images/sustainable-icon.svg" alt="Sustainable" width={32} height={32} />
-              </div>
-              <h3 className="text-lg font-medium mb-2 text-neutral-dark">Sustainable</h3>
-              <p className="text-neutral-medium">
-                Committed to ethical production and environmentally responsible practices.
-              </p>
-            </div>
+            <FeatureIcon
+              icon={GiDiamondHard}
+              title="Premium Materials"
+              description="Made with top-grain leather sourced from sustainable tanneries worldwide"
+            />
+            <FeatureIcon
+              icon={GiHandSaw}
+              title="Handcrafted"
+              description="Each piece is meticulously crafted by skilled artisans with decades of experience"
+            />
+            <FeatureIcon
+              icon={FaLeaf}
+              title="Sustainable"
+              description="Committed to ethical production and environmentally responsible practices"
+            />
           </div>
         </div>
       </section>
@@ -124,18 +103,18 @@ const Section = ({ title, products, link }) => {
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="py-16">
+    <section className="py-16" data-aos="fade-up">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
             <Link
               href={link}
-              className="py-2 px-4 rounded bg-blue-500 text-white font-medium transition-colors hover:bg-blue-600"
+              className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
             >
               View All
             </Link>        
         </div>
-        <ProductList products={products} />
+        <ProductCarousel products={products} viewAllLink={link}/>
       </div>
     </section>
   );

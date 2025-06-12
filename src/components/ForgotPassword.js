@@ -2,7 +2,8 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 
-const backgroundImageUrl = "/ifr.jpg";
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -41,10 +42,12 @@ export default function ForgotPassword() {
   };
 
   return (
-    <section
-      className="flex items-center justify-center min-h-screen bg-cover bg-center px-4"
-      style={{ backgroundImage: `url(${backgroundImageUrl})` }}
-    >
+    <section className="relative flex items-center justify-center min-h-screen px-4">
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-50"
+        style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
+      />
+
       <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Panel */}
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-[#605137] text-white rounded-t-xl md:rounded-l-xl md:rounded-tr-none">

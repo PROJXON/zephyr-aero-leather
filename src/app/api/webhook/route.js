@@ -39,7 +39,7 @@ export async function POST(req) {
             responseBody = { success: true }
             break
         case 'payment_intent.payment_failed':
-            console.log(`Payment failed for ${paymentFailed.id}`)
+            console.log(`Payment failed for ${event.data.object.id}`)
             if (wooOrderId) {
                 await fetchWooCommerce(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", { status: "failed" })
             }
