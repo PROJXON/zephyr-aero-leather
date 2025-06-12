@@ -18,8 +18,10 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
 
       <div className="space-y-4">
         {cartItems.map((item) => {
-          const [itemInfo, priceInCents] = getItemInfo(products, item)
-          const imageInfo = itemInfo.images[0]
+          const [itemInfo, priceInCents] = getItemInfo(products, item);
+          if (!itemInfo) return null; // Skip this item if product info missing
+
+          const imageInfo = itemInfo.images?.[0];
 
           return (
             <div key={item.id} className="flex gap-4 border rounded-lg p-4">
@@ -31,7 +33,6 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
                   className="object-cover rounded"
                 />
               </div>
-
               <div className="flex-1">
                 <p className="font-medium">{itemInfo.name}</p>
                 <div className="flex justify-between mt-1 items-center">
@@ -45,12 +46,12 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
                         autoFocus
                         onChange={(e) => setNewQty(e.target.value)}
                         onBlur={() => {
-                          const qty = parseInt(newQty)
-                          if (!isNaN(qty) && qty >= 0) updateQuantity(item.id, qty)
-                          setEditID(null)
+                          const qty = parseInt(newQty);
+                          if (!isNaN(qty) && qty >= 0) updateQuantity(item.id, qty);
+                          setEditID(null);
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") e.target.blur()
+                          if (e.key === "Enter") e.target.blur();
                         }}
                       />
                     ) : (
@@ -66,8 +67,9 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
                 </div>
               </div>
             </div>
-          )
+          );
         })}
+
       </div>
 
       <div className="space-y-2 text-sm pt-4 border-t">
