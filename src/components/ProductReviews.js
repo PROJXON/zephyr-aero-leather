@@ -28,24 +28,17 @@ export default function ProductReviews({ productId }) {
       const response = await fetch(`/api/order?userID=${user.id}`);
       const data = await response.json();
       const orders = data.orders || [];
-
-      console.log("Fetched Orders:", orders);
-      console.log("Checking for productId:", productId);
-
-      const hasBought = orders.some(order =>
-        Array.isArray(order.items) &&
-        order.items.some(item => {
-          console.log("Checking item:", item);
-          return item.id === productId;
-        })
+      
+      // Check if any order contains this product
+      const hasBought = orders.some(order => 
+        order.line_items.some(item => item.product_id === productId)
       );
-
+      
       setHasPurchased(hasBought);
     } catch (error) {
       console.error("Error checking purchase status:", error);
     }
   };
-
 
   const checkReviewStatus = async () => {
     try {
@@ -167,7 +160,7 @@ export default function ProductReviews({ productId }) {
                       className="text-2xl"
                     >
                       <FaStar
-                        className={star <= rating ? "text-neutral-dark" : "text-neutral-light"}
+                        className={star <= rating ? "text-yellow-400" : "text-gray-300"}
                       />
                     </button>
                   ))}
@@ -189,7 +182,7 @@ export default function ProductReviews({ productId }) {
 
               <button
                 type="submit"
-                className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               >
                 Submit Review
               </button>
