@@ -12,7 +12,7 @@ export default function ProductCarousel({ products, link }) {
   const displayProducts = products.slice(0, 7);
 
   return (
-    <div>
+    <div className="w-full overflow-hidden">
       <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
         {displayProducts.map((product) => (
           <div

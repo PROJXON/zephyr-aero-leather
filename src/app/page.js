@@ -110,7 +110,7 @@ const Section = ({ title, products, link }) => {
   return (
     <section className="py-16" data-aos="fade-up">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-6">
+        <div className="max-w-screen-xl mx-auto mb-6 flex justify-between items-center">
           <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
             <Link
               href={link}
@@ -119,7 +119,10 @@ const Section = ({ title, products, link }) => {
               View All
             </Link>        
         </div>
-        <ProductCarousel products={products} link={link} />
+        <div className="max-w-screen-xl mx-auto">
+          <ProductCarousel products={products} link={link} />
+        </div>
+
       </div>
     </section>
   );
