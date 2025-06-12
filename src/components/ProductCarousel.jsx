@@ -23,7 +23,7 @@ export default function ProductCarousel({ products, viewAllLink }) {
         pagination: false,
         breakpoints: {
           1024: { perPage: 2 },
-          768: { perPage: 1 },
+          // 768: { perPage: 1 },
         },
       }}
       className="w-full"
