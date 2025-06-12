@@ -1,22 +1,74 @@
 "use client";
 import { useCart } from "@/app/context/CartContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer, createContext } from "react";
 import { FaEdit } from "react-icons/fa";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import calculateTotal from "../../lib/calculateTotal";
 import OrderSummary from "./OrderSummary";
-import StripeForm from "./StripeForm";
+import ShippingDetails from "./ShippingDetails"
+import StripeForm from "./StripeForm"
 import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe } from "@stripe/stripe-js"
+
+const reducer = (details, action) => {
+  switch (action.type) {
+    case "FIRSTNAME":
+      return {
+        ...details,
+        name: { ...details.name, first: action.value }
+      }
+    case "LASTNAME":
+      return {
+        ...details,
+        name: { ...details.name, last: action.value }
+      }
+    case "ADDRESS1":
+      return {
+        ...details,
+        address: { ...details.address, line1: action.value }
+      }
+    case "ADDRESS2":
+      return {
+        ...details,
+        address: { ...details.address, line2: action.value }
+      }
+    case "CITY":
+      return { ...details, city: action.value }
+    case "ZIPCODE":
+      return { ...details, zipCode: action.value }
+    case "STATE":
+      return { ...details, state: action.value }
+    default:
+      return details
+  }
+}
+
+export const ChangeContext = createContext()
 
 export default function Checkout({ products }) {
   const { cartItems, updateQuantity, orderId } = useCart();
-
   const [total, setTotal] = useState(calculateTotal(cartItems, products));
   const [editID, setEditID] = useState(null);
   const [newQty, setNewQty] = useState("");
   const [clientSecret, setClientSecret] = useState("");
-  const [paymentIntentId, setPaymentIntentId] = useState(null);
+  const [paymentIntentId, setPaymentIntentId] = useState(null)
+  const [formError, setFormError] = useState(null)
+  const [shippingErrors, setShippingErrors] = useState({})
+  const [shippingDetails, dispatch] = useReducer(reducer, {
+    name: {
+      first: "",
+      last: ""
+    },
+    address: {
+      line1: "",
+      line2: ""
+    },
+    city: "",
+    zipCode: "",
+    state: ""
+  })
+
+  const states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
   changeQuantity.push({
@@ -41,6 +93,7 @@ export default function Checkout({ products }) {
             items: cartItems,
             woo_order_id: orderId,
             payment_intent_id: paymentIntentId,
+            shipping: shippingDetails
           }),
         })
           .then((res) => res.json())
@@ -54,42 +107,71 @@ export default function Checkout({ products }) {
 
       return () => clearTimeout(timeout);
     }
-  }, [cartItems]);
+  }, [cartItems, shippingDetails])
 
   const appearance = { theme: "stripe" };
   const options = { clientSecret, appearance };
-  const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+  const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
-  return (
-    <>
-      {cartItems?.length > 0 ? (
-        <div className="flex flex-col gap-8">
-          <OrderSummary
-            cartItems={cartItems}
-            products={products}
-            total={total}
-            quantityControls={{
-              updateQuantity,
-              editID,
-              setEditID,
-              newQty,
-              setNewQty,
-              changeQuantity,
-            }}
-          />
-          {clientSecret && (
-            <div className="flex justify-end">
-              <div className="w-full max-w-md">
-                <Elements stripe={stripePromise} options={options}>
-                  <StripeForm clientSecret={clientSecret} />
-                </Elements>
-              </div>
-            </div>
-          )}
+  const validateShipping = () => {
+    const errors = {}
+
+    if (!shippingDetails.name.first.trim()) errors.firstName = "Enter your first name"
+    if (!shippingDetails.name.last.trim()) errors.lastName = "Enter your last name"
+    if (!shippingDetails.address.line1.trim()) errors.address = "Enter your address"
+    if (!shippingDetails.city.trim()) errors.city = "Enter your city"
+    if (!/^\d{5}$/.test(shippingDetails.zipCode.trim())) errors.zipCode = "Enter a valid ZIP code"
+    const statesSet = new Set(states)
+    if (!statesSet.has(shippingDetails.state)) errors.state = "Select a valid state"
+
+    return errors
+  }
+
+  const handleChange = e => {
+    const { name, value } = e.target
+
+    dispatch({
+      type: name.toUpperCase(),
+      value: value
+    })
+
+    setShippingErrors(prev => {
+      const newErrors = { ...prev }
+      if (name === "address1") delete newErrors["address"]
+      else delete newErrors[name]
+      return newErrors
+    })
+  }
+
+  return (<>
+    {cartItems?.length > 0 ? (<div className="flex flex-col gap-8">
+      <OrderSummary cartItems={cartItems} products={products} total={total} quantityControls={{
+        updateQuantity,
+        editID,
+        setEditID,
+        newQty,
+        setNewQty,
+        changeQuantity,
+      }}
+      />
+      {clientSecret && (<div
+        className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between max-w-7xl w-full mx-auto"
+      >
+        <ChangeContext.Provider value={handleChange}>
+          <ShippingDetails details={shippingDetails} errors={shippingErrors} states={states} />
+        </ChangeContext.Provider>
+        <div className="w-full lg:max-w-md">
+          <Elements stripe={stripePromise} options={options}>
+            <StripeForm
+              clientSecret={clientSecret}
+              formError={formError}
+              setFormError={setFormError}
+              validateShipping={validateShipping}
+              setShippingErrors={setShippingErrors}
+            />
+          </Elements>
         </div>
-      ) : (
-        <p>Your cart is empty</p>
-      )}
-    </>
-  );
+      </div>)}
+    </div>) : <p>Your cart is empty</p>}
+  </>)
 }
