@@ -193,6 +193,11 @@ body {
     @apply text-xs;
   }
 }
+
+body {
+  overflow-x: hidden;
+}
+
 /* 
 @keyframes carouselScroll {
   0% { transform: translateX(0%); }

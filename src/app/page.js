@@ -1,5 +1,6 @@
 import fetchProducts from "../../lib/woocommerce";
 import ProductList from "../components/ProductList";
+import ProductCarousel from "@/components/ProductCarousel";
 import Image from "next/image";
 import Link from "next/link";
 import Hero from "../components/Hero";
@@ -20,13 +21,13 @@ export default async function Home() {
     moto,
     holsters,
   ] = await Promise.all([
-     fetchProducts({ category: "wallets", per_page: 4 }),
-    fetchProducts({ category: "iphoneCases", per_page: 4 }),
-    fetchProducts({ category: "sunglasses", per_page: 4 }),
-    fetchProducts({ category: "belts", per_page: 4 }),
-    fetchProducts({ category: "bags", per_page: 4 }),
-    fetchProducts({ category: "moto", per_page: 4 }),
-    fetchProducts({ category: "holsters", per_page: 4 }),
+     fetchProducts({ category: "wallets", per_page: 8 }),
+    fetchProducts({ category: "iphoneCases", per_page: 8 }),
+    fetchProducts({ category: "sunglasses", per_page: 8 }),
+    fetchProducts({ category: "belts", per_page: 8 }),
+    fetchProducts({ category: "bags", per_page: 8 }),
+    fetchProducts({ category: "moto", per_page: 8 }),
+    fetchProducts({ category: "holsters", per_page: 8 }),
   ]);
 
   return (
@@ -118,7 +119,7 @@ const Section = ({ title, products, link }) => {
               View All
             </Link>        
         </div>
-        <ProductList products={products} />
+        <ProductCarousel products={products} viewAllLink={link}/>
       </div>
     </section>
   );
