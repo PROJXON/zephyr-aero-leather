@@ -61,7 +61,7 @@ export default async function ProductPage({ params }) {
         </div>
       </div>
 
-      <div className="mt-12">
+      <div id="reviews" className="mt-12 scroll-mt-24">
         <ProductReviews productId={product.id} />
       </div>
     </div>
