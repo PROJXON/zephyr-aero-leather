@@ -7,7 +7,7 @@ const Hero = ({ title, subtitle, description, images }) => {
         <div className="grid md:grid-cols-[1.2fr_1fr] gap-12 items-center">
           {/* Text side */}
           <div
-            className="space-y-6 text-center md:text-left max-w-2xl"
+            className="space-y-6 text-center md:text-left max-w-2xl w-full mx-auto"
             data-aos="fade-right"
           >
             <h1 className="text-4xl md:text-5xl font-light text-neutral-dark leading-tight">
@@ -29,14 +29,13 @@ const Hero = ({ title, subtitle, description, images }) => {
           {/* Carousel side */}
           <div
             data-aos="fade-left"
-            className="w-full"
+            className="w-full flex justify-center md:justify-end"
           >
             <HeroCarousel images={images} altBase={title} />
           </div>
         </div>
       </div>
     </section>
-
   );
 };
 
