@@ -189,7 +189,7 @@ export default function ProductReviews({ productId }) {
 
               <button
                 type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
               >
                 Submit Review
               </button>

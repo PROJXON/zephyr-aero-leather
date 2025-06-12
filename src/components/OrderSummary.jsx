@@ -1,16 +1,20 @@
-import Image from "next/image"
-import ChangeQuantitySpans from "./ChangeQuantitySpans"
-import getItemInfo from "../../lib/getItemInfo"
+import Link from "next/link";
+import Image from "next/image";
+import ChangeQuantitySpans from "./ChangeQuantitySpans";
+import getItemInfo from "../../lib/getItemInfo";
 
-export default function OrderSummary({ cartItems, products, total, quantityControls = {} }) {
-  const { updateQuantity, editID, setEditID, newQty, setNewQty, changeQuantity } = quantityControls
-  const editable = Object.keys(quantityControls).length > 0
+export default function OrderSummary({
+  cartItems,
+  products,
+  total,
+  quantityControls = {},
+  showReviewLinks = false,
+  reviewedProductIds = [],
+}) {
+  const { updateQuantity, editID, setEditID, newQty, setNewQty, changeQuantity } = quantityControls;
+  const editable = Object.keys(quantityControls).length > 0;
 
-  const formatPrice = priceInCents => {
-    const price = (priceInCents / 100).toFixed(2)
-    return `$${price}`
-  }
-
+  const formatPrice = priceInCents => `$${(priceInCents / 100).toFixed(2)}`;
 
   return (
     <div className="space-y-6 border p-6 rounded-lg shadow-sm">
@@ -19,22 +23,28 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
       <div className="space-y-4">
         {cartItems.map((item) => {
           const [itemInfo, priceInCents] = getItemInfo(products, item);
-          if (!itemInfo) return null; // Skip this item if product info missing
+          if (!itemInfo) return null;
 
           const imageInfo = itemInfo.images?.[0];
+          const productLink = `/product/${item.id}`;
+          const alreadyReviewed = reviewedProductIds.includes(item.id);
 
           return (
             <div key={item.id} className="flex gap-4 border rounded-lg p-4">
-              <div className="relative w-24 h-24">
+              <Link href={productLink} className="relative w-24 h-24 block">
                 <Image
                   src={imageInfo?.src || "/images/placeholder.svg"}
                   alt={imageInfo?.alt || itemInfo.name}
                   fill
                   className="object-cover rounded"
                 />
-              </div>
+              </Link>
+
               <div className="flex-1">
-                <p className="font-medium">{itemInfo.name}</p>
+                <Link href={productLink} className="font-medium hover:underline block">
+                  {itemInfo.name}
+                </Link>
+
                 <div className="flex justify-between mt-1 items-center">
                   <div className="flex items-center gap-2 flex-wrap">
                     {editable && editID === item.id ? (
@@ -55,21 +65,34 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
                         }}
                       />
                     ) : (
-                      <>
-                        {item.quantity > 1 && (
-                          <span className="text-gray-400 text-sm">x{item.quantity}</span>
-                        )}
-                      </>
+                      item.quantity > 1 && (
+                        <span className="text-gray-400 text-sm">x{item.quantity}</span>
+                      )
                     )}
                     {editable && <ChangeQuantitySpans cqs={changeQuantity} item={item} />}
                   </div>
-                  <p className="text-green-600 font-semibold text-sm">{formatPrice(priceInCents)}</p>
+
+                  <p className="text-green-600 font-semibold text-sm">
+                    {formatPrice(priceInCents)}
+                  </p>
                 </div>
+
+                {showReviewLinks && (
+                  <div className="text-sm mt-2">
+                    <Link
+                      href={`${productLink}#reviews`}
+                      className={alreadyReviewed
+                        ? "line-through text-gray-400"
+                        : "text-gray-400 hover:underline"}
+                    >
+                      {alreadyReviewed ? "Review Submitted" : "Leave a Review"}
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           );
         })}
-
       </div>
 
       <div className="space-y-2 text-sm pt-4 border-t">
@@ -87,5 +110,5 @@ export default function OrderSummary({ cartItems, products, total, quantityContr
         </div>
       </div>
     </div>
-  )
+  );
 }

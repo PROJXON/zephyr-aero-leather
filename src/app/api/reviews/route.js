@@ -1,27 +1,31 @@
 import { NextResponse } from "next/server"
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 
-// Obtener reviews de un producto
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const productId = searchParams.get("productId");
   const userId = searchParams.get("userId");
 
-  if (!productId) return NextResponse.json({ error: "Product ID is required" }, { status: 400 })
-
-  const reviewsError = "Failed to fetch reviews"
+  const reviewsError = "Failed to fetch reviews";
 
   try {
-    let endpoint = `wc/v3/products/reviews?product=${productId}`;
-    if (userId) {
-      endpoint += `&customer=${userId}`;
+    let endpoint = "wc/v3/products/reviews";
+
+    if (productId && userId) {
+      endpoint += `?product=${productId}&customer=${userId}`;
+    } else if (productId) {
+      endpoint += `?product=${productId}`;
+    } else if (userId) {
+      endpoint += `?customer=${userId}`;
     }
-    const reviews = await fetchWooCommerce(endpoint, reviewsError)
+
+    const reviews = await fetchWooCommerce(endpoint, reviewsError);
     return NextResponse.json(reviews);
   } catch (error) {
     return NextResponse.json({ error: reviewsError }, { status: 500 });
   }
 }
+
 
 // Crear un nuevo review
 export async function POST(req) {
