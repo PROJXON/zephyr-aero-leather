@@ -12,7 +12,11 @@ export default function ProductList({ products }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
       {products.map((product) => (
-        <div key={product.id} className="group">
+        <div 
+          key={product.id} 
+          className="group"
+          data-aos="fade-up"
+        >
           {/* Image Card */}
           <Link href={`/product/${product.id}`}>
             <div className="relative aspect-square bg-card mb-3 overflow-hidden shadow-sm rounded-xl">

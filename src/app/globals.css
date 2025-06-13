@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 :root {
   --foreground-rgb: 51, 51, 51;
   --background-rgb: 250, 249, 246;
@@ -152,14 +153,6 @@ body {
   @apply text-primary;
 }
 
-.contact-form button {
-  @apply w-full bg-primary hover:bg-accent text-white py-2 px-4 rounded-md transition-colors;
-}
-
-.contact-form button:hover {
-  @apply bg-accent;
-}
-
 /* Responsive styles */
 @media (max-width: 1024px) {
   .contact-container {
@@ -200,11 +193,9 @@ body {
   .input-group label {
     @apply text-xs;
   }
-  
-  .contact-form button {
-    @apply py-1.5;
-  }
 }
+
+
 /* 
 @keyframes carouselScroll {
   0% { transform: translateX(0%); }

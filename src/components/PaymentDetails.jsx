@@ -1,71 +1,101 @@
-"use client"
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { useCart } from "@/app/context/CartContext"
-import OrderSummary from "./OrderSummary"
-import calculateTotal from "../../lib/calculateTotal"
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import OrderSummary from "./OrderSummary";
+import calculateTotal from "../../lib/calculateTotal";
+import { useAuth } from "@/app/context/AuthContext";
+import { useCart } from "@/app/context/CartContext";
 
 export default function PaymentDetails() {
-    const router = useRouter()
-    const searchParams = useSearchParams()
-    const [paymentIntentId, setPaymentIntentId] = useState(null)
-    const [paymentDetails, setPaymentDetails] = useState(null)
-    const [products, setProducts] = useState([]);
-    const [total, setTotal] = useState(0)
-    const [allowed, setAllowed] = useState(false)
-    const { clearCart } = useCart()
-    const queryIntent = searchParams.get("payment_intent")
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [paymentIntentId, setPaymentIntentId] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [allowed, setAllowed] = useState(false);
 
-    useEffect(() => {
-        const paid = sessionStorage.getItem("payment_success")
-        const intent = sessionStorage.getItem("payment_intent") || queryIntent
+  const { clearCart, fetchUserCart, refreshCart } = useCart();
+  const queryIntent = searchParams.get("payment_intent");
+  const { isAuthenticated } = useAuth();
 
-        if (paid === "true" || queryIntent) {
-            sessionStorage.removeItem("payment_success")
-            sessionStorage.removeItem("payment_intent")
-            setPaymentIntentId(intent)
-            setAllowed(true)
+  useEffect(() => {
+    const run = async () => {
+      const intentFromURL = queryIntent;
+      const intentFromSession = sessionStorage.getItem("payment_intent");
+      const intent = intentFromURL || intentFromSession;
 
-            const alreadyCleared = localStorage.getItem("cartCleared")
-            if (!alreadyCleared) {
-                clearCart()
-                localStorage.setItem("cartCleared", "true")
-            }
+      if (!intent) return router.replace("/");
 
-            setTimeout(() => localStorage.removeItem("cartCleared"), 1000)
-        } else router.replace("/")
-    }, [])
+      setPaymentIntentId(intent);
+      setAllowed(true);
 
-    useEffect(() => {
-        const getProducts = async () => {
-          const res = await fetch("/api/products");
-          const data = await res.json();
-          setProducts(data);
-        };
-        getProducts();
-      }, []);
+      // Clean up session markers
+      setTimeout(() => {
+        sessionStorage.removeItem("payment_success");
+        sessionStorage.removeItem("payment_intent");
+      }, 500);
 
-    useEffect(() => {
-        if (paymentIntentId) {
-            fetch(`/api/payment?payment_intent=${paymentIntentId}`)
-                .then(res => res.json())
-                .then(data => {
-                    setPaymentDetails(data)
-                    setTotal(calculateTotal(data.items, products))
-                })
-                .catch(err => console.error(err))
+      await clearCart();
+
+      for (let i = 0; i < 10; i++) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        const res = await fetch("/api/cart");
+        const data = await res.json();
+
+        if (!data.items || data.items.length === 0) {
+            break;
         }
-    }, [paymentIntentId])
 
-    return (<>
-        {allowed && (<div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-4">Payment Successful! 🎉</h1>
-            <p>Thank you for your purchase.</p>
-            {paymentDetails ? (<OrderSummary
-                cartItems={paymentDetails.items}
-                products={products}
-                total={total}
-            />) : <p>Loading your payment details...</p>}
-        </div>)}
-    </>)
+        if (i === 9) console.warn("⚠️ Woo cart still not empty after polling");
+        }
+
+      await refreshCart();
+    };
+
+    run();
+  }, []);
+
+  useEffect(() => {
+    const getProducts = async () => {
+      const res = await fetch("/api/products");
+      const data = await res.json();
+      setProducts(data);
+    };
+    getProducts();
+  }, []);
+
+  useEffect(() => {
+    if (paymentIntentId && products.length > 0) {
+      const run = async () => {
+        try {
+          await fetch(`/api/payment-intent-status?payment_intent_id=${paymentIntentId}`);
+          const res = await fetch(`/api/payment?payment_intent=${paymentIntentId}`);
+          const data = await res.json();
+          setPaymentDetails(data);
+          setTotal(calculateTotal(data.items, products));
+        } catch (err) {
+          console.error("Error syncing payment intent and Woo order:", err);
+        }
+      };
+      run();
+    }
+  }, [paymentIntentId, products]);
+
+  return allowed ? (
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-4">Payment Successful! 🎉</h1>
+      <p className="mb-6">Thank you for your purchase!</p>
+      {paymentDetails ? (
+        <OrderSummary
+          cartItems={paymentDetails.items}
+          products={products}
+          total={total}
+        />
+      ) : (
+        <p>Loading your payment details...</p>
+      )}
+    </div>
+  ) : null;
 }

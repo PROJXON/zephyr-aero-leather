@@ -6,8 +6,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useAuth } from "@/app/context/AuthContext";
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
-const backgroundImageUrl = "/ifr.jpg"
+const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
 const Register = () => {
   const [formData, setFormdata] = useState({
@@ -24,7 +25,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { setIsAuthenticated, setUser } = useAuth();
+  const { setIsAuthenticated, setUser, login } = useAuth();
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -103,8 +104,7 @@ const Register = () => {
       });
 
       const loginData = await loginResponse.json();
-      setIsAuthenticated(true);
-      setUser(loginData.user)
+      login(loginData.user);
   
       if (!loginResponse.ok) {
         setError(loginData.error || "Failed to log in");
@@ -244,7 +244,7 @@ const Register = () => {
                             />
                           </div>
                           <div className="ml-3 text-sm">
-                            <label htmlFor="terms" className="font-light text-gray-500 dark:text-gray-300">I accept the <a className="font-medium text-primary-600 hover:underline dark:text-primary-500" href="#">Terms and Conditions</a></label>
+                            <label htmlFor="terms" className="font-light text-gray-500 dark:text-gray-300">I accept the <a className="font-medium text-primary-600 hover:underline dark:text-primary-500" href="/terms">Terms and Conditions</a></label>
                           </div>
                       </div>
                       <button
