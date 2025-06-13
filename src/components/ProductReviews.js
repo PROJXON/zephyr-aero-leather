@@ -8,8 +8,6 @@ export default function ProductReviews({ productId }) {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState(5);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [hasPurchased, setHasPurchased] = useState(false);
@@ -28,12 +26,12 @@ export default function ProductReviews({ productId }) {
       const response = await fetch(`/api/order?userID=${user.id}`);
       const data = await response.json();
       const orders = data.orders || [];
-      
-      // Check if any order contains this product
-      const hasBought = orders.some(order => 
-        order.line_items.some(item => item.product_id === productId)
+
+      const hasBought = orders.some(order =>
+        Array.isArray(order.items) &&
+        order.items.some(item => item.id === productId)
       );
-      
+
       setHasPurchased(hasBought);
     } catch (error) {
       console.error("Error checking purchase status:", error);
@@ -115,8 +113,7 @@ export default function ProductReviews({ productId }) {
   return (
     <div className="mt-8">
       <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
-      
-      {/* Lista de reviews */}
+
       <div className="space-y-4 mb-8">
         {reviews.length === 0 ? (
           <p>No reviews yet</p>
@@ -134,7 +131,7 @@ export default function ProductReviews({ productId }) {
                 </div>
                 <span className="font-bold">{review.reviewer}</span>
               </div>
-              <div 
+              <div
                 className="mt-2 prose max-w-none"
                 dangerouslySetInnerHTML={{ __html: review.review }}
               />
@@ -160,7 +157,7 @@ export default function ProductReviews({ productId }) {
                       className="text-2xl"
                     >
                       <FaStar
-                        className={star <= rating ? "text-yellow-400" : "text-gray-300"}
+                        className={star <= rating ? "text-neutral-dark" : "text-neutral-light"}
                       />
                     </button>
                   ))}
@@ -182,7 +179,7 @@ export default function ProductReviews({ productId }) {
 
               <button
                 type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
               >
                 Submit Review
               </button>
@@ -196,4 +193,4 @@ export default function ProductReviews({ productId }) {
       )}
     </div>
   );
-} 
+}
