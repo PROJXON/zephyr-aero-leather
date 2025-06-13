@@ -152,8 +152,7 @@ export default function Checkout({ products }) {
         newQty,
         setNewQty,
         changeQuantity,
-      }}
-      />
+      }} />
       {clientSecret && (<div
         className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between max-w-7xl w-full mx-auto"
       >
