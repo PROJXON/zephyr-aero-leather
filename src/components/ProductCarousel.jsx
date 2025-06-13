@@ -18,19 +18,27 @@ export default function ProductCarousel({ products, viewAllLink }) {
     <Splide
       options={{
         perPage: 4,
-        gap: "1rem", // 20px
+        gap: "1rem",
         drag: "free",
         pagination: false,
         breakpoints: {
           1024: { perPage: 2 },
-          // 768: { perPage: 1 },
         },
       }}
-      className="w-full"
+      className="w-full max-w-screen-xl mx-auto px-2 sm:px-0"
     >
       {finalProducts.map((product) => (
-        <SplideSlide key={product.id} className="flex justify-center">
-          <div className="w-full sm:max-w-[768px] flex flex-col">
+        <SplideSlide key={product.id} className="flex justify-center min-w-0 px-0">
+          <div
+            className="
+              w-full 
+              flex flex-col 
+              px-2 
+              max-w-[calc(50vw-1rem)] 
+              sm:max-w-[calc(45vw-1rem)] 
+              md:max-w-[300px]
+            "
+          >
             {product.id === "view-all" ? (
               <Link href={viewAllLink}>
                 <div className="aspect-square flex items-center justify-center bg-neutral-light text-neutral-dark font-medium text-center rounded-xl shadow-sm hover:bg-neutral-medium transition-colors">
