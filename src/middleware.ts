@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 const protectedRoutes = ["/account", "/order-history"];
 const authPages = ["/login", "/register"];
 
-export function middleware(request) {
+export function middleware(request: NextRequest) {
   const hasToken = request.cookies.has("token");
   const path = request.nextUrl.pathname;
 
