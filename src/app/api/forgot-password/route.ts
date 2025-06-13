@@ -2,17 +2,31 @@ import { NextResponse } from "next/server";
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import crypto from "crypto";
 import { sendEmail } from "@/lib/email";
+import type { NextRequest } from "next/server";
 
 const api = new WooCommerceRestApi({
-  url: process.env.WOOCOMMERCE_API_URL,
-  consumerKey: process.env.WOOCOMMERCE_API_KEY,
-  consumerSecret: process.env.WOOCOMMERCE_API_SECRET,
+  url: process.env.WOOCOMMERCE_API_URL!,
+  consumerKey: process.env.WOOCOMMERCE_API_KEY!,
+  consumerSecret: process.env.WOOCOMMERCE_API_SECRET!,
   version: "wc/v3",
 });
 
-export async function POST(request) {
+interface WooCustomerMeta {
+  id?: number;
+  key: string;
+  value: any;
+}
+
+interface WooCustomer {
+  id: number;
+  email: string;
+  meta_data?: WooCustomerMeta[];
+  [key: string]: any;
+}
+
+export async function POST(request: NextRequest): Promise<Response> {
   try {
-    const { email } = await request.json();
+    const { email }: { email: string } = await request.json();
 
     if (!email) {
       return NextResponse.json(
@@ -22,9 +36,7 @@ export async function POST(request) {
     }
 
     // Check if user exists in WooCommerce
-    const { data: users } = await api.get("customers", {
-      email: email,
-    });
+    const { data: users }: { data: WooCustomer[] } = await api.get(`customers?email=${encodeURIComponent(email)}`);
 
     if (!users || users.length === 0) {
       return NextResponse.json(
@@ -39,13 +51,13 @@ export async function POST(request) {
 
     // Store reset token in user meta
     // First, get existing meta data
-    const { data: existingUser } = await api.get(`customers/${users[0].id}`);
-    const existingMetaData = existingUser.meta_data || [];
-    
+    const { data: existingUser }: { data: WooCustomer } = await api.get(`customers/${users[0].id}`);
+    const existingMetaData: WooCustomerMeta[] = existingUser.meta_data || [];
+
     // Update or add our new meta data
-    const updatedMetaData = [
-      ...existingMetaData.filter(meta => 
-        meta.key !== 'reset_token' && meta.key !== 'reset_token_expiry'
+    const updatedMetaData: WooCustomerMeta[] = [
+      ...existingMetaData.filter(meta =>
+        meta.key !== "reset_token" && meta.key !== "reset_token_expiry"
       ),
       {
         key: "reset_token",
@@ -54,11 +66,11 @@ export async function POST(request) {
       {
         key: "reset_token_expiry",
         value: resetTokenExpiry.toISOString(),
-      }
+      },
     ];
 
     await api.put(`customers/${users[0].id}`, {
-      meta_data: updatedMetaData
+      meta_data: updatedMetaData,
     });
 
     // Send reset email using Resend

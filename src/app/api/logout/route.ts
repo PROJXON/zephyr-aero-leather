@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export async function POST() {
+export async function POST(_req?: NextRequest): Promise<Response> {
   const response = new NextResponse(JSON.stringify({ success: true }), {
     status: 200,
     headers: { "Content-Type": "application/json" },
@@ -10,7 +11,7 @@ export async function POST() {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     expires: new Date(0),
-    sameSite: "Strict",
+    sameSite: "strict",
     path: "/",
   });
 
@@ -18,7 +19,7 @@ export async function POST() {
     httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     expires: new Date(0),
-    sameSite: "Strict",
+    sameSite: "strict",
     path: "/",
   });
 

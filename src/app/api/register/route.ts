@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
+import type { NextRequest } from "next/server";
 
-export async function POST(req) {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password }: { name: string; email: string; password: string } = await req.json();
 
     // Input validation
     if (!name || !email || !password) {
@@ -32,7 +33,7 @@ export async function POST(req) {
     );
 
     return NextResponse.json(data, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(
       { error: error.response?.data?.message || "Server error, please try again" },

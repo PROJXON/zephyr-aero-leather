@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
+import type { NextRequest } from "next/server";
 
-export async function POST(req) {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
-    const { email, password } = await req.json();
+    const { email, password }: { email: string; password: string } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
@@ -23,11 +24,11 @@ export async function POST(req) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
-    let jwtData;
+    let jwtData: { token: string };
     try {
       jwtData = JSON.parse(rawJwtResponse);
     } catch (err) {
-      if (rawJwtResponse.includes('<!DOCTYPE html>')) {
+      if (rawJwtResponse.includes("<!DOCTYPE html>")) {
         console.error("Received HTML instead of JSON – likely Jetpack login screen.");
       } else {
         console.error("Failed to parse JWT response as JSON:", err);
@@ -35,23 +36,23 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unexpected response from auth server" }, { status: 500 });
     }
 
-    const token = jwtData.token;
-    if (!token) return NextResponse.json({ error: "Authentication failed" }, { status: 401 })
+    const token: string | undefined = jwtData.token;
+    if (!token) return NextResponse.json({ error: "Authentication failed" }, { status: 401 });
 
     // ✅ Step 2: Fetch WordPress user data
-    let userData = null
-    const userDataError = "Failed to fetch user data"
+    let userData: any = null;
+    const userDataError = "Failed to fetch user data";
 
     try {
-      userData = await fetchWooCommerce("wp/v2/users/me", userDataError, token)
+      userData = await fetchWooCommerce("wp/v2/users/me", userDataError, token);
     } catch {
-      return NextResponse.json({ error: userDataError }, { status: 500 })
+      return NextResponse.json({ error: userDataError }, { status: 500 });
     }
-    const userId = userData.id
+    const userId: number = userData.id;
 
-    let customerData = null
+    let customerData: any = null;
     // ✅ Step 3: Fetch WooCommerce customer data
-    customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Error fetching WooCommerce customer data:")
+    customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Error fetching WooCommerce customer data:");
 
     if (!customerData) {
       return NextResponse.json({ error: "Failed to fetch WooCommerce customer Data" }, { status: 500 });
@@ -66,14 +67,14 @@ export async function POST(req) {
     res.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     res.cookies.set("userData", Buffer.from(JSON.stringify(customerData)).toString("base64"), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
@@ -91,7 +92,7 @@ export async function POST(req) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       expires: new Date(0),
-      sameSite: "Strict",
+      sameSite: "strict",
       path: "/",
     });
 
@@ -99,7 +100,7 @@ export async function POST(req) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       expires: new Date(0),
-      sameSite: "Strict",
+      sameSite: "strict",
       path: "/",
     });
 

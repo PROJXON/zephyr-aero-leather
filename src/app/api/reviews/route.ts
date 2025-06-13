@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
+import type { NextRequest } from "next/server";
 
-export async function GET(req) {
+export async function GET(req: NextRequest): Promise<Response> {
   const { searchParams } = new URL(req.url);
   const productId = searchParams.get("productId");
   const userId = searchParams.get("userId");
@@ -28,15 +29,15 @@ export async function GET(req) {
   }
 }
 
-export async function POST(req) {
+export async function POST(req: NextRequest): Promise<Response> {
   const createReviewError = "Failed to create review";
 
   try {
-    const { productId, rating, review, userId } = await req.json();
+    const { productId, rating, review, userId }: { productId: number; rating: number; review: string; userId: number } = await req.json();
 
     const orders = await fetchWooCommerce(`wc/v3/orders?customer=${userId}`, "Failed to fetch orders");
-    const hasPurchased = orders.some(order =>
-      order.line_items.some(item => item.product_id === productId)
+    const hasPurchased = orders.some((order: any) =>
+      order.line_items.some((item: any) => item.product_id === productId)
     );
 
     if (!hasPurchased) {
