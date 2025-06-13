@@ -285,7 +285,7 @@ const Navbar = ({ allProducts }) => {
               {link.show && <>
                 {typeof link.unique === "string" ?
                   <NavLink href={link.unique} onClick={() => setMenuOpen(false)} classes="block text-lg" label={link.label} /> :
-                  <button onClick={unique.function} className={unique.classes}>{link.label}</button>
+                  <button onClick={link.unique.function} className={link.unique.classes}>{link.label}</button>
                 }
               </>}
             </Fragment>))}
@@ -297,4 +297,4 @@ const Navbar = ({ allProducts }) => {
   );
 };
 
-export default Navbar;
+export default Navbar
