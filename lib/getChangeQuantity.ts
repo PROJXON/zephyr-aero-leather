@@ -1,7 +1,6 @@
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { CartItem } from "../types/types";
-
 import { UpdateQuantityFn } from "../types/types";
 
 interface GetChangeQuantityArgs {

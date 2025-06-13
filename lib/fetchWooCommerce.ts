@@ -34,4 +34,4 @@ export default async function fetchWooCommerce<T = any>(
   }
 
   return res.json() as T;
-}
+};

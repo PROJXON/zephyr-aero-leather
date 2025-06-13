@@ -15,4 +15,4 @@ export default function getItemInfo(
   const priceInCents = Math.round(price * 100 * item.quantity);
 
   return [itemInfo, priceInCents];
-}
+};

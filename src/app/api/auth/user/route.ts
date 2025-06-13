@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server"
-import getCookieInfo from "../../../../../lib/getCookieInfo"
-import fetchWooCommerce from "../../../../../lib/fetchWooCommerce"
+import { NextResponse } from "next/server";
+import getCookieInfo from "../../../../../lib/getCookieInfo";
+import fetchWooCommerce from "../../../../../lib/fetchWooCommerce";
+import type { NextRequest } from "next/server";
 
-export async function GET() {
+export async function GET(_request: NextRequest): Promise<Response> {
   try {
-    const [token, userCookie] = await getCookieInfo()
+    const [token, userCookie] = await getCookieInfo();
 
     if (userCookie) {
       try {
@@ -15,22 +16,22 @@ export async function GET() {
       }
     }
 
-    if (!token) return NextResponse.json({ isAuthenticated: false, user: null })
+    if (!token) return NextResponse.json({ isAuthenticated: false, user: null });
 
-    const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch WordPress user", token)
-    const userId = userData.id
-    const customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Failed to fetch WooCommerce customer")
-    const response = NextResponse.json({ isAuthenticated: true, user: customerData })
+    const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch WordPress user", token);
+    const userId = userData.id;
+    const customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Failed to fetch WooCommerce customer");
+    const response = NextResponse.json({ isAuthenticated: true, user: customerData });
 
     response.cookies.set("userData", Buffer.from(JSON.stringify(customerData)).toString("base64"), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7,
     });
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Auth check error:", error.message);
 
     const response = NextResponse.json({ isAuthenticated: false, user: null });
@@ -39,7 +40,7 @@ export async function GET() {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       expires: new Date(0),
-      sameSite: "Strict",
+      sameSite: "strict",
       path: "/",
     });
 
@@ -47,7 +48,7 @@ export async function GET() {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       expires: new Date(0),
-      sameSite: "Strict",
+      sameSite: "strict",
       path: "/",
     });
 

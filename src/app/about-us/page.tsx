@@ -1,15 +1,17 @@
-export const dynamic = "force-static"; // ✅ Force SSG at build time
+export const dynamic = "force-static";
 
+import type { JSX } from "react";
 import AboutUs from "@/components/AboutUs";
 import Hero from "@/components/Hero";
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL as string;
 
 export const metadata = {
   title: "About Us | Zephyr Aero Leather",
   description: "Learn about Zephyr Aero Leather – our story, commitment, and products.",
 };
 
-export default function AboutPage() {
+export default function AboutPage(): JSX.Element {
   return (
     <div className="about-page bg-background text-gray-800">
       {/* Hero Section */}
@@ -23,9 +25,7 @@ export default function AboutPage() {
           `${CDN_URL}/phelandesert.jpg`,
           `${CDN_URL}/phelancar.jpg`
         ]}
-      
       />
-
       <AboutUs />
     </div>
   );

@@ -1,18 +1,18 @@
 export type CartItem = {
   id: number;
   quantity: number;
-  lineItemId?: number; // Optional — appears in some cart states
+  lineItemId?: number;
 };
 
 export type Product = {
   id: number;
   name: string;
-  price: string | number; // Woo can send stringified prices
+  price: string | number;
   images?: {
     src: string;
     alt?: string;
   }[];
-  [key: string]: any; // Flexible for WooCommerce's API fields
+  [key: string]: any;
 };
 
 export type ShippingDetails = {
@@ -69,7 +69,7 @@ export interface WooOrder {
   };
   meta_data?: Array<{ key: string; value: any }>;
   [key: string]: any;
-}
+};
 
 export type WooOrderUpdate = Partial<Pick<WooOrder, 'shipping' | 'meta_data' | 'status' | 'line_items'>> & Record<string, any>;
 
@@ -83,4 +83,4 @@ export interface StripePaymentIntent {
   client_secret?: string;
   metadata?: Record<string, string>;
   [key: string]: any;
-}
+};

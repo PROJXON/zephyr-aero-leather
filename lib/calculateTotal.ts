@@ -6,4 +6,4 @@ export default function calculateTotal(cartItems: CartItem[], products: Product[
     const [, priceInCents] = getItemInfo(products, item);
     return total + priceInCents;
   }, 0);
-}
+};

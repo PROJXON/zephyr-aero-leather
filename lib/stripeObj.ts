@@ -7,7 +7,7 @@ if (!secretKey) {
 }
 
 const stripeObj = new Stripe(secretKey, {
-  apiVersion: "2025-03-31.basil", 
+  apiVersion: "2025-03-31.basil",
 });
 
 export default stripeObj;
