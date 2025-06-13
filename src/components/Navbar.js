@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -11,8 +10,9 @@ import NavLoggedOutBtn from "./NavLoggedOutBtn";
 import ChangeQuantitySpans from "./ChangeQuantitySpans";
 import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity";
-import { Sling as Hamburger } from "hamburger-react";
-import NavDropdown from "./NavDropdown";
+import { Sling as Hamburger } from "hamburger-react"
+import TopNavLink from "./TopNavLink"
+import NavLink from "./NavLink"
 
 const productCategories = [
   { name: "Wallets", slug: "wallets" },
@@ -73,7 +73,71 @@ const Navbar = ({ allProducts }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [accountOpen, cartOpen]);
 
-  const navItems = ["About Us"];
+  const navItems = ["About Us"]
+  const navItemsWithDropdown = [
+    {
+      label: "Collections",
+      items: collectionCategories,
+      basePath: "collections"
+    },
+    {
+      label: "Categories",
+      items: productCategories,
+      basePath: "categories"
+    }
+  ]
+
+  const mobileMenuLinks = [
+    {
+      label: "About Us",
+      unique: "/about-us",
+      show: true
+    },
+    {
+      label: "Collections",
+      unique: "/collections",
+      show: true
+    },
+    {
+      label: "Categories",
+      unique: "/categories",
+      show: true
+    },
+    {
+      label: "Sign In",
+      unique: "/login",
+      show: !isAuthenticated
+    },
+    {
+      label: "Create Account",
+      unique: "/register",
+      show: !isAuthenticated
+    },
+    {
+      label: "Order History",
+      unique: {
+        function: () => {
+          replace("/order-history")
+          setMenuOpen(false)
+        },
+        classes: "block w-full text-left text-blue-600"
+      },
+      show: isAuthenticated
+    },
+    {
+      label: "Logout",
+      unique: {
+        function: handleLogout,
+        classes: "block w-full text-left text-red-600"
+      },
+      show: isAuthenticated
+    },
+    {
+      label: "View Cart",
+      unique: "/checkout",
+      show: true
+    }
+  ]
 
   return (
     <nav className="bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
@@ -93,30 +157,17 @@ const Navbar = ({ allProducts }) => {
             </Link>
 
             <ul className="hidden lg:flex items-center gap-8 py-3 relative">
-              {navItems.map((item) => (
-                <li key={item} className="relative group overflow-hidden">
-                  <Link
-                    href={`/${item.toLowerCase().replace(/ /g, "-")}`}
-                    className="text-lg font-medium text-black transition-all duration-300"
-                  >
-                    {item}
-                  </Link>
-                  <span className="absolute left-0 bottom-0 w-full h-[2px] bg-black transition-transform duration-300 transform scale-x-0 group-hover:scale-x-100"></span>
-                </li>
-              ))}
-
-              <NavDropdown
-                label="Collections"
-                items={collectionCategories}
-                basePath="collections"
-                linkToBase={true}
-              />
-              <NavDropdown
-                label="Categories"
-                items={productCategories}
-                basePath="categories"
-                linkToBase={true}
-              />
+              {navItems.map(item => (<TopNavLink
+                key={item}
+                href={`/${item.toLowerCase().replace(/ /g, "-")}`}
+                label={item}
+              />))}
+              {navItemsWithDropdown.map(item => (<TopNavLink
+                key={item.label}
+                href={item.basePath}
+                label={item.label}
+                dropdownItems={item.items}
+              />))}
             </ul>
           </div>
 
@@ -229,75 +280,15 @@ const Navbar = ({ allProducts }) => {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 shadow-xl z-[9999]">
-            <div>
-              <Link
-                href="/about-us"
-                onClick={() => setMenuOpen(false)}
-                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-              >
-                About Us
-              </Link>
-              <Link
-                href="/collections"
-                onClick={() => setMenuOpen(false)}
-                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-              >
-                Collections
-              </Link>
-              <Link
-                href="/categories"
-                onClick={() => setMenuOpen(false)}
-                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-              >
-                Categories
-              </Link>
-
-              {!isAuthenticated ? (
-                <>
-                  <Link
-                    href="/login"
-                    onClick={() => setMenuOpen(false)}
-                    className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setMenuOpen(false)}
-                    className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-                  >
-                    Create Account
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      replace("/order-history");
-                      setMenuOpen(false);
-                    }}
-                    className="block text-lg font-medium px-3 py-2 w-full text-left rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-                  >
-                    Order History
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="block text-lg font-medium px-3 py-2 w-full text-left rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-                  >
-                    Log Out
-                  </button>
-                </>
-              )}
-
-              <Link
-                href="/checkout"
-                onClick={() => setMenuOpen(false)}
-                className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-              >
-                View Cart
-              </Link>
-            </div>
+          <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 space-y-1 shadow-xl z-[9999]">
+            {mobileMenuLinks.map(link => (<Fragment key={link.label}>
+              {link.show && <>
+                {typeof link.unique === "string" ?
+                  <NavLink href={link.unique} onClick={() => setMenuOpen(false)} classes="block text-lg" label={link.label} /> :
+                  <button onClick={unique.function} className={unique.classes}>{link.label}</button>
+                }
+              </>}
+            </Fragment>))}
           </div>
         )}
 
