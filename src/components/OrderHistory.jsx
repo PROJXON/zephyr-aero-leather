@@ -39,7 +39,28 @@ export default function OrderHistory({ products }) {
                         const datePaid = localTimes[i]
                         const items = order.items
                         const total = calculateTotal(items, products)
-                        const shipping = order.shipping || JSON.parse(order.metadata?.shipping || "{}")
+
+                        const shippingMetaEntry = order.meta_data.find(meta => meta.key === "_shipping_address_index");
+                        let shippingLines = null;
+
+                        if (shippingMetaEntry?.value) {
+                          const shippingText = shippingMetaEntry.value.trim();
+                          const parts = shippingText.trim().split(/\s{2,}/);
+
+                          if (parts.length >= 3 && parts[2]?.includes(" ")) {
+                            const cityStateZipCountry = parts[2].split(" ");
+                            if (cityStateZipCountry.length >= 4) {
+                              shippingLines = [
+                                `Name: ${parts[0] || ""}`,
+                                `Address: ${parts[1] || ""}`,
+                                `City: ${cityStateZipCountry[0] || ""}`,
+                                `State: ${cityStateZipCountry[1] || ""}`,
+                                `Zip Code: ${cityStateZipCountry[2] || ""}`,
+                                `Country: ${cityStateZipCountry[3] || ""}`,
+                              ];
+                            }
+                          }
+                        }
 
                         return (<li key={order.id}>
                             <h2 className={"font-bold text-xl text-center"}>
@@ -50,16 +71,18 @@ export default function OrderHistory({ products }) {
                                     })}
                                 </div>
                             </h2>
-                    <div className="text-sm text-gray-700 px-4 py-2">
-                      <h3 className="font-semibold text-lg">Shipping Details</h3>
-                      {shipping?.name && (
-                        <div className="mt-2 text-sm">
-                            <p><strong>Shipped To:</strong> {shipping.name.first} {shipping.name.last}</p>
-                            <p>{shipping.address.line1}{shipping.address.line2 && `, ${shipping.address.line2}`}</p>
-                            <p>{shipping.city}, {shipping.state} {shipping.zipCode}</p>
-                        </div>
-                        )}
-                    </div>
+                            <div className="text-sm text-gray-700 px-4 py-2">
+                              <h3 className="font-semibold text-lg">Shipping Details</h3>
+                              {shippingLines ? (
+                                <div className="whitespace-pre-line">
+                                  {shippingLines.map((line, index) => (
+                                    <p key={index}>{line}</p>
+                                  ))}
+                              </div>
+                              ) : (
+                                <p>No shipping information available.</p>
+                              )}
+                            </div>
                             <OrderSummary
                                 cartItems={items}
                                 products={products}
