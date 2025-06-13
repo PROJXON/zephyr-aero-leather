@@ -1,20 +1,20 @@
 import fetchWooCommerce from "./fetchWooCommerce";
 import stripeObj from "./stripeObj";
-import { CartItem, StripePaymentRequestBody, ShippingDetails } from "../types/types";
+import { CartItem, StripePaymentRequestBody, ShippingDetails, StripePaymentIntent } from "../types/types";
 
 export default async function cartStripePayment(req: Request): Promise<Response> {
   try {
     const data: StripePaymentRequestBody = await req.json();
     const { amount, items, woo_order_id, payment_intent_id, user_local_time, shipping } = data;
 
-    let paymentIntent;
+    let paymentIntent: StripePaymentIntent | null = null;
     const metadata: Record<string, string> = {};
 
     if (items) metadata.items = JSON.stringify(items);
     if (woo_order_id) metadata.woo_order_id = String(woo_order_id);
     if (user_local_time) metadata.user_local_time = user_local_time;
 
-    const paymentIntentObj: any = { metadata }; // Stripe accepts flexible objects
+    const paymentIntentObj: Partial<StripePaymentIntent> & { metadata: Record<string, string> } = { metadata }; // Stripe accepts flexible objects
 
     if (amount) paymentIntentObj.amount = amount;
 
@@ -54,22 +54,23 @@ export default async function cartStripePayment(req: Request): Promise<Response>
       }
     }
 
+    // Stripe expects PaymentIntentCreateParams, not our custom type
+    const paymentIntentParams: any = { ...paymentIntentObj };
+
     if (payment_intent_id) {
-      paymentIntent = await stripeObj.paymentIntents.update(payment_intent_id, paymentIntentObj);
+      paymentIntent = (await stripeObj.paymentIntents.update(payment_intent_id, paymentIntentParams)) as any;
     } else {
-      paymentIntentObj.currency = "usd";
-      paymentIntentObj.automatic_payment_methods = { enabled: true };
-      paymentIntent = await stripeObj.paymentIntents.create(paymentIntentObj);
+      paymentIntent = (await stripeObj.paymentIntents.create(paymentIntentParams)) as any;
     }
 
     return new Response(
       JSON.stringify({
-        clientSecret: paymentIntent.client_secret,
-        payment_intent_id: paymentIntent.id
+        clientSecret: paymentIntent?.client_secret ?? undefined,
+        payment_intent_id: paymentIntent?.id ?? undefined,
       }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       }
     );
   } catch (err: any) {

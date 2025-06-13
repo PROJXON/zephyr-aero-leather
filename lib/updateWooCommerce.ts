@@ -1,5 +1,6 @@
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import type { WooRestApiOptions } from "@woocommerce/woocommerce-rest-api";
+import type { WooOrder, WooOrderUpdate } from "../types/types";
 
 // Runtime env check
 const { WOOCOMMERCE_API_URL, WOOCOMMERCE_API_KEY, WOOCOMMERCE_API_SECRET } = process.env;
@@ -17,16 +18,16 @@ const api = new WooCommerceRestApi({
 } as WooRestApiOptions);
 
 // You can refine this return type later with a WooOrder interface
-export async function getWooOrder(id: number): Promise<any> {
+export async function getWooOrder(id: number): Promise<WooOrder> {
   const res = await api.get(`orders/${id}`);
-  return res.data;
+  return res.data as WooOrder;
 }
 
 // Accepts any shape — consider improving later with a proper WooOrderUpdate type
-export async function updateWooOrder(id: number, data: Record<string, any>): Promise<any> {
+export async function updateWooOrder(id: number, data: WooOrderUpdate): Promise<WooOrder> {
   try {
     const res = await api.put(`orders/${id}`, data);
-    return res.data;
+    return res.data as WooOrder;
   } catch (error: any) {
     console.error("Failed to update WooCommerce order:", error.response?.data || error.message);
     throw error;
