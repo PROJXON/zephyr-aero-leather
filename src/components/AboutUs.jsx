@@ -55,7 +55,7 @@ export default function AboutUs() {
               {
                 title: "Online Shopping",
                 text: "Enjoy a seamless shopping experience with our user-friendly store. Browse collections, customize orders, and track purchases easily.",
-                image: `/about-us/online-shopping.png`,
+                image: `/about-us/online-shipping.png`,
               },
               {
                 title: "Fast Shipping",
