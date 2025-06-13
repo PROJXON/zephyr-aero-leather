@@ -1,25 +1,24 @@
 "use client";
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { useAuth } from "@/app/context/AuthContext";
+import type { CartItem, CartContextType } from "../../../types/types";
 
-export const CartContext = createContext({
-  cartItems: [],
-  cartOpen: false,
-  setCartOpen: () => { },
-  addToCart: () => { },
-  removeFromCart: () => { },
-  updateQuantity: () => { },
-  orderId: null
-});
+export const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider = ({ children }) => {
+interface CartProviderProps {
+  children: ReactNode;
+}
+
+export const CartProvider = ({ children }: CartProviderProps) => {
   const { isAuthenticated, user } = useAuth();
-  const [cartItems, setCartItems] = useState([]);
-  const [orderId, setOrderId] = useState(null);
-  const [cartOpen, setCartOpen] = useState(false)
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [orderId, setOrderId] = useState<number | null>(null);
+  const [cartOpen, setCartOpen] = useState(false);
 
-  const pendingUpdates = useRef({});
-  const updateTimers = useRef({});
+  const pendingUpdates = useRef<Record<number, number>>({});
+  const updateTimers = useRef<Record<number, NodeJS.Timeout>>({});
+  const pendingRemovals = useRef<Record<number, boolean>>({});
+  const removeTimers = useRef<Record<number, NodeJS.Timeout>>({});
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -27,14 +26,15 @@ export const CartProvider = ({ children }) => {
     } else {
       loadGuestCart();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   const loadGuestCart = () => {
-    const savedCart = JSON.parse(localStorage.getItem("guestCart")) || [];
+    const savedCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
     setCartItems(savedCart);
   };
 
-  const saveGuestCart = (updatedCart) => {
+  const saveGuestCart = (updatedCart: CartItem[]) => {
     setCartItems(updatedCart);
     localStorage.setItem("guestCart", JSON.stringify(updatedCart));
   };
@@ -46,21 +46,21 @@ export const CartProvider = ({ children }) => {
 
       const data = await response.json();
       setCartItems(
-        (data.items || []).map(item => ({
+        (data.items || []).map((item: any) => ({
           lineItemId: item.id,
           id: item.product_id,
           quantity: item.quantity,
         }))
-      )
-      setOrderId(data.orderId || null)
-    } catch (error) {
+      );
+      setOrderId(data.orderId || null);
+    } catch (error: any) {
       console.error("Error fetching cart:", error.message);
       setCartItems([]);
       setOrderId(null);
     }
-  }
+  };
 
-  const addToCart = async (productId, quantity = 1) => {
+  const addToCart = async (productId: number, quantity: number = 1) => {
     if (isAuthenticated) {
       setCartItems((prevItems) => {
         const updated = [...prevItems];
@@ -78,15 +78,11 @@ export const CartProvider = ({ children }) => {
         return updated;
       });
 
-      // Accumulate quantity in memory
       if (!pendingUpdates.current[productId]) pendingUpdates.current[productId] = 0;
       pendingUpdates.current[productId] += quantity;
 
-
-      // Reset timer if one is already running
       clearTimeout(updateTimers.current[productId]);
 
-      // Set new timer
       updateTimers.current[productId] = setTimeout(() => {
         const batchedQuantity = pendingUpdates.current[productId];
         delete pendingUpdates.current[productId];
@@ -116,7 +112,7 @@ export const CartProvider = ({ children }) => {
       } else {
         updatedCart.push({
           id: productId,
-          quantity
+          quantity,
         });
       }
 
@@ -124,20 +120,14 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const removeFromCart = async (productId) => {
+  const removeFromCart = async (productId: number) => {
     if (isAuthenticated) {
-      // 1. Optimistically update UI
       setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+      pendingRemovals.current[productId] = true;
+      clearTimeout(removeTimers.current[productId]);
 
-      // 2. Mark this product for removal
-      pendingRemovals[productId] = true;
-
-      // 3. Clear any existing timer
-      clearTimeout(removeTimers[productId]);
-
-      // 4. Set new timer to debounce removal
-      removeTimers[productId] = setTimeout(() => {
-        delete pendingRemovals[productId];
+      removeTimers.current[productId] = setTimeout(() => {
+        delete pendingRemovals.current[productId];
 
         fetch("/api/cart/item", {
           method: "DELETE",
@@ -149,19 +139,19 @@ export const CartProvider = ({ children }) => {
             return res.json();
           })
           .then(() => {
-            fetchUserCart(); // Sync final cart state
+            fetchUserCart();
           })
           .catch((err) => {
             console.error("Error syncing cart removal with Woo:", err.message);
           });
-      }, 300); // Same delay as addToCart
+      }, 300);
     } else {
       const updatedCart = cartItems.filter((item) => item.id !== productId);
       saveGuestCart(updatedCart);
     }
   };
 
-  const updateQuantity = (productId, newQuantity) => {
+  const updateQuantity = (productId: number, newQuantity: number) => {
     if (isAuthenticated) {
       setCartItems((prevItems) => {
         const updated = [...prevItems];
@@ -188,12 +178,11 @@ export const CartProvider = ({ children }) => {
         delete pendingUpdates.current[productId];
 
         fetch("/api/cart")
-          .then(res => res.json())
+          .then((res) => res.json())
           .then(({ orderId: freshOrderId, items }) => {
-            const existingItem = items.find(item => item.product_id === productId);
+            const existingItem = items.find((item: any) => item.product_id === productId);
 
             if (!existingItem && finalQuantity > 0) {
-              // 🆕 It's a new item — use POST
               return fetch("/api/cart/item", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -201,16 +190,12 @@ export const CartProvider = ({ children }) => {
               });
             }
 
-            // 🧼 Otherwise build full sanitized line_items
-            const line_items = items.map((item) => {
-              return {
-                id: item.id,
-                quantity: item.product_id === productId ? finalQuantity : item.quantity,
-              };
-            });
+            const line_items = items.map((item: any) => ({
+              id: item.id,
+              quantity: item.product_id === productId ? finalQuantity : item.quantity,
+            }));
 
-            // If removing, and it’s not in Woo yet, nothing to do
-            if (!existingItem && finalQuantity === 0) return
+            if (!existingItem && finalQuantity === 0) return;
 
             return fetch("/api/cart/item", {
               method: "PUT",
@@ -228,7 +213,6 @@ export const CartProvider = ({ children }) => {
           });
       }, 300);
     } else {
-      // guest logic unchanged
       const updatedCart = [...cartItems];
       const index = updatedCart.findIndex((item) => item.id === productId);
 
@@ -252,7 +236,7 @@ export const CartProvider = ({ children }) => {
     const data = await res.json();
 
     setCartItems(
-      (data.items || []).map(item => ({
+      (data.items || []).map((item: any) => ({
         lineItemId: item.id,
         id: item.product_id,
         quantity: item.quantity,
@@ -261,7 +245,6 @@ export const CartProvider = ({ children }) => {
     setOrderId(data.orderId || null);
   };
 
-
   const clearCart = async () => {
     if (isAuthenticated) {
       try {
@@ -269,8 +252,8 @@ export const CartProvider = ({ children }) => {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-          orderId,
-          line_items: [], // ← force clear Woo cart
+            orderId,
+            line_items: [],
           }),
         });
 
@@ -278,8 +261,7 @@ export const CartProvider = ({ children }) => {
 
         setCartItems([]);
         setOrderId(null);
-
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error clearing cart:", error.message);
       }
     } else {
@@ -287,23 +269,32 @@ export const CartProvider = ({ children }) => {
       setCartItems([]);
     }
   };
-  
+
   return (
-    <CartContext.Provider value={{
-      cartItems,
-      addToCart,
-      updateQuantity,
-      setCartOpen,
-      cartOpen,
-      clearCart,
-      orderId,
-      fetchUserCart,
-      setCartItems,
-      refreshCart
-    }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addToCart,
+        updateQuantity,
+        setCartOpen,
+        cartOpen,
+        clearCart,
+        orderId,
+        fetchUserCart,
+        setCartItems,
+        refreshCart,
+        removeFromCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
 
-export const useCart = () => useContext(CartContext);
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
+};

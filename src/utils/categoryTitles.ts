@@ -1,4 +1,6 @@
-const categoryTitles = {
+import type { CategoryTitlesMap } from "../../types/types";
+
+const categoryTitles: CategoryTitlesMap = {
   wallets: {
     title: "Wallets",
     subtitle: "Crafted with precision for everyday carry",

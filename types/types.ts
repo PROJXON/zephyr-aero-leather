@@ -84,3 +84,62 @@ export interface StripePaymentIntent {
   metadata?: Record<string, string>;
   [key: string]: any;
 };
+
+export interface Category {
+  name: string;
+  description: string;
+  image: string;
+  slugs: string[];
+}
+
+export type CategoryMap = Record<string, readonly string[]>;
+
+export interface CategoryTitle {
+  title: string;
+  subtitle: string;
+  images: string[];
+}
+export type CategoryTitlesMap = Record<string, CategoryTitle>;
+
+export interface Collection {
+  name: string;
+  description: string;
+  image: string;
+  productIds: number[];
+  carouselImages: string[];
+}
+
+export type CollectionMap = Record<string, Collection>;
+
+export interface User {
+  id: number | string;
+  name: string;
+  email: string;
+  // Add any other fields your user object has
+  [key: string]: any;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  fetchUserFromServer: () => Promise<void>;
+  login: (userData: User) => void;
+  logout: () => Promise<void>;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}
+
+export interface CartContextType {
+  cartItems: CartItem[];
+  cartOpen: boolean;
+  setCartOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  addToCart: (productId: number, quantity?: number) => Promise<void> | void;
+  removeFromCart: (productId: number) => Promise<void> | void;
+  updateQuantity: (productId: number, newQuantity: number) => void;
+  orderId: number | null;
+  clearCart: () => Promise<void> | void;
+  fetchUserCart: () => Promise<void> | void;
+  setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
+  refreshCart: () => Promise<void> | void;
+}

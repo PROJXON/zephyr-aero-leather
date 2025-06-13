@@ -1,11 +1,16 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import type { User, AuthContextType } from "../../../types/types";
 
-export const AuthContext = createContext(null);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -36,9 +41,10 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     fetchUserFromServer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const login = (userData) => {
+  const login = (userData: User) => {
     setUser(userData);
     setIsAuthenticated(true);
   };
@@ -49,16 +55,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isAuthenticated, 
-        loading, 
-        fetchUserFromServer, 
-        login, 
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        loading,
+        fetchUserFromServer,
+        login,
         logout,
         setIsAuthenticated,
-        setUser }}>
+        setUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

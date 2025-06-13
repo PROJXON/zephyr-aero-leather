@@ -1,4 +1,6 @@
-const categoryMap = {
+import type { CategoryMap } from "../../types/types";
+
+const categoryMap: CategoryMap = {
   wallets: ["wallets"],
   iphoneCases: ["iphone-cases"],
   sunglasses: [
