@@ -291,7 +291,6 @@ const Navbar = ({ allProducts }) => {
             </Fragment>))}
           </div>
         )}
-
       </div>
     </nav>
   );
