@@ -6,12 +6,13 @@ import Link from "next/link";
 import Hero from "../components/Hero";
 import { GiDiamondHard, GiHandSaw } from "react-icons/gi";
 import { FaLeaf } from "react-icons/fa";
+import type { JSX } from "react";
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
 export const revalidate = 60;
 
-const FeatureIcon = ({ icon: Icon, title, description }) => (
+const FeatureIcon = ({ icon: Icon, title, description }: { icon: React.ElementType, title: string, description: string }): JSX.Element => (
   <div className="text-center">
     <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-secondary rounded-full transition duration-300 transform hover:-translate-y-1 hover:shadow-lg">
       <Icon className="text-5xl text-neutral-dark" />
@@ -21,7 +22,7 @@ const FeatureIcon = ({ icon: Icon, title, description }) => (
   </div>
 );
 
-export default async function Home() {
+export default async function Home(): Promise<JSX.Element> {
   const [
     wallets,
     iphoneCases,
@@ -31,7 +32,7 @@ export default async function Home() {
     moto,
     holsters,
   ] = await Promise.all([
-     fetchProducts({ category: "wallets", per_page: 8 }),
+    fetchProducts({ category: "wallets", per_page: 8 }),
     fetchProducts({ category: "iphoneCases", per_page: 8 }),
     fetchProducts({ category: "sunglasses", per_page: 8 }),
     fetchProducts({ category: "belts", per_page: 8 }),
@@ -98,8 +99,13 @@ export default async function Home() {
   );
 }
 
-// Reusable Section component
-const Section = ({ title, products, link }) => {
+interface SectionProps {
+  title: string;
+  products: any[];
+  link: string;
+}
+
+const Section = ({ title, products, link }: SectionProps): JSX.Element | null => {
   if (!products || products.length === 0) return null;
 
   return (
@@ -107,14 +113,14 @@ const Section = ({ title, products, link }) => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl text-neutral-dark font-normal">{title}</h2>
-            <Link
-              href={link}
-              className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
-            >
-              View All
-            </Link>        
+          <Link
+            href={link}
+            className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+          >
+            View All
+          </Link>
         </div>
-        <ProductCarousel products={products} viewAllLink={link}/>
+        <ProductCarousel products={products} viewAllLink={link} />
       </div>
     </section>
   );

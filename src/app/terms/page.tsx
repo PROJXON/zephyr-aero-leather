@@ -1,11 +1,12 @@
-// app/terms/page.js
+// app/terms/page.tsx
+import type { JSX } from "react";
 
 export const metadata = {
   title: "Terms and Conditions | Zephyr Aero Leather",
   description: "Read the terms and conditions for using Zephyr Aero Leather's website and services.",
 };
 
-export default function TermsPage() {
+export default function TermsPage(): JSX.Element {
   return (
     <div className="bg-white text-gray-800 px-4 py-12">
       <div className="max-w-4xl mx-auto">

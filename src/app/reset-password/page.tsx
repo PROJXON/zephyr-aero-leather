@@ -1,7 +1,8 @@
 import { Suspense } from "react";
-import ResetPasswordForm from "../../components/ResetPasswordForm"; // adjust path as needed
+import ResetPasswordForm from "../../components/ResetPasswordForm";
+import type { JSX } from "react";
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordPage(): JSX.Element {
   return (
     <section className="flex items-center justify-center min-h-screen bg-cover bg-center px-4">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-lg">

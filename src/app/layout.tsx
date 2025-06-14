@@ -1,12 +1,12 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
-import fetchProducts from "../../lib/woocommerce"
-import getCookieInfo from "../../lib/getCookieInfo";
+import fetchProducts from "../../lib/woocommerce";
 import AOSWrapper from "@/components/AOSWrapper";
+import type { JSX } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,21 +48,8 @@ export const metadata = {
   },
 };
 
-
-
-export default async function RootLayout({ children }) {
-  // let user = null;
-
+export default async function RootLayout({ children }: { children: React.ReactNode }): Promise<JSX.Element> {
   const products = await fetchProducts();
-
-  // try {
-  //   const [, userCookie] = await getCookieInfo()
-  //   if (userCookie) {
-  //     user = JSON.parse(atob(userCookie));
-  //   }
-  // } catch (error) {
-  //   console.error("Error reading cookies on server:", error);
-  // }
 
   return (
     <html lang="en">

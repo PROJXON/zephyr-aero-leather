@@ -3,10 +3,12 @@ import Image from "next/image";
 import ProductReviews from "@/components/ProductReviews";
 import AddToCartButton from "@/components/AddToCartButton";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
+import type { JSX } from "react";
+import type { Product } from "../../../../types/types";
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 
-async function getProduct(id) {
+async function getProduct(id: string): Promise<Product | null> {
   try {
     return await fetchWooCommerce(`wc/v3/products/${id}`, "Product not found");
   } catch (error) {
@@ -17,7 +19,7 @@ async function getProduct(id) {
 
 export async function generateStaticParams() {
   try {
-    const products = await fetchWooCommerce(`wc/v3/products?per_page=100`);
+    const products: Product[] = await fetchWooCommerce(`wc/v3/products?per_page=100`);
     return products.map((product) => ({ id: product.id.toString() }));
   } catch (error) {
     console.error("Error generating static params:", error);
@@ -25,8 +27,12 @@ export async function generateStaticParams() {
   }
 }
 
-export default async function ProductPage({ params }) {
-  const { id } = await params;
+interface ProductPageProps {
+  params: { id: string };
+}
+
+export default async function ProductPage({ params }: ProductPageProps): Promise<JSX.Element> {
+  const { id } = params;
   const product = await getProduct(id);
 
   if (!product) notFound();
@@ -36,10 +42,11 @@ export default async function ProductPage({ params }) {
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-8">
         <div className="relative aspect-square">
           <Image
-            src={product.images[0]?.src || "/placeholder.jpg"}
+            src={product.images?.[0]?.src || "/placeholder.jpg"}
             alt={product.name}
             fill
             className="object-cover rounded-xl"
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         </div>
 
