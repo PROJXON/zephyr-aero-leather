@@ -1,6 +1,6 @@
 "use client"
 import { useContext } from "react"
-import { ChangeContext } from "./Checkout"
+import { ChangeContext, StatesContext } from "./Checkout"
 
 export default function AddressFormInput({
     name,
@@ -8,10 +8,10 @@ export default function AddressFormInput({
     value,
     span,
     error,
-    type = "text",
-    options = []
+    type = "text"
 }) {
     const onChange = useContext(ChangeContext)
+    const states = useContext(StatesContext)
     const classes = `w-full p-2 border rounded col-span-${span}${error ? " border-red-400 placeholder-red-300" : ""}`
     const displayPlaceholder = error || placeholder
 
@@ -23,7 +23,7 @@ export default function AddressFormInput({
             onChange={onChange}
         >
             <option value="">{displayPlaceholder}</option>
-            {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            {states.map(state => <option key={state} value={state}>{state}</option>)}
         </select> : <input
             className={classes}
             type={type}

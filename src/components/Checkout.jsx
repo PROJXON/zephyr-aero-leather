@@ -44,6 +44,7 @@ const reducer = (details, action) => {
 }
 
 export const ChangeContext = createContext()
+export const StatesContext = createContext()
 
 export default function Checkout({ products }) {
   const { cartItems, updateQuantity, orderId } = useCart();
@@ -157,7 +158,9 @@ export default function Checkout({ products }) {
         className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between max-w-7xl w-full mx-auto"
       >
         <ChangeContext.Provider value={handleChange}>
-          <AddressDetails details={shippingDetails} errors={shippingErrors} states={states} />
+          <StatesContext.Provider value={states}>
+            <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
+          </StatesContext.Provider>
         </ChangeContext.Provider>
         <div className="w-full lg:max-w-md">
           <Elements stripe={stripePromise} options={options}>
