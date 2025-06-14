@@ -280,15 +280,40 @@ const Navbar = ({ allProducts }) => {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 space-y-1 shadow-xl z-[9999]">
-            {mobileMenuLinks.map(link => (<Fragment key={link.label}>
-              {link.show && <>
-                {typeof link.unique === "string" ?
-                  <NavLink href={link.unique} onClick={() => setMenuOpen(false)} classes="block text-lg" label={link.label} /> :
-                  <button onClick={link.unique.function} className={link.unique.classes}>{link.label}</button>
-                }
-              </>}
-            </Fragment>))}
+          <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 shadow-xl z-[9999]">
+            <div>
+              {isAuthenticated && (
+                <div className="px-3 py-2 mb-2 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-sm text-gray-500">Signed in as</p>
+                  <p className="font-medium text-gray-900">{user?.first_name} {user?.last_name}</p>
+                </div>
+              )}
+              {mobileMenuLinks.map((item, index) => (
+                item.show && (
+                  <Fragment key={index}>
+                    {typeof item.unique === 'string' ? (
+                      <Link
+                        href={item.unique}
+                        onClick={() => setMenuOpen(false)}
+                        className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          item.unique.function();
+                          setMenuOpen(false);
+                        }}
+                        className={`text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 transition duration-300 ${item.unique.classes}`}
+                      >
+                        {item.label}
+                      </button>
+                    )}
+                  </Fragment>
+                )
+              ))}
+            </div>
           </div>
         )}
       </div>
