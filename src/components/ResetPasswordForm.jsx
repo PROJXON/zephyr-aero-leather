@@ -58,13 +58,13 @@ export default function ResetPasswordForm() {
   };
 
   return (
-    <>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      {message && <p className="text-green-500 text-sm">{message}</p>}
+    <div className="w-full max-w-md mx-auto p-4 md:p-6">
+      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+      {message && <p className="text-green-500 text-sm mb-4">{message}</p>}
 
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+      <form className="space-y-6" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-900 mb-2">
             New Password
           </label>
           <input
@@ -73,13 +73,13 @@ export default function ResetPasswordForm() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#605137] focus:border-[#605137]"
+            className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all"
             disabled={loading}
           />
         </div>
 
         <div>
-          <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-900 mb-2">
             Confirm New Password
           </label>
           <input
@@ -88,7 +88,7 @@ export default function ResetPasswordForm() {
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#605137] focus:border-[#605137]"
+            className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all"
             disabled={loading}
           />
         </div>
@@ -96,13 +96,13 @@ export default function ResetPasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#605137] hover:bg-[#30291C] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#605137] ${
+          className={`w-full py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
           {loading ? "Resetting..." : "Reset Password"}
         </button>
       </form>
-    </>
+    </div>
   );
 }
