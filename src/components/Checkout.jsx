@@ -98,7 +98,8 @@ export default function Checkout({ products }) {
             items: cartItems,
             woo_order_id: orderId,
             payment_intent_id: paymentIntentId,
-            shipping: shippingDetails
+            shipping: shippingDetails,
+            billing: billingDetails
           }),
         })
           .then((res) => res.json())
@@ -112,7 +113,7 @@ export default function Checkout({ products }) {
 
       return () => clearTimeout(timeout);
     }
-  }, [cartItems, shippingDetails])
+  }, [cartItems, shippingDetails, billingDetails])
 
   const appearance = { theme: "stripe" };
   const options = { clientSecret, appearance };
