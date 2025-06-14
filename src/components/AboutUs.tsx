@@ -1,8 +1,48 @@
 import Image from "next/image";
+import Link from "next/link";
+import type { ReactElement } from "react";
+import type { CommitmentItem, WhyShopItem } from "../../types/types";
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
-export default function AboutUs() {
+export default function AboutUs(): ReactElement {
+  const commitmentItems: CommitmentItem[] = [
+    {
+      title: "Quality Materials",
+      text: "We source only the finest leather from reputable suppliers who share our commitment to excellence.",
+    },
+    {
+      title: "Skilled Artisans",
+      text: "Every piece is crafted by experienced artisans who bring decades of expertise to their work.",
+    },
+    {
+      title: "Timeless Design",
+      text: "Our designs transcend trends, focusing on classic aesthetics that never go out of style.",
+    },
+    {
+      title: "Functional Beauty",
+      text: "We believe that beautiful products should also be highly functional for everyday life.",
+    },
+  ];
+
+  const whyShopItems: WhyShopItem[] = [
+    {
+      title: "Online Shopping",
+      text: "Enjoy a seamless shopping experience with our user-friendly store. Browse collections, customize orders, and track purchases easily.",
+      image: `/about-us/online-shipping.png`,
+    },
+    {
+      title: "Fast Shipping",
+      text: "We process and ship every order promptly. Receive your handcrafted goods on time, every time.",
+      image: `/about-us/fast-shipping.png`,
+    },
+    {
+      title: "Easy Returns",
+      text: "Not satisfied? Our hassle-free return policy ensures a confident shopping experience.",
+      image: `/about-us/easy-returns.png`,
+    },
+  ];
+
   return (
     <div>
       {/* Our Commitment */}
@@ -12,24 +52,7 @@ export default function AboutUs() {
             Our Commitment
           </h2>
           <div className="grid md:grid-cols-2 gap-10 text-left">
-            {[
-              {
-                title: "Quality Materials",
-                text: "We source only the finest leather from reputable suppliers who share our commitment to excellence.",
-              },
-              {
-                title: "Skilled Artisans",
-                text: "Every piece is crafted by experienced artisans who bring decades of expertise to their work.",
-              },
-              {
-                title: "Timeless Design",
-                text: "Our designs transcend trends, focusing on classic aesthetics that never go out of style.",
-              },
-              {
-                title: "Functional Beauty",
-                text: "We believe that beautiful products should also be highly functional for everyday life.",
-              },
-            ].map((item, i) => (
+            {commitmentItems.map((item, i) => (
               <div
                 key={i}
                 className="p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 hover:-translate-y-1"
@@ -51,23 +74,7 @@ export default function AboutUs() {
             Why Shop With Us
           </h2>
           <div className="grid md:grid-cols-3 gap-10 text-left">
-            {[
-              {
-                title: "Online Shopping",
-                text: "Enjoy a seamless shopping experience with our user-friendly store. Browse collections, customize orders, and track purchases easily.",
-                image: `/about-us/online-shipping.png`,
-              },
-              {
-                title: "Fast Shipping",
-                text: "We process and ship every order promptly. Receive your handcrafted goods on time, every time.",
-                image: `/about-us/fast-shipping.png`,
-              },
-              {
-                title: "Easy Returns",
-                text: "Not satisfied? Our hassle-free return policy ensures a confident shopping experience.",
-                image: `/about-us/easy-returns.png`,
-              },
-            ].map((item, i) => (
+            {whyShopItems.map((item, i) => (
               <div
                 key={i}
                 className="group p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 hover:-translate-y-1"
@@ -98,9 +105,12 @@ export default function AboutUs() {
               Why Zephyr Stands Out
             </h2>
             <p className="text-lg leading-relaxed text-neutral-medium mt-4">
-              Zephyr Aero Leather is committed to exceptional quality, using only full-grain leather—the highest grade available—for every product we create.
-              Each piece is meticulously handcrafted by skilled artisans, ensuring durability, elegance, and a personal touch in every stitch.
-              Proudly made in the USA, our products reflect a legacy of craftsmanship and a passion for timeless design.
+              Zephyr Aero Leather is committed to exceptional quality, using only
+              full-grain leather—the highest grade available—for every product we
+              create. Each piece is meticulously handcrafted by skilled artisans,
+              ensuring durability, elegance, and a personal touch in every stitch.
+              Proudly made in the USA, our products reflect a legacy of
+              craftsmanship and a passion for timeless design.
             </p>
           </div>
           <div>
@@ -121,14 +131,16 @@ export default function AboutUs() {
           Ready to Soar?
         </h2>
         <p className="text-lg max-w-2xl mx-auto mb-6 text-neutral-medium">
-          Join the community of adventurers who appreciate the perfect blend of heritage, quality, and style. Discover the Zephyr Aero Leather difference.
+          Join the community of adventurers who appreciate the perfect blend of
+          heritage, quality, and style. Discover the Zephyr Aero Leather
+          difference.
         </p>
-        <a
+        <Link
           href="/collections"
           className="inline-block bg-neutral-light text-neutral-dark px-6 py-3 rounded-full font-medium hover:bg-neutral-medium transition-colors"
         >
           Visit Our Collection
-        </a>
+        </Link>
       </section>
     </div>
   );

@@ -158,6 +158,11 @@ export interface HeroProps {
   images: string[];
 }
 
+export interface HeroCarouselProps {
+  images: string[];
+  altBase?: string;
+}
+
 export interface CartProviderProps {
   children: React.ReactNode;
 }
@@ -180,4 +185,81 @@ export interface ProductPageProps {
 
 export interface CategoryPageProps {
   params: { slug: string };
+}
+
+export interface CommitmentItem {
+  title: string;
+  text: string;
+}
+
+export interface WhyShopItem {
+  title: string;
+  text: string;
+  image: string;
+}
+
+export interface AddToCartButtonProps {
+  productId: number;
+  className?: string;
+}
+
+export interface DebugInfo {
+  localStorage: unknown;
+  cookies: string | null;
+  apiResponse: unknown;
+  timestamp: string | null;
+}
+
+export interface ChangeQuantitySpan {
+  onClick: (item: any) => void;
+  icon: React.ElementType;
+}
+
+export interface ChangeQuantitySpansProps {
+  cqs: ChangeQuantitySpan[];
+  item: any;
+}
+
+export interface CheckoutProps {
+  products: Product[];
+}
+
+export interface ShippingDetailsState {
+  name: {
+    first: string;
+    last: string;
+  };
+  address: {
+    line1: string;
+    line2?: string;
+  };
+  city: string;
+  zipCode: string;
+  state: string;
+}
+
+export type ShippingDetailsAction =
+  | { type: "FIRSTNAME"; value: string }
+  | { type: "LASTNAME"; value: string }
+  | { type: "ADDRESS1"; value: string }
+  | { type: "ADDRESS2"; value: string }
+  | { type: "CITY"; value: string }
+  | { type: "ZIPCODE"; value: string }
+  | { type: "STATE"; value: string }
+  | { type: string; value: string };
+
+export interface ShippingErrors {
+  [key: string]: string;
+}
+
+export interface ContactFormData {
+  name: string;
+  email: string;
+  message: string;
+}
+
+export interface EmailTemplateProps {
+  name: string;
+  email: string;
+  message: string;
 }

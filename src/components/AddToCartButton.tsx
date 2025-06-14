@@ -1,8 +1,9 @@
 "use client";
 import { useCart } from "@/app/context/CartContext";
+import type { AddToCartButtonProps, CartContextType } from "../../types/types";
 
-export default function AddToCartButton({ productId, className = "" }) {
-  const { updateQuantity, cartItems, cartOpen, setCartOpen } = useCart();
+export default function AddToCartButton({ productId, className = "" }: AddToCartButtonProps) {
+  const { updateQuantity, cartItems, cartOpen, setCartOpen } = useCart() as CartContextType;
 
   const handleAddToCart = () => {
     const currentQty = cartItems.find(item => item.id === productId)?.quantity || 0;

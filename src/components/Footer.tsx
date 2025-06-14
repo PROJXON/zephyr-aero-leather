@@ -3,10 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaFacebook, FaLinkedin, FaInstagram } from "react-icons/fa";
+import type { ReactElement } from "react";
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
 
-const Footer = () => {
+export default function Footer(): ReactElement {
   return (
     <footer className="bg-black text-white py-8 md:py-10">
       <div className="max-w-screen-xl mx-auto px-6">
@@ -32,9 +33,18 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
             <ul className="space-y-3 text-gray-300 text-sm">
               {[
-                { name: "Home", href: "/" },
-                { name: "About Us", href: "/about-us" },
-                { name: "Contact", href: "/contact" },
+                {
+                  name: "Home",
+                  href: "/",
+                },
+                {
+                  name: "About Us",
+                  href: "/about-us",
+                },
+                {
+                  name: "Contact",
+                  href: "/contact",
+                },
               ].map(({ name, href }) => (
                 <li key={name} className="group">
                   <Link
@@ -80,6 +90,4 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

@@ -1,6 +1,7 @@
 import React from 'react';
+import type { EmailTemplateProps } from '../../types/types';
 
-const EmailTemplate = ({ name, email, message }) => {
+export function EmailTemplate({ name, email, message }: EmailTemplateProps) {
   return (
     <div style={{
       fontFamily: 'Arial, sans-serif',
@@ -20,7 +21,6 @@ const EmailTemplate = ({ name, email, message }) => {
           margin: '0',
         }}>New Contact Form Submission</h1>
       </div>
-
       <div style={{
         backgroundColor: '#f9f9f9',
         padding: '20px',
@@ -31,7 +31,6 @@ const EmailTemplate = ({ name, email, message }) => {
           <strong>From:</strong> {name} ({email})
         </p>
       </div>
-
       <div style={{
         backgroundColor: '#ffffff',
         padding: '20px',
@@ -50,7 +49,6 @@ const EmailTemplate = ({ name, email, message }) => {
           whiteSpace: 'pre-wrap',
         }}>{message}</p>
       </div>
-
       <div style={{
         marginTop: '30px',
         paddingTop: '20px',
@@ -64,10 +62,9 @@ const EmailTemplate = ({ name, email, message }) => {
       </div>
     </div>
   );
-};
+}
 
-
-const ConfirmationEmailTemplate = ({ name, email, message }) => {
+export function ConfirmationEmailTemplate({ name, email, message }: EmailTemplateProps) {
   return (
     <div style={{
       fontFamily: 'Arial, sans-serif',
@@ -87,7 +84,6 @@ const ConfirmationEmailTemplate = ({ name, email, message }) => {
           margin: '0',
         }}>Thank You for Contacting Us</h1>
       </div>
-
       <div style={{
         backgroundColor: '#f9f9f9',
         padding: '20px',
@@ -104,7 +100,6 @@ const ConfirmationEmailTemplate = ({ name, email, message }) => {
           For your reference, here&apos;s a copy of your message:
         </p>
       </div>
-
       <div style={{
         backgroundColor: '#ffffff',
         padding: '20px',
@@ -119,7 +114,6 @@ const ConfirmationEmailTemplate = ({ name, email, message }) => {
           whiteSpace: 'pre-wrap',
         }}>{message}</p>
       </div>
-
       <div style={{
         marginTop: '30px',
         paddingTop: '20px',
@@ -133,6 +127,4 @@ const ConfirmationEmailTemplate = ({ name, email, message }) => {
       </div>
     </div>
   );
-};
-
-export { EmailTemplate, ConfirmationEmailTemplate };
+}

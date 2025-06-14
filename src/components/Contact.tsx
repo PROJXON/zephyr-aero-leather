@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import type { ContactFormData } from "../../types/types";
+import type { FormEvent, ChangeEvent } from "react";
 
 export default function Contact() {
   const [sent, setSent] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
     message: "",
@@ -19,7 +21,7 @@ export default function Contact() {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSending(true);
 
@@ -51,7 +53,7 @@ export default function Contact() {
             required
             disabled={sent}
             value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, name: e.target.value })}
             className="w-full px-4 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-medium"
           />
         </div>
@@ -66,7 +68,7 @@ export default function Contact() {
             required
             disabled={sent}
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, email: e.target.value })}
             className="w-full px-4 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-medium"
           />
         </div>
@@ -80,7 +82,7 @@ export default function Contact() {
             required
             disabled={sent}
             value={formData.message}
-            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, message: e.target.value })}
             className="w-full px-4 py-2 border border-neutral-light rounded-md min-h-[150px] resize-none focus:outline-none focus:ring-1 focus:ring-neutral-medium"
           ></textarea>
         </div>

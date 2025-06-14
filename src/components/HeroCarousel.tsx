@@ -1,10 +1,15 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
+import type { HeroCarouselProps } from "../../types/types";
+import type { ReactElement } from "react";
 
-const HeroCarousel = ({ images, altBase = "Hero" }) => {
+export default function HeroCarousel({
+  images,
+  altBase = "Hero",
+}: HeroCarouselProps): ReactElement {
   const [current, setCurrent] = useState(0);
-  const intervalRef = useRef(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const delay = 5000; // 5 seconds
   const isHoveredRef = useRef(false);
 
@@ -19,10 +24,12 @@ const HeroCarousel = ({ images, altBase = "Hero" }) => {
 
   useEffect(() => {
     startInterval();
-    return () => clearInterval(intervalRef.current);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [images.length]);
 
-  const goToSlide = (index) => {
+  const goToSlide = (index: number) => {
     setCurrent(index);
     startInterval(); // reset timer on manual change
   };
@@ -74,6 +81,4 @@ const HeroCarousel = ({ images, altBase = "Hero" }) => {
       </div>
     </div>
   );
-};
-
-export default HeroCarousel;
+}

@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/aos": "^3.0.7",
     "@types/node": "^24.0.1",
     "@types/react": "^19.1.8",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
