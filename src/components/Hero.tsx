@@ -1,14 +1,8 @@
 import HeroCarousel from "./HeroCarousel";
-import type { JSX } from "react";
+import type { HeroProps } from "../../types/types";
+import type { ReactElement } from "react";
 
-interface HeroProps {
-  title: string;
-  subtitle?: string | JSX.Element;
-  description?: string;
-  images: string[];
-}
-
-const Hero = ({ title, subtitle, description, images }: HeroProps): JSX.Element => {
+const Hero = ({ title, subtitle, description, images }: HeroProps): ReactElement => {
   return (
     <section className="relative bg-warm-bg">
       <div className="container mx-auto px-4 py-16 md:py-24">

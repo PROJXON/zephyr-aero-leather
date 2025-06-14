@@ -143,3 +143,41 @@ export interface CartContextType {
   setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
   refreshCart: () => Promise<void> | void;
 }
+
+// --- UI & Page Props ---
+export interface SectionProps {
+  title: string;
+  products: Product[]; // Now strictly typed
+  link: string;
+}
+
+export interface HeroProps {
+  title: string;
+  subtitle?: string | React.ReactNode; // Broader compatibility
+  description?: string;
+  images: string[];
+}
+
+export interface CartProviderProps {
+  children: React.ReactNode;
+}
+
+export interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export interface RegisterFormData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  termsAccepted: boolean;
+}
+
+export interface ProductPageProps {
+  params: { id: string };
+}
+
+export interface CategoryPageProps {
+  params: { slug: string };
+}

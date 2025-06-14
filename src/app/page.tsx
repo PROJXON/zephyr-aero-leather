@@ -7,6 +7,7 @@ import Hero from "../components/Hero";
 import { GiDiamondHard, GiHandSaw } from "react-icons/gi";
 import { FaLeaf } from "react-icons/fa";
 import type { JSX } from "react";
+import type { SectionProps } from "../../types/types";
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 
@@ -97,12 +98,6 @@ export default async function Home(): Promise<JSX.Element> {
       </section>
     </div>
   );
-}
-
-interface SectionProps {
-  title: string;
-  products: any[];
-  link: string;
 }
 
 const Section = ({ title, products, link }: SectionProps): JSX.Element | null => {
