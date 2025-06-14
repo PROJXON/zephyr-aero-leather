@@ -14,7 +14,7 @@ export default function TermsPage(): JSX.Element {
         <p className="mb-4 text-sm text-gray-500">Effective Date: June 6, 2025</p>
 
         <p className="mb-4">
-          Welcome to <strong>Zephyr Aero Leather</strong> ("we", "us", or "our"). By accessing or using our website
+          Welcome to <strong>Zephyr Aero Leather</strong> (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). By accessing or using our website
           (https://zephyraeroleather.com), creating an account, or making a purchase, you agree to the following Terms and
           Conditions. Please read them carefully before using our services.
         </p>
