@@ -127,32 +127,29 @@ const Register = () => {
 
   return(
     // <section className="bg-gray-50 dark:bg-gray-900">
-    <section className="relative flex items-center justify-center min-h-screen px-4">
+    <section className="relative flex items-center justify-center min-h-screen px-4 py-8 md:py-4">
   {/* Background Image with 50% opacity overlay */}
   <div
     className="absolute inset-0 bg-cover bg-center opacity-50"
     style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
   />
 
-        <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
-
-          {/* Left: Already Have an Account? */}
-          <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-[#605137] text-white rounded-r-xl">
-            <h2 className="text-3xl font-bold">Welcome Back!</h2>
-            <p className="text-center mt-2">Already have an account? Sign in now.</p>
+        <div className="relative w-full max-w-4xl h-[650px] md:h-[700px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden mb-8 md:mb-0">
+          {/* Left: Already Have an Account? - Hidden on mobile */}
+          <div className="hidden md:flex w-full md:w-1/2 flex-col justify-center items-center p-8 md:p-16 bg-neutral-dark text-white rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+            <h2 className="text-2xl md:text-3xl font-bold text-center">Welcome Back!</h2>
+            <p className="text-center mt-2 mb-6">Already have an account? Sign in now.</p>
             
             <Link href="/login">
-              <button className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition">
+              <button className="w-full md:w-auto px-6 py-2 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors">
                 Sign In
               </button>
             </Link>
          </div>
 
-
-
             {/* Right: Register Form */}
               <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white bg-opacity-90 rounded-b-xl md:rounded-r-xl md:rounded-bl-none">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-4 mt-2">
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                       Create an account
                   </h1>
                   {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -166,7 +163,7 @@ const Register = () => {
                             autoComplete="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
+                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all" 
                             placeholder="Maverick" 
                             required 
                             disabled={loading} // Disable input when loading
@@ -181,7 +178,7 @@ const Register = () => {
                             autoComplete="email" 
                             value={formData.email}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
+                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all" 
                             placeholder="name@company.com" 
                             required 
                             disabled={loading} // Disable input when loading
@@ -197,14 +194,14 @@ const Register = () => {
                             value={formData.password}
                             onChange={handleChange}
                             placeholder="••••••••" 
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
+                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all" 
                             required 
                             disabled={loading} // Disable input when loading
                           />
                             <button
                               type="button"
                               onClick={() => setShowPassword((prev) => !prev)}
-                              className="absolute inset-y-0 right-4 flex items-center text-sm text-[#605137] font-semibold hover:underline focus:outline-none">
+                              className="absolute inset-y-0 right-4 flex items-center text-sm text-neutral-dark font-semibold hover:underline focus:outline-none">
                               {showPassword ? "Hide" : "Show"}
                             </button>
                       </div>
@@ -218,18 +215,18 @@ const Register = () => {
                             value={formData.confirmPassword}
                             onChange={handleChange}
                             placeholder="••••••••" 
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
+                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all" 
                             required
                             disabled={loading} // Disable input when loading
                           />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword((prev) => !prev)}
-                                className="absolute inset-y-0 right-4 flex items-center text-sm text-[#605137] font-semibold hover:underline focus:outline-none">
+                                className="absolute inset-y-0 right-4 flex items-center text-sm text-neutral-dark font-semibold hover:underline focus:outline-none">
                               {showPassword ? "Hide" : "Show"}
                             </button>
                       </div>
-                      <div className="flex items-start">
+                      <div className="flex items-start mb-6">
                           <div className="flex items-center h-5">
                             <input 
                               id="terms"
@@ -238,7 +235,7 @@ const Register = () => {
                               name="termsAccepted"
                               checked={formData.termsAccepted}
                               onChange={handleChange}
-                              className="w-5 h-5 border border-gray-700 rounded bg-gray-50 focus:ring-2 focus:ring-[#605137] transition checked:bg-[#605137] checked:border-[#30291C] checked:appearance-auto"
+                              className="w-5 h-5 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-neutral-dark transition checked:bg-neutral-dark checked:border-neutral-dark checked:appearance-auto"
                               required
                               disabled={loading} // Disable input when loading
                             />
@@ -250,7 +247,7 @@ const Register = () => {
                       <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${
+                        className={`w-full py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors ${
                           loading ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                       >
