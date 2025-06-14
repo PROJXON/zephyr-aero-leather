@@ -50,13 +50,13 @@ export default function ForgotPassword() {
 
       <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Panel */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-[#605137] text-white rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-neutral-dark text-white rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
           <h2 className="text-2xl font-bold mb-4 mt-2">Remember Password?</h2>
           <p className="text-center mt-2">Go back and sign in to your account.</p>
 
           <button
             onClick={() => router.push("/login")}
-            className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition"
+            className="mt-4 px-6 py-2 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors"
           >
             Sign In
           </button>
@@ -83,7 +83,7 @@ export default function ForgotPassword() {
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all"
+                  className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all"
                   placeholder="name@company.com"
                   required
                 />
@@ -91,8 +91,9 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${loading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                className={`w-full py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 {loading ? "Resetting..." : "Reset Password"}
               </button>
