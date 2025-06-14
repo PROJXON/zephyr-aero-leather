@@ -137,12 +137,12 @@ const Register = () => {
         <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
 
           {/* Left: Already Have an Account? */}
-          <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-[#605137] text-white rounded-r-xl">
+          <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-neutral-dark text-white rounded-r-xl">
             <h2 className="text-3xl font-bold">Welcome Back!</h2>
             <p className="text-center mt-2">Already have an account? Sign in now.</p>
             
             <Link href="/login">
-              <button className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition">
+              <button className="mt-4 px-6 py-2 border border-white rounded-lg hover:bg-white hover:text-neutral-dark transition">
                 Sign In
               </button>
             </Link>
@@ -166,7 +166,7 @@ const Register = () => {
                             autoComplete="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
+                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all" 
                             placeholder="Maverick" 
                             required 
                             disabled={loading} // Disable input when loading
@@ -181,7 +181,7 @@ const Register = () => {
                             autoComplete="email" 
                             value={formData.email}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
+                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all" 
                             placeholder="name@company.com" 
                             required 
                             disabled={loading} // Disable input when loading
@@ -197,14 +197,14 @@ const Register = () => {
                             value={formData.password}
                             onChange={handleChange}
                             placeholder="••••••••" 
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
+                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all" 
                             required 
                             disabled={loading} // Disable input when loading
                           />
                             <button
                               type="button"
                               onClick={() => setShowPassword((prev) => !prev)}
-                              className="absolute inset-y-0 right-4 flex items-center text-sm text-[#605137] font-semibold hover:underline focus:outline-none">
+                              className="absolute inset-y-0 right-4 flex items-center text-sm text-neutral-dark font-semibold hover:underline focus:outline-none">
                               {showPassword ? "Hide" : "Show"}
                             </button>
                       </div>
@@ -218,18 +218,18 @@ const Register = () => {
                             value={formData.confirmPassword}
                             onChange={handleChange}
                             placeholder="••••••••" 
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
+                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-neutral-dark placeholder-gray-400 transition-all" 
                             required
                             disabled={loading} // Disable input when loading
                           />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword((prev) => !prev)}
-                                className="absolute inset-y-0 right-4 flex items-center text-sm text-[#605137] font-semibold hover:underline focus:outline-none">
+                                className="absolute inset-y-0 right-4 flex items-center text-sm text-neutral-dark font-semibold hover:underline focus:outline-none">
                               {showPassword ? "Hide" : "Show"}
                             </button>
                       </div>
-                      <div className="flex items-start">
+                      <div className="flex items-start mb-6">
                           <div className="flex items-center h-5">
                             <input 
                               id="terms"
@@ -238,7 +238,7 @@ const Register = () => {
                               name="termsAccepted"
                               checked={formData.termsAccepted}
                               onChange={handleChange}
-                              className="w-5 h-5 border border-gray-700 rounded bg-gray-50 focus:ring-2 focus:ring-[#605137] transition checked:bg-[#605137] checked:border-[#30291C] checked:appearance-auto"
+                              className="w-5 h-5 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-neutral-dark transition checked:bg-neutral-dark checked:border-neutral-dark checked:appearance-auto"
                               required
                               disabled={loading} // Disable input when loading
                             />
@@ -250,7 +250,7 @@ const Register = () => {
                       <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${
+                        className={`w-full py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors ${
                           loading ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                       >
