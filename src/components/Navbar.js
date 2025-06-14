@@ -229,44 +229,36 @@ const Navbar = ({ allProducts }) => {
                     right: "max(calc((65vw - 1280px) / 2), 12px)",
                   }}
                 >
-                  {cartItems?.length > 0 ? (
-                    <>
-                      <ul>
-                        {cartItems.map((item) => {
-                          const itemName =
-                            allProducts.find((product) => product.id === item.id)
-                              ?.name || "Item";
-                          return (
-                            <li
-                              key={`${item.id}-${item.lineItemId || "temp"}`}
-                              className="grid grid-cols-[1fr_auto] border-b py-2 gap-1"
-                            >
-                              <span>{itemName}</span>
-                              <div className="m-auto">
-                                <div className="text-center">x {item.quantity}</div>
-                                <div className="flex items-center flex-wrap gap-1">
-                                  <ChangeQuantitySpans
-                                    cqs={changeQuantity}
-                                    item={item}
-                                  />
-                                </div>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                      <div className="mt-4 flex justify-end">
-                        <button
-                          className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
-                          onClick={() => replace("/checkout")}
+                  {cartItems?.length > 0 ? (<>
+                    <ul>
+                      {cartItems.map(item => {
+                        const itemName = allProducts.find(product => product.id === item.id)?.name || "Item";
+                        return (<li
+                          key={`${item.id}-${item.lineItemId || "temp"}`}
+                          className="grid grid-cols-[1fr_auto] border-b py-2 gap-1"
                         >
-                          Checkout
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <p className="text-sm text-gray-900">Your cart is empty.</p>
-                  )}
+                          <span>{itemName}</span>
+                          <div className="m-auto">
+                            <div className="text-center">x {item.quantity}</div>
+                            <div className="flex items-center flex-wrap gap-1">
+                              <ChangeQuantitySpans
+                                cqs={changeQuantity}
+                                item={item}
+                              />
+                            </div>
+                          </div>
+                        </li>)
+                      })}
+                    </ul>
+                    <div className="mt-4 flex justify-end">
+                      <button
+                        className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+                        onClick={() => replace("/checkout")}
+                      >
+                        Checkout
+                      </button>
+                    </div>
+                  </>) : <p className="text-sm text-gray-900">Your cart is empty.</p>}
                 </div>
               )}
             </div>

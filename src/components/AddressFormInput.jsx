@@ -2,7 +2,7 @@
 import { useContext } from "react"
 import { ChangeContext } from "./Checkout"
 
-export default function ShippingFormInput({
+export default function AddressFormInput({
     name,
     placeholder,
     value,

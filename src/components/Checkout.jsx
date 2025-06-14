@@ -5,7 +5,7 @@ import { FaEdit } from "react-icons/fa";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import calculateTotal from "../../lib/calculateTotal";
 import OrderSummary from "./OrderSummary";
-import ShippingDetails from "./ShippingDetails"
+import AddressDetails from "./AddressDetails"
 import StripeForm from "./StripeForm"
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js"
@@ -157,7 +157,7 @@ export default function Checkout({ products }) {
         className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between max-w-7xl w-full mx-auto"
       >
         <ChangeContext.Provider value={handleChange}>
-          <ShippingDetails details={shippingDetails} errors={shippingErrors} states={states} />
+          <AddressDetails details={shippingDetails} errors={shippingErrors} states={states} />
         </ChangeContext.Provider>
         <div className="w-full lg:max-w-md">
           <Elements stripe={stripePromise} options={options}>
