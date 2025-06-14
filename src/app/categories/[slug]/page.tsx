@@ -25,7 +25,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   const carouselImages = products
     .map((product) => product?.images?.[0]?.src)
-    .filter(Boolean)
+    .filter((src): src is string => Boolean(src))
     .slice(0, 5);
 
   return (

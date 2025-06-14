@@ -4,20 +4,29 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-
 import { useAuth } from "@/app/context/AuthContext";
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+import type { JSX } from "react";
+
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL as string;
+
+interface RegisterFormData {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  termsAccepted: boolean;
+}
 
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
-const Register = () => {
-  const [formData, setFormdata] = useState({
+const Register = (): JSX.Element => {
+  const [formData, setFormdata] = useState<RegisterFormData>({
     name: "",
     email: "",
     password: "",
-    confirmPassword: "", 
+    confirmPassword: "",
     termsAccepted: false,
-  })
+  });
 
   const [error, setError] = useState("");
   
@@ -27,7 +36,7 @@ const Register = () => {
 
   const { setIsAuthenticated, setUser, login } = useAuth();
 
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.target;
     setFormdata((prev) => ({
       ...prev,
@@ -35,11 +44,11 @@ const Register = () => {
     }));
   };
 
-  const isValidEmail = (email) => {
+  const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); 
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
 
