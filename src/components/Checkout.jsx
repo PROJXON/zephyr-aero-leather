@@ -118,16 +118,16 @@ export default function Checkout({ products }) {
   const options = { clientSecret, appearance };
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
-  const validateShipping = () => {
+  const validateAddress = details => {
     const errors = {}
 
-    if (!shippingDetails.name.first.trim()) errors.firstName = "Enter your first name"
-    if (!shippingDetails.name.last.trim()) errors.lastName = "Enter your last name"
-    if (!shippingDetails.address.line1.trim()) errors.address = "Enter your address"
-    if (!shippingDetails.city.trim()) errors.city = "Enter your city"
-    if (!/^\d{5}$/.test(shippingDetails.zipCode.trim())) errors.zipCode = "Enter a valid ZIP code"
+    if (!details.name.first.trim()) errors.firstName = "Enter your first name"
+    if (!details.name.last.trim()) errors.lastName = "Enter your last name"
+    if (!details.address.line1.trim()) errors.address = "Enter your address"
+    if (!details.city.trim()) errors.city = "Enter your city"
+    if (!/^\d{5}$/.test(details.zipCode.trim())) errors.zipCode = "Enter a valid ZIP code"
     const statesSet = new Set(states)
-    if (!statesSet.has(shippingDetails.state)) errors.state = "Select a valid state"
+    if (!statesSet.has(details.state)) errors.state = "Select a valid state"
 
     return errors
   }
@@ -164,21 +164,26 @@ export default function Checkout({ products }) {
       {clientSecret && (<div
         className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between max-w-7xl w-full mx-auto"
       >
-        <StatesContext.Provider value={states}>
-          <ChangeContext.Provider value={billingChange}>
-            <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
-          </ChangeContext.Provider>
-          <ChangeContext.Provider value={shippingChange}>
-            <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
-          </ChangeContext.Provider>
-        </StatesContext.Provider>
+        <div className="w-full lg:max-w-xl">
+          <StatesContext.Provider value={states}>
+            <ChangeContext.Provider value={billingChange}>
+              <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
+            </ChangeContext.Provider>
+            <br />
+            <ChangeContext.Provider value={shippingChange}>
+              <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
+            </ChangeContext.Provider>
+          </StatesContext.Provider>
+        </div>
         <div className="w-full lg:max-w-md">
           <Elements stripe={stripePromise} options={options}>
             <StripeForm
               clientSecret={clientSecret}
               formError={formError}
               setFormError={setFormError}
-              validateShipping={validateShipping}
+              validateBilling={() => validateAddress(billingDetails)}
+              setBillingErrors={setBillingErrors}
+              validateShipping={() => validateAddress(shippingDetails)}
               setShippingErrors={setShippingErrors}
             />
           </Elements>
