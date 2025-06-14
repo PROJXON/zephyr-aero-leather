@@ -43,6 +43,20 @@ const reducer = (details, action) => {
   }
 }
 
+const defaultAddressDetails = {
+  name: {
+    first: "",
+    last: ""
+  },
+  address: {
+    line1: "",
+    line2: ""
+  },
+  city: "",
+  zipCode: "",
+  state: ""
+}
+
 export const ChangeContext = createContext()
 export const StatesContext = createContext()
 
@@ -55,19 +69,9 @@ export default function Checkout({ products }) {
   const [paymentIntentId, setPaymentIntentId] = useState(null)
   const [formError, setFormError] = useState(null)
   const [shippingErrors, setShippingErrors] = useState({})
-  const [shippingDetails, dispatch] = useReducer(reducer, {
-    name: {
-      first: "",
-      last: ""
-    },
-    address: {
-      line1: "",
-      line2: ""
-    },
-    city: "",
-    zipCode: "",
-    state: ""
-  })
+  const [shippingDetails, shippingDispatch] = useReducer(reducer, defaultAddressDetails)
+  const [billingErrors, setBillingErrors] = useState({})
+  const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
 
   const states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
@@ -128,7 +132,7 @@ export default function Checkout({ products }) {
     return errors
   }
 
-  const handleChange = e => {
+  const handleChange = (dispatch, setErrors) => e => {
     const { name, value } = e.target
 
     dispatch({
@@ -136,13 +140,16 @@ export default function Checkout({ products }) {
       value: value
     })
 
-    setShippingErrors(prev => {
+    setErrors(prev => {
       const newErrors = { ...prev }
       if (name === "address1") delete newErrors["address"]
       else delete newErrors[name]
       return newErrors
     })
   }
+
+  const shippingChange = handleChange(shippingDispatch, setShippingErrors)
+  const billingChange = handleChange(billingDispatch, setBillingErrors)
 
   return (<>
     {cartItems?.length > 0 ? (<div className="flex flex-col gap-8">
@@ -157,11 +164,14 @@ export default function Checkout({ products }) {
       {clientSecret && (<div
         className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between max-w-7xl w-full mx-auto"
       >
-        <ChangeContext.Provider value={handleChange}>
-          <StatesContext.Provider value={states}>
+        <StatesContext.Provider value={states}>
+          <ChangeContext.Provider value={billingChange}>
+            <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
+          </ChangeContext.Provider>
+          <ChangeContext.Provider value={shippingChange}>
             <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
-          </StatesContext.Provider>
-        </ChangeContext.Provider>
+          </ChangeContext.Provider>
+        </StatesContext.Provider>
         <div className="w-full lg:max-w-md">
           <Elements stripe={stripePromise} options={options}>
             <StripeForm
