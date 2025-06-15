@@ -39,7 +39,7 @@
     "src",
     "types",
     ".next/types/**/*.ts"
-  ],
+, "lib/email.ts"  ],
   "exclude": [
     "node_modules"
   ]

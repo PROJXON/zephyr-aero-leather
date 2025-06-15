@@ -379,3 +379,9 @@ export interface StripeFormProps {
   validateShipping: () => Record<string, string>;
   setShippingErrors: (errors: Record<string, string>) => void;
 }
+
+export interface SendEmailParams {
+  to: string | string[];
+  subject: string;
+  html: string;
+}
