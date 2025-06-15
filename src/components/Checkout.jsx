@@ -1,11 +1,11 @@
 "use client";
 import { useCart } from "@/app/context/CartContext";
-import { useState, useEffect, useReducer, createContext } from "react";
+import { useState, useEffect, useReducer, useCallback, createContext } from "react";
 import { FaEdit } from "react-icons/fa";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import calculateTotal from "../../lib/calculateTotal";
 import OrderSummary from "./OrderSummary";
-import ShippingDetails from "./ShippingDetails"
+import AddressDetails from "./AddressDetails"
 import StripeForm from "./StripeForm"
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js"
@@ -43,7 +43,22 @@ const reducer = (details, action) => {
   }
 }
 
+const defaultAddressDetails = {
+  name: {
+    first: "",
+    last: ""
+  },
+  address: {
+    line1: "",
+    line2: ""
+  },
+  city: "",
+  zipCode: "",
+  state: ""
+}
+
 export const ChangeContext = createContext()
+export const StatesContext = createContext()
 
 export default function Checkout({ products }) {
   const { cartItems, updateQuantity, orderId } = useCart();
@@ -54,19 +69,9 @@ export default function Checkout({ products }) {
   const [paymentIntentId, setPaymentIntentId] = useState(null)
   const [formError, setFormError] = useState(null)
   const [shippingErrors, setShippingErrors] = useState({})
-  const [shippingDetails, dispatch] = useReducer(reducer, {
-    name: {
-      first: "",
-      last: ""
-    },
-    address: {
-      line1: "",
-      line2: ""
-    },
-    city: "",
-    zipCode: "",
-    state: ""
-  })
+  const [shippingDetails, shippingDispatch] = useReducer(reducer, defaultAddressDetails)
+  const [billingErrors, setBillingErrors] = useState({})
+  const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
 
   const states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
@@ -93,7 +98,8 @@ export default function Checkout({ products }) {
             items: cartItems,
             woo_order_id: orderId,
             payment_intent_id: paymentIntentId,
-            shipping: shippingDetails
+            shipping: shippingDetails,
+            billing: billingDetails
           }),
         })
           .then((res) => res.json())
@@ -107,27 +113,27 @@ export default function Checkout({ products }) {
 
       return () => clearTimeout(timeout);
     }
-  }, [cartItems, shippingDetails])
+  }, [cartItems, shippingDetails, billingDetails])
 
   const appearance = { theme: "stripe" };
   const options = { clientSecret, appearance };
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
-  const validateShipping = () => {
+  const validateAddress = details => {
     const errors = {}
 
-    if (!shippingDetails.name.first.trim()) errors.firstName = "Enter your first name"
-    if (!shippingDetails.name.last.trim()) errors.lastName = "Enter your last name"
-    if (!shippingDetails.address.line1.trim()) errors.address = "Enter your address"
-    if (!shippingDetails.city.trim()) errors.city = "Enter your city"
-    if (!/^\d{5}$/.test(shippingDetails.zipCode.trim())) errors.zipCode = "Enter a valid ZIP code"
+    if (!details.name.first.trim()) errors.firstName = "Enter your first name"
+    if (!details.name.last.trim()) errors.lastName = "Enter your last name"
+    if (!details.address.line1.trim()) errors.address = "Enter your address"
+    if (!details.city.trim()) errors.city = "Enter your city"
+    if (!/^\d{5}$/.test(details.zipCode.trim())) errors.zipCode = "Enter a valid ZIP code"
     const statesSet = new Set(states)
-    if (!statesSet.has(shippingDetails.state)) errors.state = "Select a valid state"
+    if (!statesSet.has(details.state)) errors.state = "Select a valid state"
 
     return errors
   }
 
-  const handleChange = e => {
+  const handleChange = (dispatch, setErrors) => e => {
     const { name, value } = e.target
 
     dispatch({
@@ -135,13 +141,16 @@ export default function Checkout({ products }) {
       value: value
     })
 
-    setShippingErrors(prev => {
+    setErrors(prev => {
       const newErrors = { ...prev }
       if (name === "address1") delete newErrors["address"]
       else delete newErrors[name]
       return newErrors
     })
   }
+
+  const shippingChange = useCallback(handleChange(shippingDispatch, setShippingErrors), [shippingErrors]);
+  const billingChange = useCallback(handleChange(billingDispatch, setBillingErrors), [billingErrors]);
 
   return (<>
     {cartItems?.length > 0 ? (<div className="flex flex-col gap-8">
@@ -156,16 +165,26 @@ export default function Checkout({ products }) {
       {clientSecret && (<div
         className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between max-w-7xl w-full mx-auto"
       >
-        <ChangeContext.Provider value={handleChange}>
-          <ShippingDetails details={shippingDetails} errors={shippingErrors} states={states} />
-        </ChangeContext.Provider>
+        <div className="w-full lg:max-w-xl">
+          <StatesContext.Provider value={states}>
+            <ChangeContext.Provider value={billingChange}>
+              <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
+            </ChangeContext.Provider>
+            <br />
+            <ChangeContext.Provider value={shippingChange}>
+              <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
+            </ChangeContext.Provider>
+          </StatesContext.Provider>
+        </div>
         <div className="w-full lg:max-w-md">
           <Elements stripe={stripePromise} options={options}>
             <StripeForm
               clientSecret={clientSecret}
               formError={formError}
               setFormError={setFormError}
-              validateShipping={validateShipping}
+              validateBilling={() => validateAddress(billingDetails)}
+              setBillingErrors={setBillingErrors}
+              validateShipping={() => validateAddress(shippingDetails)}
               setShippingErrors={setShippingErrors}
             />
           </Elements>

@@ -2,18 +2,39 @@
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js"
 import { useState } from "react"
 
-export default function StripeForm({ clientSecret, formError, setFormError, validateShipping, setShippingErrors }) {
+export default function StripeForm({
+  clientSecret,
+  formError,
+  setFormError,
+  validateBilling,
+  setBillingErrors,
+  validateShipping,
+  setShippingErrors
+}) {
   const stripe = useStripe()
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
+
+  const checkAddressForm = (validateFunc, setter) => {
+    const errors = validateFunc()
+    if (Object.keys(errors).length > 0) {
+      setter(errors)
+      return true
+    }
+    return false
+  }
 
   const handleSubmit = async e => {
     e.preventDefault()
     if (!stripe || !elements) return
 
-    const errors = validateShipping()
-    if (Object.keys(errors).length > 0) {
-      setShippingErrors(errors)
+    const billingError = checkAddressForm(validateBilling, setBillingErrors)
+    if (billingError) {
+      setFormError("Fix the error(s) in the billing form")
+      return
+    }
+    const addressError = checkAddressForm(validateShipping, setShippingErrors)
+    if (addressError) {
       setFormError("Fix the error(s) in the shipping form")
       return
     }
