@@ -13,6 +13,9 @@ import { useCart } from "@/app/context/CartContext";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import { Sling as Hamburger } from "hamburger-react";
 import NavDropdown from "./NavDropdown";
+import type { Product } from "../../types/types";
+import type { ReactElement } from "react";
+import type { NavbarProps } from "../../types/types";
 
 const productCategories = [
   { name: "Wallets", slug: "wallets" },
@@ -32,7 +35,7 @@ const collectionCategories = [
   { name: "Minimalist", slug: "minimalist" },
 ];
 
-const Navbar = ({ allProducts }) => {
+export default function Navbar({ allProducts }: NavbarProps): ReactElement {
   const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -56,19 +59,18 @@ const Navbar = ({ allProducts }) => {
   };
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (accountOpen && !(document.getElementById("profileBtn")?.contains(e.target as Node))) {
         setAccountOpen(false);
       }
       if (
         cartOpen &&
-        !document.getElementById("cartBtn")?.contains(e.target) &&
-        !e.target.classList.contains("addToCartBtn")
+        !(document.getElementById("cartBtn")?.contains(e.target as Node)) &&
+        !(e.target as HTMLElement).classList.contains("addToCartBtn")
       ) {
         setCartOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [accountOpen, cartOpen]);
@@ -300,10 +302,7 @@ const Navbar = ({ allProducts }) => {
             </div>
           </div>
         )}
-
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

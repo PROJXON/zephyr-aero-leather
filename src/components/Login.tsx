@@ -1,38 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
+import type { LoginFormData } from "../../types/types";
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
-const Login = () => {
-  const [formData, setFormData] = useState({
+export default function Login() {
+  const [form, setForm] = useState<LoginFormData>({
     email: "",
     password: "",
   });
-
-  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Added loading state
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError("");
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
 
-    if (!formData.email || !formData.password) {
+    if (!form.email || !form.password) {
       setError("Email and password are required");
       return;
     }
@@ -46,8 +42,8 @@ const Login = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
+          email: form.email,
+          password: form.password,
         }),
         credentials: "include",
       });
@@ -83,11 +79,11 @@ const Login = () => {
 
   return (
     <section className="relative flex items-center justify-center min-h-screen px-4">
-  {/* Background Image with 50% opacity overlay */}
-  <div
-    className="absolute inset-0 bg-cover bg-center opacity-50"
-    style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
-  />
+      {/* Background Image with 50% opacity overlay */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-50"
+        style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
+      />
       <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Panel: Sign In Form */}
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-white bg-opacity-90 rounded-l-xl">
@@ -99,7 +95,7 @@ const Login = () => {
               type="email"
               name="email"
               placeholder="name@company.com"
-              value={formData.email}
+              value={form.email}
               onChange={handleChange}
               className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all"
               required
@@ -112,7 +108,7 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Enter your password"
-                value={formData.password}
+                value={form.password}
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all pr-16"
                 required
@@ -167,5 +163,3 @@ const Login = () => {
     </section>
   );
 };
-
-export default Login;

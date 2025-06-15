@@ -263,3 +263,21 @@ export interface EmailTemplateProps {
   email: string;
   message: string;
 }
+
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+export interface NavbarProps {
+  allProducts: Product[];
+}
+
+export interface NavButtonProps {
+  onClick: () => void;
+  className?: string;
+  srOnly?: string;
+  d?: string;
+  text?: string;
+  fill?: string;
+}
