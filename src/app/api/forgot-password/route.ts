@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import crypto from "crypto";
-import { sendEmail } from "@/lib/email";
+import { sendEmail } from "../../../../lib/email";
 import type { NextRequest } from "next/server";
 
 const api = new WooCommerceRestApi({
