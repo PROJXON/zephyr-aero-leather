@@ -3,12 +3,13 @@ import { useState, useEffect } from "react"
 import { useAuth } from "@/app/context/AuthContext"
 import OrderSummary from "./OrderSummary"
 import calculateTotal from "../../lib/calculateTotal"
+import type { Product } from "../../types/types"
 
-export default function OrderHistory({ products }) {
+export default function OrderHistory({ products }: { products: Product[] }) {
   const { isAuthenticated, user } = useAuth()
-  const [orders, setOrders] = useState([])
-  const [localTimes, setLocalTimes] = useState([])
-  const [reviewedProductIds, setReviewedProductIds] = useState([])
+  const [orders, setOrders] = useState<any[]>([])
+  const [localTimes, setLocalTimes] = useState<Date[]>([])
+  const [reviewedProductIds, setReviewedProductIds] = useState<number[]>([])
 
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -24,8 +25,8 @@ export default function OrderHistory({ products }) {
           const ordersArray = orderData.orders || []
           setOrders(ordersArray.reverse())
 
-          const times = ordersArray.map(order => {
-            const timeString = order.meta_data.find(meta => meta.key === "user_local_time")?.value
+          const times = ordersArray.map((order: any) => {
+            const timeString = order.meta_data.find((meta: any) => meta.key === "user_local_time")?.value
             return new Date(timeString)
           })
           setLocalTimes(times)
@@ -42,7 +43,7 @@ export default function OrderHistory({ products }) {
         try {
           const res = await fetch(`/api/reviews?userId=${user.id}`)
           const data = await res.json()
-          const ids = data.map(review => Number(review.product_id))
+          const ids = data.map((review: any) => Number(review.product_id))
           setReviewedProductIds(ids)
         } catch (err) {
           console.error("Error fetching user reviews:", err)
@@ -59,7 +60,7 @@ export default function OrderHistory({ products }) {
             <p>No orders found</p>
           ) : (
             <ul>
-              {orders.map((order, i) => {
+              {orders.map((order: any, i: number) => {
                 const datePaid = localTimes[i]
                 const items = order.items
                 const total = calculateTotal(items, products)

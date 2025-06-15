@@ -281,3 +281,101 @@ export interface NavButtonProps {
   text?: string;
   fill?: string;
 }
+
+export interface NavLinkProps {
+  href: string;
+  classes?: string;
+  label: string;
+  onClick?: () => void;
+}
+
+export interface TopNavLinkDropdownItem {
+  name: string;
+  slug: string;
+}
+
+export interface TopNavLinkProps {
+  href: string;
+  label: string;
+  dropdownItems?: TopNavLinkDropdownItem[];
+}
+
+export interface NavLoggedOutBtnProps {
+  href: string;
+  text: string;
+}
+
+export interface OrderSummaryProps {
+  cartItems: CartItem[];
+  products: Product[];
+  total: number;
+  quantityControls?: Partial<QuantityControls>;
+  showReviewLinks?: boolean;
+  reviewedProductIds?: number[];
+}
+
+export interface QuantityControls {
+  updateQuantity: (id: number, qty: number) => void;
+  editID: number | null;
+  setEditID: (id: number | null) => void;
+  newQty: string;
+  setNewQty: (qty: string) => void;
+  changeQuantity: ChangeQuantitySpan[];
+}
+
+export interface PaymentDetailsData {
+  items: CartItem[];
+  [key: string]: any;
+}
+
+export interface ProductCarouselProps {
+  products: Product[];
+  viewAllLink: string;
+}
+
+export interface ProductListProps {
+  products: Product[];
+}
+
+export interface ProductReview {
+  id: number;
+  reviewer: string;
+  rating: number;
+  review: string;
+}
+
+export interface ProductReviewsProps {
+  productId: number;
+}
+
+export interface ResetPasswordFormState {
+  password: string;
+  confirmPassword: string;
+  error: string;
+  message: string;
+  loading: boolean;
+}
+
+export interface ShippingDetailsProps {
+  details: ShippingDetails;
+  errors: { [key: string]: string };
+  states: string[];
+}
+
+export interface ShippingFormInputProps {
+  name: string;
+  placeholder: string;
+  value: string;
+  span: number;
+  error?: string;
+  type?: string;
+  options?: string[];
+}
+
+export interface StripeFormProps {
+  clientSecret: string;
+  formError: string | null;
+  setFormError: (msg: string | null) => void;
+  validateShipping: () => Record<string, string>;
+  setShippingErrors: (errors: Record<string, string>) => void;
+}

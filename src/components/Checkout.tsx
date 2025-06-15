@@ -155,7 +155,7 @@ export default function Checkout({ products }: CheckoutProps) {
               setEditID,
               newQty,
               setNewQty,
-              changeQuantity,
+              changeQuantity, // this is an array from getChangeQuantity
             }}
           />
           {clientSecret && (

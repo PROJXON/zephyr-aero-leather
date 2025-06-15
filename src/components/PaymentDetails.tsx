@@ -6,17 +6,18 @@ import OrderSummary from "./OrderSummary";
 import calculateTotal from "../../lib/calculateTotal";
 import { useAuth } from "@/app/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
+import type { Product, CartItem, PaymentDetailsData } from "../../types/types";
 
 export default function PaymentDetails() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [paymentIntentId, setPaymentIntentId] = useState(null);
-  const [paymentDetails, setPaymentDetails] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [allowed, setAllowed] = useState(false);
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetailsData | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [total, setTotal] = useState<number>(0);
+  const [allowed, setAllowed] = useState<boolean>(false);
 
-  const { clearCart, fetchUserCart, refreshCart } = useCart();
+  const { clearCart, refreshCart } = useCart();
   const queryIntent = searchParams.get("payment_intent");
   const { isAuthenticated } = useAuth();
 
@@ -45,17 +46,17 @@ export default function PaymentDetails() {
         const data = await res.json();
 
         if (!data.items || data.items.length === 0) {
-            break;
+          break;
         }
 
         if (i === 9) console.warn("⚠️ Woo cart still not empty after polling");
-        }
+      }
 
       await refreshCart();
     };
 
     run();
-  }, []);
+  }, [clearCart, queryIntent, refreshCart, router]);
 
   useEffect(() => {
     const getProducts = async () => {

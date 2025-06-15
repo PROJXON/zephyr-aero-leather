@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ChangeQuantitySpans from "./ChangeQuantitySpans";
 import getItemInfo from "../../lib/getItemInfo";
+import type { Product, CartItem, ChangeQuantitySpan, OrderSummaryProps, QuantityControls } from "../../types/types";
 
 export default function OrderSummary({
   cartItems,
@@ -10,11 +11,22 @@ export default function OrderSummary({
   quantityControls = {},
   showReviewLinks = false,
   reviewedProductIds = [],
-}) {
-  const { updateQuantity, editID, setEditID, newQty, setNewQty, changeQuantity } = quantityControls;
-  const editable = Object.keys(quantityControls).length > 0;
+}: OrderSummaryProps) {
+  const {
+    updateQuantity,
+    editID,
+    setEditID,
+    newQty,
+    setNewQty,
+    changeQuantity = [],
+  } = quantityControls as QuantityControls;
+  const editable =
+    typeof updateQuantity === "function" &&
+    typeof setEditID === "function" &&
+    typeof setNewQty === "function" &&
+    changeQuantity.length > 0;
 
-  const formatPrice = priceInCents => `$${(priceInCents / 100).toFixed(2)}`;
+  const formatPrice = (priceInCents: number) => `$${(priceInCents / 100).toFixed(2)}`;
 
   return (
     <div className="space-y-6 border p-6 rounded-lg shadow-sm">
@@ -54,14 +66,14 @@ export default function OrderSummary({
                         min="0"
                         value={newQty}
                         autoFocus
-                        onChange={(e) => setNewQty(e.target.value)}
+                        onChange={(e) => setNewQty && setNewQty(e.target.value)}
                         onBlur={() => {
-                          const qty = parseInt(newQty);
-                          if (!isNaN(qty) && qty >= 0) updateQuantity(item.id, qty);
-                          setEditID(null);
+                          const qty = parseInt(newQty || "0");
+                          if (!isNaN(qty) && qty >= 0 && updateQuantity) updateQuantity(item.id, qty);
+                          setEditID && setEditID(null);
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") e.target.blur();
+                          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                         }}
                       />
                     ) : (
@@ -69,7 +81,7 @@ export default function OrderSummary({
                         <span className="text-gray-400 text-sm">x{item.quantity}</span>
                       )
                     )}
-                    {editable && <ChangeQuantitySpans cqs={changeQuantity} item={item} />}
+                    {editable && changeQuantity.length > 0 && <ChangeQuantitySpans cqs={changeQuantity} item={item} />}
                   </div>
 
                   <p className="text-green-600 font-semibold text-sm">
