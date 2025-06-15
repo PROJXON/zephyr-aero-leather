@@ -13,6 +13,16 @@ import getChangeQuantity from "../../lib/getChangeQuantity";
 import { Sling as Hamburger } from "hamburger-react"
 import TopNavLink from "./TopNavLink"
 import NavLink from "./NavLink"
+import { 
+  InformationCircleIcon,
+  Squares2X2Icon,
+  TagIcon,
+  KeyIcon,
+  UserPlusIcon,
+  ClipboardDocumentListIcon,
+  ArrowRightOnRectangleIcon,
+  ShoppingCartIcon
+} from '@heroicons/react/24/outline';
 
 const productCategories = [
   { name: "Wallets", slug: "wallets" },
@@ -91,27 +101,32 @@ const Navbar = ({ allProducts }) => {
     {
       label: "About Us",
       unique: "/about-us",
-      show: true
+      show: true,
+      icon: InformationCircleIcon
     },
     {
       label: "Collections",
       unique: "/collections",
-      show: true
+      show: true,
+      icon: Squares2X2Icon
     },
     {
       label: "Categories",
       unique: "/categories",
-      show: true
+      show: true,
+      icon: TagIcon
     },
     {
       label: "Sign In",
       unique: "/login",
-      show: !isAuthenticated
+      show: !isAuthenticated,
+      icon: KeyIcon
     },
     {
       label: "Create Account",
       unique: "/register",
-      show: !isAuthenticated
+      show: !isAuthenticated,
+      icon: UserPlusIcon
     },
     {
       label: "Order History",
@@ -122,7 +137,8 @@ const Navbar = ({ allProducts }) => {
         },
         classes: "block w-full text-left text-blue-600"
       },
-      show: isAuthenticated
+      show: isAuthenticated,
+      icon: ClipboardDocumentListIcon
     },
     {
       label: "Logout",
@@ -130,12 +146,14 @@ const Navbar = ({ allProducts }) => {
         function: handleLogout,
         classes: "block w-full text-left text-red-600"
       },
-      show: isAuthenticated
+      show: isAuthenticated,
+      icon: ArrowRightOnRectangleIcon
     },
     {
       label: "View Cart",
       unique: "/checkout",
-      show: true
+      show: true,
+      icon: ShoppingCartIcon
     }
   ]
 
@@ -279,18 +297,43 @@ const Navbar = ({ allProducts }) => {
         </div>
 
         {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 space-y-1 shadow-xl z-[9999]">
-            {mobileMenuLinks.map(link => (<Fragment key={link.label}>
-              {link.show && <>
-                {typeof link.unique === "string" ?
-                  <NavLink href={link.unique} onClick={() => setMenuOpen(false)} classes="block text-lg" label={link.label} /> :
-                  <button onClick={link.unique.function} className={link.unique.classes}>{link.label}</button>
-                }
-              </>}
-            </Fragment>))}
+        <div className={`lg:hidden ${menuOpen ? 'block' : 'hidden'}`}>
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-white shadow-lg rounded-b-xl">
+            {/* User Info Section when logged in */}
+            {isAuthenticated && user && (
+              <div className="px-4 py-3 mb-2 bg-gray-50 border border-gray-200 rounded-lg">
+                <p className="text-sm font-medium text-gray-900">Welcome back,</p>
+                <p className="text-lg font-semibold text-neutral-dark">{user.first_name} {user.last_name}</p>
+              </div>
+            )}
+
+            {/* Main Navigation Links */}
+            <div className="space-y-1">
+              {mobileMenuLinks.filter(link => link.show).map((link, index) => (
+                <div key={link.label}>
+                  {typeof link.unique === 'string' ? (
+                    <Link
+                      href={link.unique}
+                      className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-neutral-dark rounded-lg transition-colors"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <link.icon className="w-5 h-5 mr-3" />
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={link.unique.function}
+                      className={`flex items-center w-full px-4 py-3 text-base font-medium ${link.unique.classes} hover:bg-gray-100 rounded-lg transition-colors`}
+                    >
+                      <link.icon className="w-5 h-5 mr-3" />
+                      {link.label}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );
