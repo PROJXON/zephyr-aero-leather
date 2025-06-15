@@ -1,6 +1,6 @@
 "use client";
 import { useCart } from "@/app/context/CartContext";
-import { useState, useEffect, useReducer, createContext } from "react";
+import { useState, useEffect, useReducer, useCallback, createContext } from "react";
 import { FaEdit } from "react-icons/fa";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import calculateTotal from "../../lib/calculateTotal";
@@ -149,8 +149,8 @@ export default function Checkout({ products }) {
     })
   }
 
-  const shippingChange = handleChange(shippingDispatch, setShippingErrors)
-  const billingChange = handleChange(billingDispatch, setBillingErrors)
+  const shippingChange = useCallback(handleChange(shippingDispatch, setShippingErrors), [shippingErrors]);
+  const billingChange = useCallback(handleChange(billingDispatch, setBillingErrors), [billingErrors]);
 
   return (<>
     {cartItems?.length > 0 ? (<div className="flex flex-col gap-8">
