@@ -8,8 +8,8 @@ export default function StripeForm({ clientSecret, formError, setFormError, vali
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!stripe || !elements) return;
 
     const errors = validateShipping();

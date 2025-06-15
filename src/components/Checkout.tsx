@@ -45,7 +45,7 @@ function reducer(details: ShippingDetailsState, action: ShippingDetailsAction): 
   }
 }
 
-export const ChangeContext = createContext<((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void) | undefined>(undefined);
+export const ChangeContext = createContext<((event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void) | undefined>(undefined);
 
 export default function Checkout({ products }: CheckoutProps) {
   const { cartItems, updateQuantity, orderId } = useCart();
@@ -125,8 +125,8 @@ export default function Checkout({ products }: CheckoutProps) {
     return errors;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
 
     dispatch({
       type: name.toUpperCase(),

@@ -21,8 +21,8 @@ export default function Contact() {
     });
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setIsSending(true);
 
     const res = await fetch("/api/sendEmail", {
@@ -53,7 +53,7 @@ export default function Contact() {
             required
             disabled={sent}
             value={formData.name}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, name: e.target.value })}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, name: event.target.value })}
             className="w-full px-4 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-medium"
           />
         </div>
@@ -68,7 +68,7 @@ export default function Contact() {
             required
             disabled={sent}
             value={formData.email}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, email: event.target.value })}
             className="w-full px-4 py-2 border border-neutral-light rounded-md focus:outline-none focus:ring-1 focus:ring-neutral-medium"
           />
         </div>
@@ -82,7 +82,7 @@ export default function Contact() {
             required
             disabled={sent}
             value={formData.message}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, message: e.target.value })}
+            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, message: event.target.value })}
             className="w-full px-4 py-2 border border-neutral-light rounded-md min-h-[150px] resize-none focus:outline-none focus:ring-1 focus:ring-neutral-medium"
           ></textarea>
         </div>

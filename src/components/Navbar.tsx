@@ -57,14 +57,14 @@ const Navbar = ({ allProducts }: NavbarProps) => {
   };
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (accountOpen && !(document.getElementById("profileBtn")?.contains(e.target as Node))) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (accountOpen && !(document.getElementById("profileBtn")?.contains(event.target as Node))) {
         setAccountOpen(false);
       }
       if (
         cartOpen &&
-        !(document.getElementById("cartBtn")?.contains(e.target as Node)) &&
-        !(e.target as HTMLElement).classList.contains("addToCartBtn")
+        !(document.getElementById("cartBtn")?.contains(event.target as Node)) &&
+        !(event.target as HTMLElement).classList.contains("addToCartBtn")
       ) {
         setCartOpen(false);
       }

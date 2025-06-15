@@ -14,8 +14,8 @@ export default function ForgotPassword() {
 
   const router = useRouter();
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setMessage("");
     setError("");
     setLoading(true);
@@ -76,7 +76,7 @@ export default function ForgotPassword() {
                   id="email"
                   autoComplete="email"
                   value={email}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
                   className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all"
                   placeholder="name@company.com"
                   required

@@ -61,8 +61,8 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     }
   }, [productId, isAuthenticated, user]);
 
-  const handleSubmitReview = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmitReview = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setError("");
     if (!isAuthenticated) {
       setError("You must be logged in to leave a review");

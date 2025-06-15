@@ -9,7 +9,7 @@ export default function ShippingFormInput({
   span,
   error,
   type = "text",
-  options = []
+  options = [],
 }: ShippingFormInputProps) {
   const onChange = useContext(ChangeContext);
   const classes = `w-full p-2 border rounded col-span-${span}${error ? " border-red-400 placeholder-red-300" : ""}`;
@@ -41,4 +41,4 @@ export default function ShippingFormInput({
       )}
     </>
   );
-}
+};
