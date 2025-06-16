@@ -1,26 +1,27 @@
 // Next.js Page Props Types
 export interface CategoryPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export interface CollectionPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export interface ProductPageProps {
-  params: { slug: string };
+  params: Promise<{ id: string }>;
 }
 
 // Cart Types
 export interface CartItem {
   id: number;
-  name: string;
-  price: number;
   quantity: number;
-  image: string;
-  slug: string;
-  productId: number;
+  name?: string;
+  price?: number;
+  image?: string;
+  slug?: string;
+  productId?: number;
   variationId?: number;
+  lineItemId?: number;
   variation?: {
     attribute: string;
     value: string;
@@ -70,8 +71,18 @@ export interface Product {
   description: string;
   price: number;
   salePrice?: number;
-  images: string[];
+  images: Array<{
+    src: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+  }>;
   category: string;
+  categories?: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
   collection?: string;
   variations?: {
     id: number;
@@ -89,30 +100,34 @@ export interface Product {
 
 // Category Types
 export interface Category {
-  id: number;
+  id?: number;
   name: string;
-  slug: string;
+  slug?: string;
   description: string;
   image: string;
   products?: Product[];
+  slugs: string[];
 }
 
 export type CategoryMap = Record<string, readonly string[]>;
 
 export interface CategoryTitle {
-  name: string;
-  description: string;
+  title: string;
+  subtitle: string;
+  images?: string[];
 }
 
 export type CategoryTitlesMap = Record<string, CategoryTitle>;
 
 // Collection Types
 export interface Collection {
-  id: number;
+  id?: number;
   name: string;
-  slug: string;
+  slug?: string;
   description: string;
   image: string;
+  carouselImages: string[];
+  productIds: number[];
   products?: Product[];
 }
 
@@ -125,6 +140,8 @@ export interface User {
   email: string;
   role: string;
   termsAccepted: boolean;
+  first_name?: string;
+  last_name?: string;
 }
 
 // Auth Types
@@ -147,8 +164,8 @@ export type FilterOption = 'all' | 'sale' | 'new' | 'bestselling';
 // Commitment Types
 export interface CommitmentItem {
   title: string;
-  description: string;
-  icon: string;
+  text: string;
+  icon?: string;
 }
 
 // Shipping Types
@@ -271,6 +288,8 @@ export interface HeroProps {
 export interface HeroCarouselProps {
   images: string[];
   altBase?: string;
+  autoPlay?: boolean;
+  interval?: number;
 }
 
 export interface CartProviderProps {

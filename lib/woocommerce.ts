@@ -1,6 +1,7 @@
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import categoryMap from "../src/utils/categoryMap";
 import type { Product, Category, CategoryKey, FetchProductsOptions } from "../types/types";
+import type { WooCommerceCategory } from "../types/woocommerce";
 
 const { WOOCOMMERCE_API_URL, WOOCOMMERCE_API_KEY, WOOCOMMERCE_API_SECRET } = process.env;
 
@@ -14,7 +15,7 @@ const api = new WooCommerceRestApi({
   consumerSecret: WOOCOMMERCE_API_SECRET,
   version: "wc/v3",
   queryStringAuth: true,
-  timeout: 30000,
+  timeout: 60000,
 });
 
 const mapAndTag = (products: Product[]): Product[] =>
@@ -22,7 +23,7 @@ const mapAndTag = (products: Product[]): Product[] =>
     const categories = product.categories || [];
     const genericCategory =
       categories
-        .map((cat: Category) =>
+        .map((cat: WooCommerceCategory) =>
           (Object.entries(categoryMap) as [CategoryKey, readonly string[]][])
             .find(([_, slugs]) => slugs.includes(cat.slug))?.[0]
         )
@@ -54,8 +55,8 @@ const fetchProducts = async ({
 
       const catResponse = await api.get("products/categories?per_page=100");
       const matchedIds = catResponse.data
-        .filter((cat: Category) => slugs.includes(cat.slug))
-        .map((cat: Category) => cat.id);
+        .filter((cat: WooCommerceCategory) => slugs.includes(cat.slug))
+        .map((cat: WooCommerceCategory) => cat.id);
 
       if (!matchedIds.length) {
         console.warn(`[WooCommerce] No category IDs found for: ${category}`);

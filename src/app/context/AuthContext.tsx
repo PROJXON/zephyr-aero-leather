@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import type { User, AuthContextType } from "../../../types/types";
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setIsAuthenticated(false);
   };
 
-  const fetchUserFromServer = async () => {
+  const fetchUserFromServer = useCallback(async () => {
     try {
       const response = await fetch("/api/auth/user", { credentials: "include" });
       if (!response.ok) throw new Error("Failed to fetch user");
@@ -37,12 +37,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchUserFromServer();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchUserFromServer]);
 
   const login = (userData: User) => {
     setUser(userData);

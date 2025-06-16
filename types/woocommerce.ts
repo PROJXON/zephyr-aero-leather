@@ -57,16 +57,14 @@ export interface WooProduct {
     width?: number;
     height?: number;
   }[];
+  categories?: WooCommerceCategory[];
   [key: string]: any;
 }
 
 // WooCommerce Category Types
-export interface WooCategory {
+export interface WooCommerceCategory {
   id: number;
   name: string;
-  description: string;
-  image: string;
-  slugs: string[];
   slug: string;
 }
 

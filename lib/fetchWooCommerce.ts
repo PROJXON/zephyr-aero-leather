@@ -1,10 +1,10 @@
-import { WooRequestBody } from "../types/types";
+import { WooRequestBody } from "../types/woocommerce";
 
 export default async function fetchWooCommerce<T = any>(
   endpoint: string,
   errorMessage: string = "WooCommerce request failed",
   token: string | null = null,
-  method: string = "GET",
+  method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   body: WooRequestBody | null = null
 ): Promise<T> {
   const url = `${process.env.WOOCOMMERCE_API_URL}/wp-json/${endpoint}`;
