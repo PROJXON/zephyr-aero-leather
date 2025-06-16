@@ -1,6 +1,6 @@
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-import categoryMap from "@/utils/categoryMap";
-import type { Product } from "../types/types";
+import categoryMap from "../src/utils/categoryMap";
+import type { Product, Category, CategoryKey, FetchProductsOptions } from "../types/types";
 
 const { WOOCOMMERCE_API_URL, WOOCOMMERCE_API_KEY, WOOCOMMERCE_API_SECRET } = process.env;
 
@@ -17,42 +17,23 @@ const api = new WooCommerceRestApi({
   timeout: 30000,
 });
 
-// Type for the categoryMap keys
-type CategoryKey = keyof typeof categoryMap;
-
-// Add genericCategory tag to each product
 const mapAndTag = (products: Product[]): Product[] =>
   products.map((product) => {
     const categories = product.categories || [];
-
     const genericCategory =
       categories
-        .map((cat: { slug: string }) =>
+        .map((cat: Category) =>
           (Object.entries(categoryMap) as [CategoryKey, readonly string[]][])
             .find(([_, slugs]) => slugs.includes(cat.slug))?.[0]
         )
         .find(Boolean) || "Uncategorized";
 
-    // Transform the product data to match our Product type
-    const { images, ...rest } = product;
     return {
-      ...rest,
+      ...product,
       genericCategory,
-      images: images?.map((img: any) => ({
-        src: img.src,
-        alt: img.alt || '',
-        width: img.width || 800,
-        height: img.height || 800
-      }))
     };
   });
 
-interface FetchProductsOptions {
-  category?: CategoryKey;
-  per_page?: number;
-}
-
-// Fetch products from WooCommerce, optionally filtered by category
 const fetchProducts = async ({
   category,
   per_page = 100,
@@ -64,7 +45,6 @@ const fetchProducts = async ({
     };
 
     if (category) {
-      // Get slugs for the requested category as a mutable array
       const slugs = (categoryMap[category] as readonly string[]).slice();
 
       if (!slugs?.length) {
@@ -72,18 +52,16 @@ const fetchProducts = async ({
         return [];
       }
 
-      // Fetch all categories and match IDs for the slugs
       const catResponse = await api.get("products/categories?per_page=100");
       const matchedIds = catResponse.data
-        .filter((cat: { slug: string }) => slugs.includes(cat.slug))
-        .map((cat: { id: number }) => cat.id);
+        .filter((cat: Category) => slugs.includes(cat.slug))
+        .map((cat: Category) => cat.id);
 
       if (!matchedIds.length) {
         console.warn(`[WooCommerce] No category IDs found for: ${category}`);
         return [];
       }
 
-      // Build query string for products endpoint
       const query = new URLSearchParams({
         per_page: String(per_page),
         status: "publish",
@@ -92,7 +70,6 @@ const fetchProducts = async ({
       const response = await api.get(`products?${query}`);
       return mapAndTag(response.data);
     } else {
-      // Fetch all products, paginated
       let page = 1;
       let allProducts: Product[] = [];
 
@@ -113,7 +90,6 @@ const fetchProducts = async ({
       return mapAndTag(allProducts);
     }
   } catch (error: any) {
-    // Improved error logging for debugging
     console.error("[WooCommerce] Error fetching products:", {
       message: error.message,
       response: error.response?.data,

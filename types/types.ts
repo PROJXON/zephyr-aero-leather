@@ -88,13 +88,21 @@ export interface StripePaymentIntent {
 };
 
 export interface Category {
+  id: number;
   name: string;
   description: string;
   image: string;
   slugs: string[];
+  slug: string;
 }
 
 export type CategoryMap = Record<string, readonly string[]>;
+export type CategoryKey = keyof CategoryMap;
+
+export interface FetchProductsOptions {
+  category?: CategoryKey;
+  per_page?: number;
+}
 
 export interface CategoryTitle {
   title: string;
@@ -387,3 +395,14 @@ export interface SendEmailParams {
   subject: string;
   html: string;
 }
+
+export interface FetchProductsParams {
+  category?: string;
+  per_page?: number;
+}
+
+export type ViewAllProduct = {
+  id: "view-all";
+};
+
+export type CarouselProduct = Product | ViewAllProduct;
