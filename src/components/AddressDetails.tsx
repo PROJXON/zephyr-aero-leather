@@ -61,10 +61,12 @@ export default function AddressDetails({ title, details, errors }: {
     }
   ];
 
-  return (<div className="block">
-    <h2 className="text-xl font-semibold mb-2">{title}</h2>
-    <div className="grid grid-cols-6 gap-1">
-      {inputs.map((input, i) => <AddressFormInput key={i} {...input as AddressFormInputProps} />)}
+  return (
+    <div className="block">
+      <h2 className="text-xl font-semibold mb-2">{title}</h2>
+      <div className="grid grid-cols-6 gap-1">
+        {inputs.map((input, i) => <AddressFormInput key={i} {...input as AddressFormInputProps} />)}
+      </div>
     </div>
-  </div>);
+  );
 }

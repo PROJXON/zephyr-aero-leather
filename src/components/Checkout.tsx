@@ -9,9 +9,15 @@ import AddressDetails from "./AddressDetails";
 import StripeForm from "./StripeForm";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import type { CheckoutProps, AddressDetailsState, AddressDetailsAction, AddressErrors } from "../../types/types";
+import type {
+  CheckoutProps,
+  AddressDetailsState,
+  AddressDetailsAction,
+  AddressErrors,
+  AddressFormChange
+} from "../../types/types";
 import type { StripeElementsOptions, Appearance } from "@stripe/stripe-js";
-import type { ChangeEvent, Dispatch, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -51,7 +57,7 @@ function reducer(details: AddressDetailsState, action: AddressDetailsAction): Ad
   }
 }
 
-export const ChangeContext = createContext<((event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void)>(() => { });
+export const ChangeContext = createContext<((event: AddressFormChange) => void)>(() => { });
 export const StatesContext = createContext<(string[])>([]);
 
 export default function Checkout({ products }: CheckoutProps) {
@@ -158,7 +164,7 @@ export default function Checkout({ products }: CheckoutProps) {
 
   const handleChange = (
     dispatch: Dispatch<AddressDetailsAction>,
-    setErrors: Dispatch<SetStateAction<AddressErrors>>) => (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    setErrors: Dispatch<SetStateAction<AddressErrors>>) => (event: AddressFormChange
     ) => {
       const { name, value } = event.target;
       const type = name.toUpperCase() as AddressDetailsAction["type"];
@@ -174,13 +180,15 @@ export default function Checkout({ products }: CheckoutProps) {
     };
 
   const shippingChange = useCallback(
-    handleChange(shippingDispatch, setShippingErrors),
+    (event: AddressFormChange) => handleChange(shippingDispatch, setShippingErrors)(event),
     [shippingDispatch, setShippingErrors]
   );
   const billingChange = useCallback(
-    handleChange(billingDispatch, setBillingErrors),
+    (event: AddressFormChange) => handleChange(billingDispatch, setBillingErrors)(event),
     [billingDispatch, setBillingErrors]
   );
+
+  const toggleBillToShipping = () => setBillToShipping(!billToShipping);
 
   return (
     <>
@@ -210,10 +218,12 @@ export default function Checkout({ products }: CheckoutProps) {
                     <input
                       type="checkbox"
                       name="billToShipping"
-                      onChange={() => setBillToShipping(!billToShipping)}
+                      onChange={toggleBillToShipping}
                       checked={billToShipping}
                     />
-                    <label htmlFor="billToShipping" className="ml-2">Bill to shipping address</label>
+                    <label htmlFor="billToShipping" className="ml-2" onClick={toggleBillToShipping}>
+                      Bill to shipping address
+                    </label>
                   </div>
                   {!billToShipping && (<ChangeContext.Provider value={billingChange}>
                     <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />

@@ -546,3 +546,5 @@ export interface AddressFormInputProps {
   "url" |
   "week"
 }
+
+export type AddressFormChange = React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
