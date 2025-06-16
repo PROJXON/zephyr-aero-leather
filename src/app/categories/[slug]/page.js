@@ -31,11 +31,23 @@ export default async function CategoryPage({ params }) {
         />
       )}
 
-      <section className="container mx-auto px-4 py-16">
+      <section className="container mx-auto px-6 md:px-12 lg:px-24 py-20">
         {products.length > 0 ? (
-          <ProductList products={products} />
+          <div className="space-y-12">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-neutral-dark mb-6 tracking-tight">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-neutral-dark to-neutral-medium">
+                  {hero.title}
+                </span>
+              </h2>
+              <p className="text-neutral-medium text-lg font-light tracking-wide">
+                {hero.subtitle}
+              </p>
+            </div>
+            <ProductList products={products} />
+          </div>
         ) : (
-          <p className="text-neutral-medium">No products found in this category.</p>
+          <p className="text-neutral-medium text-center text-lg font-light">No products found in this category.</p>
         )}
       </section>
     </div>
