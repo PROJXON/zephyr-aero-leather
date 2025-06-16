@@ -1,6 +1,11 @@
 import AddressFormInput from "./AddressFormInput";
+import type { AddressDetailsState, AddressErrors, AddressFormInputProps } from "../../types/types";
 
-export default function AddressDetails({ title, details, errors }) {
+export default function AddressDetails({ title, details, errors }: {
+  title: string,
+  details: AddressDetailsState,
+  errors: AddressErrors
+}) {
   const { name, address, city, zipCode, state } = details;
 
   const inputs = [
@@ -59,7 +64,7 @@ export default function AddressDetails({ title, details, errors }) {
   return (<div className="block">
     <h2 className="text-xl font-semibold mb-2">{title}</h2>
     <div className="grid grid-cols-6 gap-1">
-      {inputs.map((input, i) => <AddressFormInput key={i} {...input} />)}
+      {inputs.map((input, i) => <AddressFormInput key={i} {...input as AddressFormInputProps} />)}
     </div>
   </div>);
 }
