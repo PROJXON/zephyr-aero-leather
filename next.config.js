@@ -3,18 +3,23 @@ require("dotenv").config();
 const nextConfig = {
   images: {
     domains: [
-      new URL(process.env.WOOCOMMERCE_API_URL).hostname,
-      new URL(process.env.NEXT_PUBLIC_CDN_URL).hostname,
+      'api.zephyraeroleather.com',
+      'zephyraeroleather.com',
+      'zephyraeroleather.com'
     ],
     remotePatterns: [
       {
         protocol: "https",
-        hostname: new URL(process.env.WOOCOMMERCE_API_URL).hostname,
+        hostname: "api.zephyraeroleather.com",
       },
       {
         protocol: "https",
-        hostname: new URL(process.env.NEXT_PUBLIC_CDN_URL).hostname,
+        hostname: "zephyraeroleather.com",
       },
+      {
+        protocol: "https",
+        hostname: "*.zephyraeroleather.com",
+      }
     ],
   },
 };

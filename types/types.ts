@@ -11,6 +11,8 @@ export type Product = {
   images?: {
     src: string;
     alt?: string;
+    width?: number;
+    height?: number;
   }[];
   [key: string]: any;
 };

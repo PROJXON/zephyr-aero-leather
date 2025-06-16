@@ -33,9 +33,17 @@ const mapAndTag = (products: Product[]): Product[] =>
         )
         .find(Boolean) || "Uncategorized";
 
+    // Transform the product data to match our Product type
+    const { images, ...rest } = product;
     return {
-      ...product,
+      ...rest,
       genericCategory,
+      images: images?.map((img: any) => ({
+        src: img.src,
+        alt: img.alt || '',
+        width: img.width || 800,
+        height: img.height || 800
+      }))
     };
   });
 
