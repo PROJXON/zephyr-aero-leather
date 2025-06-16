@@ -121,7 +121,7 @@ export default function Checkout({ products }: CheckoutProps) {
 
       return () => clearTimeout(timeout);
     }
-  }, [cartItems, shippingDetails, billingDetails]);
+  }, [cartItems, shippingDetails, billingDetails, orderId, paymentIntentId, products]);
 
   useEffect(() => {
     if (billToShipping) {
