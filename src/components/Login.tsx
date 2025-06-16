@@ -79,7 +79,6 @@ export default function Login() {
 
   return (
     <section className="relative flex items-center justify-center min-h-screen px-4">
-      {/* Background Image with 50% opacity overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-50"
         style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}

@@ -1,23 +1,175 @@
-export type CartItem = {
+// Next.js Page Props Types
+export interface CategoryPageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export interface CollectionPageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export interface ProductPageProps {
+  params: Promise<{ id: string }>;
+}
+
+// Cart Types
+export interface CartItem {
   id: number;
   quantity: number;
+  name?: string;
+  price?: number;
+  image?: string;
+  slug?: string;
+  productId?: number;
+  variationId?: number;
   lineItemId?: number;
-};
+  variation?: {
+    attribute: string;
+    value: string;
+  };
+}
 
-export type Product = {
+export interface Cart {
+  items: CartItem[];
+  total: number;
+  itemCount: number;
+}
+
+// Order Types
+export interface Order {
+  id: string;
+  status: string;
+  total: number;
+  items: CartItem[];
+  shipping: {
+    firstName: string;
+    lastName: string;
+    address1: string;
+    address2?: string;
+    city: string;
+    state: string;
+    postcode: string;
+    country: string;
+  };
+  createdAt: string;
+}
+
+// Review Types
+export interface Review {
+  id: number;
+  productId: number;
+  rating: number;
+  comment: string;
+  userName: string;
+  createdAt: string;
+}
+
+// Product Types
+export interface Product {
   id: number;
   name: string;
-  price: string | number;
-  images?: {
+  slug: string;
+  description: string;
+  price: number;
+  salePrice?: number;
+  images: Array<{
     src: string;
     alt?: string;
     width?: number;
     height?: number;
+  }>;
+  category: string;
+  categories?: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
+  collection?: string;
+  variations?: {
+    id: number;
+    attributes: {
+      [key: string]: string;
+    };
+    price: number;
+    salePrice?: number;
+    stock: number;
   }[];
-  [key: string]: any;
-};
+  stock: number;
+  rating?: number;
+  reviewCount?: number;
+}
 
-export type ShippingDetails = {
+// Category Types
+export interface Category {
+  id?: number;
+  name: string;
+  slug?: string;
+  description: string;
+  image: string;
+  products?: Product[];
+  slugs: string[];
+}
+
+export type CategoryMap = Record<string, readonly string[]>;
+
+export interface CategoryTitle {
+  title: string;
+  subtitle: string;
+  images?: string[];
+}
+
+export type CategoryTitlesMap = Record<string, CategoryTitle>;
+
+// Collection Types
+export interface Collection {
+  id?: number;
+  name: string;
+  slug?: string;
+  description: string;
+  image: string;
+  carouselImages: string[];
+  productIds: number[];
+  products?: Product[];
+}
+
+export type CollectionMap = Record<string, Collection>;
+
+// User Types
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  termsAccepted: boolean;
+  first_name?: string;
+  last_name?: string;
+}
+
+// Auth Types
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}
+
+// API Response Types
+export interface ApiResponse<T> {
+  data: T;
+  error?: string;
+}
+
+// Utility Types
+export type SortOption = 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc' | 'newest';
+export type FilterOption = 'all' | 'sale' | 'new' | 'bestselling';
+
+// Commitment Types
+export interface CommitmentItem {
+  title: string;
+  text: string;
+  icon?: string;
+}
+
+// Shipping Types
+export interface ShippingDetails {
   name: {
     first: string;
     last: string;
@@ -29,9 +181,10 @@ export type ShippingDetails = {
   city: string;
   zipCode: string;
   state: string;
-};
+}
 
-export type StripePaymentRequestBody = {
+// Payment Types
+export interface StripePaymentRequestBody {
   amount: number;
   currency: string;
   items: CartItem[];
@@ -39,9 +192,7 @@ export type StripePaymentRequestBody = {
   payment_intent_id?: string;
   user_local_time?: string;
   shipping?: ShippingDetails;
-};
-
-export type WooRequestBody = Record<string, any>;
+}
 
 export type UpdateQuantityFn = (id: number, quantity: number) => void;
 
@@ -88,46 +239,11 @@ export interface StripePaymentIntent {
   [key: string]: any;
 };
 
-export interface Category {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-  slugs: string[];
-  slug: string;
-}
-
-export type CategoryMap = Record<string, readonly string[]>;
 export type CategoryKey = keyof CategoryMap;
 
 export interface FetchProductsOptions {
   category?: CategoryKey;
   per_page?: number;
-}
-
-export interface CategoryTitle {
-  title: string;
-  subtitle: string;
-  images: string[];
-}
-export type CategoryTitlesMap = Record<string, CategoryTitle>;
-
-export interface Collection {
-  name: string;
-  description: string;
-  image: string;
-  productIds: number[];
-  carouselImages: string[];
-}
-
-export type CollectionMap = Record<string, Collection>;
-
-export interface User {
-  id: number | string;
-  name: string;
-  email: string;
-  // Add any other fields your user object has
-  [key: string]: any;
 }
 
 export interface AuthContextType {
@@ -172,6 +288,8 @@ export interface HeroProps {
 export interface HeroCarouselProps {
   images: string[];
   altBase?: string;
+  autoPlay?: boolean;
+  interval?: number;
 }
 
 export interface CartProviderProps {
@@ -188,19 +306,6 @@ export interface RegisterFormData {
   password: string;
   confirmPassword: string;
   termsAccepted: boolean;
-}
-
-export interface ProductPageProps {
-  params: { id: string };
-}
-
-export interface CategoryPageProps {
-  params: { slug: string };
-}
-
-export interface CommitmentItem {
-  title: string;
-  text: string;
 }
 
 export interface WhyShopItem {

@@ -46,8 +46,6 @@ export default function StripeForm({ clientSecret, formError, setFormError, vali
       return_url: returnURL,
     });
 
-    console.log("Stripe result:", result);
-
     if (result.error) {
       setFormError(result.error.message || null);
       setIsProcessing(false);

@@ -6,17 +6,14 @@ export async function POST(req: NextRequest): Promise<Response> {
   try {
     const { name, email, password }: { name: string; email: string; password: string } = await req.json();
 
-    // Input validation
     if (!name || !email || !password) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
-    // Encode WooCommerce API credentials
     const authHeader = `Basic ${Buffer.from(
       `${process.env.WOOCOMMERCE_API_KEY}:${process.env.WOOCOMMERCE_API_SECRET}`
     ).toString("base64")}`;
 
-    // Create user in WooCommerce
     const { data } = await axios.post(
       `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/customers`,
       {

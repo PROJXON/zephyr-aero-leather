@@ -32,7 +32,7 @@ export const metadata = {
     siteName: "Zephyr Aero Leather",
     images: [
       {
-        url: "/og-image.png", // relative path is now safe due to metadataBase
+        url: "/og-image.png", 
         width: 1200,
         height: 630,
         alt: "Zephyr Aero Leather - Premium Leather Goods",

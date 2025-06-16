@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import type { HeroCarouselProps } from "../../types/types";
 import type { ReactElement } from "react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 export default function HeroCarousel({
   images,
@@ -13,21 +14,25 @@ export default function HeroCarousel({
   const delay = 5000; // 5 seconds
   const isHoveredRef = useRef(false);
 
-  const startInterval = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      if (!isHoveredRef.current) {
+  const startInterval = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    if (!isHoveredRef.current) {
+      intervalRef.current = setInterval(() => {
         setCurrent((prev) => (prev + 1) % images.length);
-      }
-    }, delay);
-  };
+      }, delay);
+    }
+  }, [images.length, delay]);
 
   useEffect(() => {
     startInterval();
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     };
-  }, [images.length]);
+  }, [startInterval]);
 
   const goToSlide = (index: number) => {
     setCurrent(index);

@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import type { CartItem, CartContextType } from "../../../types/types";
 
@@ -20,26 +20,17 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   const pendingRemovals = useRef<Record<number, boolean>>({});
   const removeTimers = useRef<Record<number, NodeJS.Timeout>>({});
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchUserCart();
-    } else {
-      loadGuestCart();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
-
-  const loadGuestCart = () => {
+  const loadGuestCart = useCallback(() => {
     const savedCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
     setCartItems(savedCart);
-  };
+  }, []);
 
   const saveGuestCart = (updatedCart: CartItem[]) => {
     setCartItems(updatedCart);
     localStorage.setItem("guestCart", JSON.stringify(updatedCart));
   };
 
-  const fetchUserCart = async () => {
+  const fetchUserCart = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
       const response = await fetch("/api/cart");
@@ -59,7 +50,15 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       setCartItems([]);
       setOrderId(null);
     }
-  };
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchUserCart();
+    } else {
+      loadGuestCart();
+    }
+  }, [isAuthenticated, fetchUserCart, loadGuestCart]);
 
   const addToCart = async (productId: number, quantity: number = 1) => {
     if (isAuthenticated) {

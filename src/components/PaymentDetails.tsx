@@ -29,7 +29,6 @@ export default function PaymentDetails() {
       const intent = intentFromURL || intentFromSession;
       const paymentSuccess = sessionStorage.getItem("payment_success");
 
-      // Only redirect if there's no intent AND no success marker
       if (!intent && !paymentSuccess) {
         return router.replace("/");
       }
@@ -37,7 +36,6 @@ export default function PaymentDetails() {
       setPaymentIntentId(intent);
       setAllowed(true);
 
-      // Only clear cart once
       if (!cartClearedRef.current) {
         cartClearedRef.current = true;
         await clearCart();

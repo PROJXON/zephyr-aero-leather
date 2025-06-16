@@ -10,15 +10,13 @@ export async function POST(req: NextRequest): Promise<Response> {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
     }
 
-    // ✅ Step 1: Get JWT token from WooCommerce
     const jwtRes = await fetch(`${process.env.WOOCOMMERCE_API_URL}/wp-json/jwt-auth/v1/token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: email, password }),
     });
 
-    const rawJwtResponse = await jwtRes.text(); // get raw text
-    console.log("JWT raw response:", rawJwtResponse); // log it
+    const rawJwtResponse = await jwtRes.text();
 
     if (!jwtRes.ok) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
@@ -29,7 +27,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       jwtData = JSON.parse(rawJwtResponse);
     } catch (err) {
       if (rawJwtResponse.includes("<!DOCTYPE html>")) {
-        console.error("Received HTML instead of JSON – likely Jetpack login screen.");
+        console.error("Received HTML instead of JSON – likely Jetpack login screen");
       } else {
         console.error("Failed to parse JWT response as JSON:", err);
       }
@@ -39,7 +37,6 @@ export async function POST(req: NextRequest): Promise<Response> {
     const token: string | undefined = jwtData.token;
     if (!token) return NextResponse.json({ error: "Authentication failed" }, { status: 401 });
 
-    // ✅ Step 2: Fetch WordPress user data
     let userData: any = null;
     const userDataError = "Failed to fetch user data";
 
@@ -51,14 +48,12 @@ export async function POST(req: NextRequest): Promise<Response> {
     const userId: number = userData.id;
 
     let customerData: any = null;
-    // ✅ Step 3: Fetch WooCommerce customer data
     customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Error fetching WooCommerce customer data:");
 
     if (!customerData) {
       return NextResponse.json({ error: "Failed to fetch WooCommerce customer Data" }, { status: 500 });
     }
 
-    // ✅ Step 4: Create response with cookies
     const res = new NextResponse(JSON.stringify({ success: true, user: customerData }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
@@ -82,7 +77,6 @@ export async function POST(req: NextRequest): Promise<Response> {
   } catch (error) {
     console.error("Login error:", error);
 
-    // ✅ Step 5: Return error and clear cookies if login fails
     const response = new NextResponse(JSON.stringify({ error: "An error occurred" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

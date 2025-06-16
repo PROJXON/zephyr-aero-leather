@@ -34,12 +34,10 @@ export async function POST(request: NextRequest): Promise<Response> {
       );
     }
 
-    // Find user with matching reset token
     const { data: users }: { data: WooCustomer[] } = await api.get(
       "customers?per_page=100"
     );
 
-    // Find user with matching reset token in their meta data
     const user = users.find((user) =>
       user.meta_data?.some(
         (meta) => meta.key === "reset_token" && meta.value === token
@@ -53,7 +51,6 @@ export async function POST(request: NextRequest): Promise<Response> {
       );
     }
 
-    // Find the reset token expiry in meta data
     const resetTokenExpiry = user.meta_data?.find(
       (meta) => meta.key === "reset_token_expiry"
     )?.value;
@@ -65,7 +62,6 @@ export async function POST(request: NextRequest): Promise<Response> {
       );
     }
 
-    // Update password and clear reset token
     const updatedMetaData =
       user.meta_data?.filter(
         (meta) => meta.key !== "reset_token" && meta.key !== "reset_token_expiry"

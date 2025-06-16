@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -40,16 +40,27 @@ const Navbar = ({ allProducts }: NavbarProps) => {
   const { cartItems, updateQuantity, setCartOpen, cartOpen } = useCart();
   const { replace } = useRouter();
   const pathname = usePathname();
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
 
-  useEffect(() => {
-    fetchUserFromServer();
+  const handleCartOpen = useCallback(() => {
+    setIsCartOpen(true);
+  }, []);
+
+  const handleCartClose = useCallback(() => {
+    setIsCartOpen(false);
   }, []);
 
   useEffect(() => {
-    setCartOpen(false);
-  }, [pathname]);
+    fetchUserFromServer();
+  }, [fetchUserFromServer]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setCartOpen(false);
+    }
+  }, [isAuthenticated, setCartOpen]);
 
   const handleLogout = async () => {
     await logout();
@@ -71,7 +82,7 @@ const Navbar = ({ allProducts }: NavbarProps) => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [accountOpen, cartOpen]);
+  }, [accountOpen, cartOpen, setCartOpen]);
 
   const navItems = ["About Us"];
   const navItemsWithDropdown = [
