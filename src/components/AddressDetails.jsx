@@ -1,7 +1,7 @@
-import AddressFormInput from "./AddressFormInput"
+import AddressFormInput from "./AddressFormInput";
 
 export default function AddressDetails({ title, details, errors }) {
-  const { name, address, city, zipCode, state } = details
+  const { name, address, city, zipCode, state } = details;
 
   const inputs = [
     {
@@ -54,12 +54,12 @@ export default function AddressDetails({ title, details, errors }) {
       error: errors.state,
       type: "select"
     }
-  ]
+  ];
 
   return (<div className="block">
     <h2 className="text-xl font-semibold mb-2">{title}</h2>
     <div className="grid grid-cols-6 gap-1">
       {inputs.map((input, i) => <AddressFormInput key={i} {...input} />)}
     </div>
-  </div>)
+  </div>);
 }
