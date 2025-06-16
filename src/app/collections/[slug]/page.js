@@ -31,16 +31,26 @@ export default async function CollectionPage({ params }) {
         images={images}
       />
 
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          {collectionProducts.length > 0 ? (
+      <section className="container mx-auto px-6 md:px-12 lg:px-24 py-20">
+        {collectionProducts.length > 0 ? (
+          <div className="space-y-12">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-neutral-dark mb-6 tracking-tight">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-neutral-dark to-neutral-medium">
+                  {collection.name}
+                </span>
+              </h2>
+              <p className="text-neutral-medium text-lg font-light tracking-wide">
+                {collection.description}
+              </p>
+            </div>
             <ProductList products={collectionProducts} />
-          ) : (
-            <p className="text-neutral-medium">
-              No products assigned to this collection.
-            </p>
-          )}
-        </div>
+          </div>
+        ) : (
+          <p className="text-neutral-medium text-center text-lg font-light">
+            No products assigned to this collection.
+          </p>
+        )}
       </section>
     </div>
   );
