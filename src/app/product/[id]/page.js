@@ -3,6 +3,7 @@ import Image from "next/image";
 import ProductReviews from "@/components/ProductReviews";
 import AddToCartButton from "@/components/AddToCartButton";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
+import Link from "next/link";
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 
@@ -26,42 +27,78 @@ export async function generateStaticParams() {
 }
 
 export default async function ProductPage({ params }) {
-  const { id } = await params;
+  const { id } = await params
   const product = await getProduct(id);
 
   if (!product) notFound();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-8">
-        <div className="relative aspect-square">
-          <Image
-            src={product.images[0]?.src || "/placeholder.jpg"}
-            alt={product.name}
-            fill
-            className="object-cover rounded-xl"
-          />
+    <div className="container mx-auto px-6 md:px-12 lg:px-24 pt-6 pb-12">
+
+      <div className="mb-4 text-sm text-neutral-medium">
+        <Link href="/" className="hover:text-neutral-dark transition-colors">Home</Link>
+        <span className="mx-2">/</span>
+        <Link href="/categories" className="hover:text-neutral-dark transition-colors">Categories</Link>
+        <span className="mx-2">/</span>
+        <span className="text-neutral-dark">{product.name}</span>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12">
+
+        <div className="space-y-4">
+          <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-gray-50">
+            <Image
+              src={product.images[0]?.src || "/placeholder.jpg"}
+              alt={product.name}
+              fill
+              className="object-contain p-4 transition-all duration-300 hover:scale-105"
+              priority
+            />
+          </div>
+        
+          {product.images.length > 1 && (
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {product.images.map((image, index) => (
+                <div 
+                  key={index} 
+                  className="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-transparent hover:border-neutral-medium transition-colors cursor-pointer"
+                >
+                  <Image
+                    src={image.src}
+                    alt={`${product.name} - View ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="py-10">
-          <h1 className="text-3xl mb-4 text-center">{product.name}</h1>
-          <p className="text-2xl text-gray-800 mb-4 text-right w-full">
-            ${product.price}
-          </p>
-          <div
-            className="prose max-w-none mb-8 text-right w-full"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
-          <div className="flex justify-end mt-6">
+        <div className="space-y-6 pt-8">
+          <div className="border-b border-neutral-light pb-6">
+            <h1 className="text-2xl md:text-3xl font-bold text-neutral-dark mb-2 tracking-tight">
+              {product.name}
+            </h1>
+            <p className="text-xl text-neutral-dark font-medium">
+              ${product.price}
+            </p>
+          </div>
+
+          <div className="prose max-w-none text-neutral-medium text-base font-light tracking-wide">
+            <div dangerouslySetInnerHTML={{ __html: product.description }} />
+          </div>
+
+          <div className="pt-4">
             <AddToCartButton
               productId={product.id}
-              className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+              className="w-full md:w-auto py-3 px-6 text-base font-medium bg-neutral-light text-neutral-dark rounded-lg hover:bg-neutral-medium transition-colors shadow-md"
             />
           </div>
         </div>
       </div>
 
-      <div id="reviews" className="mt-12 scroll-mt-24">
+      <div className="mt-16 border-t border-neutral-light pt-12">
         <ProductReviews productId={product.id} />
       </div>
     </div>
