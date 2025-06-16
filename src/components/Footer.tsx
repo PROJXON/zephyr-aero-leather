@@ -11,25 +11,27 @@ export default function Footer(): ReactElement {
   return (
     <footer className="bg-black text-white py-8 md:py-10">
       <div className="max-w-screen-xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
           {/* Logo & About Section */}
-          <div>
+          <div className="flex flex-col items-center md:items-center">
             <Link href="/">
               <Image 
                 src={ZephyrLogo} 
                 alt="Zephyr Logo" 
                 width={150}
                 height={75}
-                className="mx-auto md:mx-0 rounded-xl"
+                sizes="250px"
+                style={{ width: "auto", height: "auto" }}
+                className="mx-auto rounded-xl"
               />
             </Link>
             <p className="mt-3 text-gray-300 text-sm leading-relaxed">
-              Your one-stop shop for premium quality products. Discover the latest trends with Zephyr.
+              Your one-stop shop for premium quality products
             </p>
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="flex flex-col items-center md:items-center">
             <h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
             <ul className="space-y-3 text-gray-300 text-sm">
               {[
@@ -65,9 +67,9 @@ export default function Footer(): ReactElement {
           </div>
 
           {/* Social Media Links */}
-          <div>
+          <div className="flex flex-col items-center md:items-center">
             <h3 className="text-lg font-semibold mb-4 text-white">Follow Us</h3>
-            <div className="flex justify-center md:justify-start space-x-6">
+            <div className="flex justify-center space-x-6">
               <Link href="https://www.facebook.com/ZephyrAeroLeather/" className="text-gray-300 hover:text-white transform hover:scale-110 transition duration-200"
 >
                 <FaFacebook size={26} />
