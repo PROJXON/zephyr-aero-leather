@@ -4,6 +4,7 @@ import ProductReviews from "@/components/ProductReviews";
 import AddToCartButton from "@/components/AddToCartButton";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 import Link from "next/link";
+import { FaChevronRight } from "react-icons/fa";
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 
@@ -34,7 +35,7 @@ export default async function ProductPage({ params }) {
 
   return (
     <div className="container mx-auto px-6 md:px-12 lg:px-24 pt-6 pb-12">
-      
+    
       <div className="mb-4 text-sm text-neutral-medium">
         <Link href="/" className="hover:text-neutral-dark transition-colors">Home</Link>
         <span className="mx-2">/</span>
@@ -43,9 +44,9 @@ export default async function ProductPage({ params }) {
         <span className="text-neutral-dark">{product.name}</span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-4 md:gap-12">
         
-        <div className="space-y-4">
+        <div className="space-y-1 md:space-y-4">
           <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-gray-50">
             <Image
               src={product.images[0]?.src || "/placeholder.jpg"}
@@ -55,7 +56,7 @@ export default async function ProductPage({ params }) {
               priority
             />
           </div>
-          
+        
           {product.images.length > 1 && (
             <div className="flex gap-3 overflow-x-auto pb-2">
               {product.images.map((image, index) => (
@@ -75,9 +76,9 @@ export default async function ProductPage({ params }) {
           )}
         </div>
 
-        <div className="space-y-6 pt-8">
+        <div className="space-y-6 pt-2 md:pt-8">
           <div className="border-b border-neutral-light pb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-neutral-dark mb-2 tracking-tight">
+            <h1 className="text-lg md:text-xl font-bold text-neutral-dark mb-2 tracking-tight">
               {product.name}
             </h1>
             <div className="flex items-center justify-between">
@@ -89,9 +90,7 @@ export default async function ProductPage({ params }) {
                 className="text-sm text-neutral-medium hover:text-neutral-dark transition-colors flex items-center gap-1"
               >
                 <span>Reviews</span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
+                <FaChevronRight className="w-4 h-4" />
               </a>
             </div>
           </div>
