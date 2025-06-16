@@ -1,24 +1,27 @@
 import { NextResponse } from "next/server"
 import stripe from "../../../../lib/stripeObj"
-import fetchWooCommerce from "../../../../lib/fetchWooCommerce"
+import { getWooOrder, updateWooOrder } from "../../../../lib/updateWooCommerce"
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url)
-  const clientSecret = searchParams.get("client_secret")
+  const intentId = searchParams.get("payment_intent_id")
 
-  if (!clientSecret) return NextResponse.json({ error: "Missing client_secret" }, { status: 400 })
-
-  const intentId = clientSecret.split("_secret")[0]
+  if (!intentId) {
+    return NextResponse.json({ error: "Missing payment_intent_id" }, { status: 400 })
+  }
 
   try {
     const intent = await stripe.paymentIntents.retrieve(intentId)
-
     const wooOrderId = intent.metadata?.woo_order_id
     let items = []
 
     if (wooOrderId) {
-      const wooOrder = await fetchWooCommerce(`wc/v3/orders/${wooOrderId}`)
+      const wooOrder = await getWooOrder(wooOrderId)
       items = wooOrder?.line_items || []
+
+      if (wooOrder.status === "pending" && intent.status === "succeeded") {
+        await updateWooOrder(wooOrderId, { status: "completed" })
+      }
     }
 
     return NextResponse.json({
