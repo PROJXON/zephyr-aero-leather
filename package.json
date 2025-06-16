@@ -9,17 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/react-fontawesome": "^0.2.2",
     "@splidejs/react-splide": "^0.7.12",
     "@stripe/react-stripe-js": "^3.6.0",
     "@stripe/stripe-js": "^7.1.0",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "aos": "^2.3.4",
     "axios": "^1.7.9",
-    "flowbite": "^3.1.2",
     "hamburger-react": "^2.5.2",
-    "js-cookie": "^3.0.5",
     "next": "^15.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -29,12 +26,18 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/aos": "^3.0.7",
+    "@types/node": "^24.0.1",
+    "@types/react": "^19.1.8",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
     "autoprefixer": "^10.4.20",
     "dotenv": "^16.5.0",
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.8.3"
   }
 }

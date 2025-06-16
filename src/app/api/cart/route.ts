@@ -1,0 +1,50 @@
+import { NextResponse } from "next/server";
+import getCookieInfo from "../../../../lib/getCookieInfo";
+import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
+
+export async function GET(): Promise<Response> {
+  try {
+    const [token] = await getCookieInfo();
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch user data", token);
+    const userId = userData.id;
+
+    const orders = await fetchWooCommerce(`wc/v3/orders?customer=${userId}&status=pending`, "Failed to fetch orders");
+    const pendingOrder = orders.find((order: any) => order.status === "pending");
+
+    if (pendingOrder) {
+      return NextResponse.json({ orderId: pendingOrder.id, items: pendingOrder.line_items });
+    }
+
+    return NextResponse.json({ orderId: null, items: [] });
+  } catch (error: any) {
+    console.error("Error fetching cart:", error.message);
+    return NextResponse.json({ error: "Failed to fetch cart" }, { status: 500 });
+  }
+}
+
+export async function PUT(): Promise<Response> {
+  const clearCartError = "Failed to clear cart";
+
+  try {
+    const [token] = await getCookieInfo();
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch user", token);
+    const userId = userData.id;
+
+    const orders = await fetchWooCommerce(`wc/v3/orders?customer=${userId}&status=pending`, "Failed to fetch orders");
+    const pendingOrder = orders.find((order: any) => order.status === "pending");
+
+    if (!pendingOrder) {
+      return NextResponse.json({ error: "No pending order found" }, { status: 404 });
+    }
+
+    const result = await fetchWooCommerce(`wc/v3/orders/${pendingOrder.id}`, clearCartError, null, "PUT", { line_items: [] });
+    return NextResponse.json({ message: "Cart cleared", data: result });
+  } catch (error: any) {
+    console.error("Error clearing cart:", error.message);
+    return NextResponse.json({ error: clearCartError }, { status: 500 });
+  }
+}
