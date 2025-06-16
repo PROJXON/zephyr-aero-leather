@@ -79,11 +79,12 @@ export default function AboutUs(): ReactElement {
                 key={i}
                 className="group p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 hover:-translate-y-1"
               >
-                <div className="w-full aspect-square relative mb-4 rounded-xl overflow-hidden">
+                <div className="w-full h-[300px] relative mb-4 rounded-xl overflow-hidden">
                   <Image
                     src={item.image}
                     alt={item.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>

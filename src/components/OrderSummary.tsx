@@ -48,6 +48,7 @@ export default function OrderSummary({
                   src={imageInfo?.src || "/images/placeholder.svg"}
                   alt={imageInfo?.alt || itemInfo.name}
                   fill
+                  sizes="(max-width: 768px) 96px, 96px"
                   className="object-cover rounded"
                 />
               </Link>
