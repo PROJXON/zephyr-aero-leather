@@ -143,7 +143,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${
+              className={`w-full py-2 bg-[#30291C] text-neutral-dark font-bold rounded-full mt-4 bg-neutral-light  hover:bg-neutral-medium transition-colors ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -158,7 +158,7 @@ const Login = () => {
           <p className="text-center mt-2">Create an account to start shopping with us.</p>
 
           <Link href="/register">
-            <button className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition">
+            <button className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition bg-neutral-light text-neutral-dark">
               Create Account
             </button>
           </Link>

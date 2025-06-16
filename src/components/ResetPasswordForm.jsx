@@ -13,6 +13,9 @@ export default function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
+  const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -60,9 +63,13 @@ export default function ResetPasswordForm() {
   return (
     <>
       {error && <p className="text-red-500 text-sm">{error}</p>}
-      {message && <p className="text-green-500 text-sm">{message}</p>}
+      {message && <p className="text-neutral-dark text-sm">{message}</p>}
 
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+      <div
+    className="absolute inset-0 bg-cover bg-center opacity-50"
+    style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
+  />
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
             New Password
@@ -96,7 +103,7 @@ export default function ResetPasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#605137] hover:bg-[#30291C] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#605137] ${
+          className={`w-full py-2 bg-[#30291C] text-neutral-dark font-bold rounded-full mt-4 bg-neutral-light  hover:bg-neutral-medium transition-colors ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

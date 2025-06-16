@@ -142,7 +142,7 @@ const Register = () => {
             <p className="text-center mt-2">Already have an account? Sign in now.</p>
             
             <Link href="/login">
-              <button className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition">
+              <button className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition bg-neutral-light text-neutral-dark">
                 Sign In
               </button>
             </Link>
@@ -250,7 +250,7 @@ const Register = () => {
                       <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${
+                        className={`w-full py-2 bg-[#30291C] text-neutral-dark font-bold rounded-full mt-4 bg-neutral-light  hover:bg-neutral-medium transition-colors ${
                           loading ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                       >

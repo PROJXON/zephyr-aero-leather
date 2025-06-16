@@ -56,7 +56,7 @@ export default function ForgotPassword() {
 
           <button
             onClick={() => router.push("/login")}
-            className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition"
+            className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition bg-neutral-light text-neutral-dark"
           >
             Sign In
           </button>
@@ -69,7 +69,7 @@ export default function ForgotPassword() {
               Forgot Password
             </h1>
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            {message && <p className="text-green-500 text-sm">{message}</p>}
+            {message && <p className="text-neutral-dark text-sm">{message}</p>}
 
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit} noValidate>
               <div>
@@ -91,7 +91,7 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${loading ? "opacity-50 cursor-not-allowed" : ""
+                className={`w-full py-2 bg-[#30291C] text-neutral-dark font-bold rounded-full mt-4 bg-neutral-light  hover:bg-neutral-medium transition-colors ${loading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
               >
                 {loading ? "Resetting..." : "Reset Password"}
