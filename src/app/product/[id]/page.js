@@ -34,7 +34,7 @@ export default async function ProductPage({ params }) {
 
   return (
     <div className="container mx-auto px-6 md:px-12 lg:px-24 pt-6 pb-12">
-
+      
       <div className="mb-4 text-sm text-neutral-medium">
         <Link href="/" className="hover:text-neutral-dark transition-colors">Home</Link>
         <span className="mx-2">/</span>
@@ -44,7 +44,7 @@ export default async function ProductPage({ params }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12">
-
+        
         <div className="space-y-4">
           <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-gray-50">
             <Image
@@ -55,7 +55,7 @@ export default async function ProductPage({ params }) {
               priority
             />
           </div>
-        
+          
           {product.images.length > 1 && (
             <div className="flex gap-3 overflow-x-auto pb-2">
               {product.images.map((image, index) => (
@@ -80,9 +80,20 @@ export default async function ProductPage({ params }) {
             <h1 className="text-2xl md:text-3xl font-bold text-neutral-dark mb-2 tracking-tight">
               {product.name}
             </h1>
-            <p className="text-xl text-neutral-dark font-medium">
-              ${product.price}
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xl text-neutral-dark font-medium">
+                ${product.price}
+              </p>
+              <a 
+                href="#reviews" 
+                className="text-sm text-neutral-medium hover:text-neutral-dark transition-colors flex items-center gap-1"
+              >
+                <span>Reviews</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </a>
+            </div>
           </div>
 
           <div className="prose max-w-none text-neutral-medium text-base font-light tracking-wide">
@@ -98,7 +109,10 @@ export default async function ProductPage({ params }) {
         </div>
       </div>
 
-      <div className="mt-16 border-t border-neutral-light pt-12">
+      <div 
+        id="reviews" 
+        className="mt-12 border-t border-neutral-light pt-8 scroll-mt-24"
+      >
         <ProductReviews productId={product.id} />
       </div>
     </div>
