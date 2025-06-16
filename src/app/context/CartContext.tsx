@@ -40,6 +40,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   };
 
   const fetchUserCart = async () => {
+    if (!isAuthenticated) return;
     try {
       const response = await fetch("/api/cart");
       if (!response.ok) throw new Error("Failed to fetch cart");
@@ -84,6 +85,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       clearTimeout(updateTimers.current[productId]);
 
       updateTimers.current[productId] = setTimeout(() => {
+        if (!isAuthenticated) return;
         const batchedQuantity = pendingUpdates.current[productId];
         delete pendingUpdates.current[productId];
 
@@ -127,6 +129,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       clearTimeout(removeTimers.current[productId]);
 
       removeTimers.current[productId] = setTimeout(() => {
+        if (!isAuthenticated) return;
         delete pendingRemovals.current[productId];
 
         fetch("/api/cart/item", {
@@ -174,6 +177,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       clearTimeout(updateTimers.current[productId]);
 
       updateTimers.current[productId] = setTimeout(() => {
+        if (!isAuthenticated) return;
         const finalQuantity = pendingUpdates.current[productId];
         delete pendingUpdates.current[productId];
 
@@ -231,6 +235,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   };
 
   const refreshCart = async () => {
+    if (!isAuthenticated) return;
     const res = await fetch("/api/cart");
     if (!res.ok) return;
     const data = await res.json();
@@ -247,6 +252,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
   const clearCart = async () => {
     if (isAuthenticated) {
+      if (!isAuthenticated) return;
       try {
         const response = await fetch("/api/cart", {
           method: "PUT",
