@@ -2,6 +2,7 @@ import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import categoryMap from "../src/utils/categoryMap";
 import type { Product, Category, CategoryKey, FetchProductsOptions } from "../types/types";
 import type { WooCommerceCategory } from "../types/woocommerce";
+import type { FetchProductsParams } from "../types/woocommerce";
 
 const { WOOCOMMERCE_API_URL, WOOCOMMERCE_API_KEY, WOOCOMMERCE_API_SECRET } = process.env;
 
@@ -40,7 +41,7 @@ const fetchProducts = async ({
   per_page = 100,
 }: FetchProductsOptions = {}): Promise<Product[]> => {
   try {
-    const params: Record<string, any> = {
+    const params: FetchProductsParams = {
       per_page,
       status: "publish",
     };
@@ -90,12 +91,17 @@ const fetchProducts = async ({
 
       return mapAndTag(allProducts);
     }
-  } catch (error: any) {
-    console.error("[WooCommerce] Error fetching products:", {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-    });
+  } catch (error: unknown) {
+    if (error && typeof error === "object" && "message" in error) {
+      const err = error as { message: string; response?: { data?: unknown; status?: number } };
+      console.error("[WooCommerce] Error fetching products:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+      });
+    } else {
+      console.error("[WooCommerce] Unknown error fetching products:", error);
+    }
     return [];
   }
 };

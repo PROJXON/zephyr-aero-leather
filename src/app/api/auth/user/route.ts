@@ -19,20 +19,29 @@ export async function GET(_request: NextRequest): Promise<Response> {
     if (!token) return NextResponse.json({ isAuthenticated: false, user: null });
 
     const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch WordPress user", token);
-    const userId = userData.id;
-    const customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Failed to fetch WooCommerce customer");
-    const response = NextResponse.json({ isAuthenticated: true, user: customerData });
+    if (typeof userData === "object" && userData !== null && "id" in userData) {
+      const userId = (userData as { id: number }).id;
+      const customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Failed to fetch WooCommerce customer");
+      const response = NextResponse.json({ isAuthenticated: true, user: customerData });
 
-    response.cookies.set("userData", Buffer.from(JSON.stringify(customerData)).toString("base64"), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7,
-    });
+      response.cookies.set("userData", Buffer.from(JSON.stringify(customerData)).toString("base64"), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7,
+      });
 
-    return response;
-  } catch (error: any) {
-    console.error("Auth check error:", error.message);
+      return response;
+    } else {
+      throw new Error("Invalid user data received from WooCommerce");
+    }
+  } catch (error: unknown) {
+    if (error && typeof error === "object" && "message" in error) {
+      const err = error as { message: string };
+      console.error("Auth check error:", err.message);
+    } else {
+      console.error("Auth check error:", error);
+    }
 
     const response = NextResponse.json({ isAuthenticated: false, user: null });
 

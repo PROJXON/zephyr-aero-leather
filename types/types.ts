@@ -209,7 +209,7 @@ export interface WooOrder {
     product_id: number;
     quantity: number;
     price: string;
-    [key: string]: any;
+    [key: string]: unknown;
   }>;
   shipping: {
     first_name: string;
@@ -221,11 +221,11 @@ export interface WooOrder {
     state: string;
     country: string;
   };
-  meta_data?: Array<{ key: string; value: any }>;
-  [key: string]: any;
+  meta_data?: Array<{ key: string; value: unknown }>;
+  [key: string]: unknown;
 };
 
-export type WooOrderUpdate = Partial<Pick<WooOrder, 'shipping' | 'meta_data' | 'status' | 'line_items'>> & Record<string, any>;
+export type WooOrderUpdate = Partial<Pick<WooOrder, 'shipping' | 'meta_data' | 'status' | 'line_items'>> & Record<string, unknown>;
 
 // --- Stripe Types ---
 
@@ -236,7 +236,7 @@ export interface StripePaymentIntent {
   status: string;
   client_secret?: string;
   metadata?: Record<string, string>;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export type CategoryKey = keyof CategoryMap;
@@ -327,13 +327,13 @@ export interface DebugInfo {
 }
 
 export interface ChangeQuantitySpan {
-  onClick: (item: any) => void;
+  onClick: (item: unknown) => void;
   icon: React.ElementType;
 }
 
 export interface ChangeQuantitySpansProps {
   cqs: ChangeQuantitySpan[];
-  item: any;
+  item: unknown;
 }
 
 export interface CheckoutProps {
@@ -441,7 +441,7 @@ export interface QuantityControls {
 
 export interface PaymentDetailsData {
   items: CartItem[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ProductCarouselProps {

@@ -1,5 +1,5 @@
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-import type { WooRestApiOptions, WooOrder, WooOrderUpdate } from "../types/woocommerce";
+import type { WooRestApiOptions, WooOrder, WooOrderUpdate, WooError, WooRestResponse } from "../types/woocommerce";
 
 const { WOOCOMMERCE_API_URL, WOOCOMMERCE_API_KEY, WOOCOMMERCE_API_SECRET } = process.env;
 
@@ -16,16 +16,22 @@ const api = new WooCommerceRestApi({
 } as WooRestApiOptions);
 
 export async function getWooOrder(id: number): Promise<WooOrder> {
-  const res = await api.get(`orders/${id}`);
-  return res.data as WooOrder;
+  const res: WooRestResponse<WooOrder> = await api.get(`orders/${id}`);
+  return res.data;
 }
 
 export async function updateWooOrder(id: number, data: WooOrderUpdate): Promise<WooOrder> {
   try {
-    const res = await api.put(`orders/${id}`, data);
-    return res.data as WooOrder;
-  } catch (error: any) {
-    console.error("Failed to update WooCommerce order:", error.response?.data || error.message);
-    throw error;
+    const res: WooRestResponse<WooOrder> = await api.put(`orders/${id}`, data);
+    return res.data;
+  } catch (error: unknown) {
+    if (error && typeof error === "object" && "message" in error) {
+      const err = error as WooError;
+      console.error("Failed to update WooCommerce order:", err.data || err.message);
+      throw err;
+    } else {
+      console.error("Unknown WooCommerce order update error:", error);
+      throw error;
+    }
   }
 }

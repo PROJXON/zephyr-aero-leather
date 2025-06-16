@@ -70,3 +70,19 @@ export interface WooCommerceCategory {
 
 // WooCommerce API Request Types
 export type WooRequestBody = Record<string, any>; 
+
+export interface WooError {
+  code: string;
+  message: string;
+  data?: { status?: number; [key: string]: unknown };
+  [key: string]: unknown;
+}
+
+// WooCommerce-specific query params for fetching products
+export interface FetchProductsParams {
+  per_page: number;
+  status: string;
+  category?: string; // comma-separated IDs
+  page?: number;
+  [key: string]: string | number | undefined;
+}
