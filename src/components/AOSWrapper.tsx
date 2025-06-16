@@ -1,4 +1,3 @@
-// components/AOSWrapper.jsx
 "use client";
 
 import { useEffect } from "react";

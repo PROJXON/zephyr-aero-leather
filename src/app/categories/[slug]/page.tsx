@@ -3,6 +3,7 @@ import ProductList from "../../../components/ProductList";
 import categoryMap from "@/utils/categoryMap";
 import categoryTitles from "@/utils/categoryTitles";
 import Hero from "@/components/Hero";
+import type { CategoryPageProps, Product } from "../../../../types/types";
 
 export async function generateStaticParams() {
   return Object.keys(categoryMap).map((slug) => ({ slug }));
@@ -10,8 +11,9 @@ export async function generateStaticParams() {
 
 export const revalidate = 60;
 
-export default async function CategoryPage({ params }) {
-  const { slug } = await params;
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
   const products = await fetchProducts({ category: slug });
 
   const hero = categoryTitles[slug];

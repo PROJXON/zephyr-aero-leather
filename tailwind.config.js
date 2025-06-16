@@ -51,7 +51,6 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Custom colors from ver2
         'neutral-dark': 'var(--neutral-dark)',
         'neutral-medium': 'var(--neutral-medium)',
         'neutral-light': 'var(--neutral-light)',

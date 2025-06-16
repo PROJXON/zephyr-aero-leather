@@ -1,4 +1,3 @@
-// env.d.ts
 namespace NodeJS {
   interface ProcessEnv {
     WOOCOMMERCE_API_URL: string;

@@ -1,4 +1,3 @@
-// app/terms/page.tsx
 import type { JSX } from "react";
 
 export const metadata = {

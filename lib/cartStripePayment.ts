@@ -5,15 +5,6 @@ import { CartItem, StripePaymentRequestBody, ShippingDetails, StripePaymentInten
 export default async function cartStripePayment(req: Request): Promise<Response> {
   try {
     const data: StripePaymentRequestBody = await req.json();
-    console.log('Payment request data:', {
-      amount: data.amount,
-      currency: data.currency,
-      items: data.items?.length,
-      woo_order_id: data.woo_order_id,
-      payment_intent_id: data.payment_intent_id,
-      has_shipping: !!data.shipping
-    });
-    
     const { amount, currency, items, woo_order_id, payment_intent_id, user_local_time, shipping } = data;
 
     if (!amount || amount <= 0) {
@@ -86,12 +77,6 @@ export default async function cartStripePayment(req: Request): Promise<Response>
 
     // Stripe expects PaymentIntentCreateParams, not our custom type
     const paymentIntentParams: any = { ...paymentIntentObj };
-    console.log('Stripe payment intent params:', {
-      amount: paymentIntentParams.amount,
-      currency: paymentIntentParams.currency,
-      metadata: paymentIntentParams.metadata,
-      has_shipping: !!paymentIntentParams.shipping
-    });
 
     try {
       if (payment_intent_id) {
@@ -99,18 +84,11 @@ export default async function cartStripePayment(req: Request): Promise<Response>
       } else {
         paymentIntent = (await stripeObj.paymentIntents.create(paymentIntentParams)) as any;
       }
-      console.log('Stripe payment intent created/updated:', {
-        id: paymentIntent.id,
-        amount: paymentIntent.amount,
-        status: paymentIntent.status
-      });
     } catch (stripeError: any) {
       console.error('Stripe API error:', {
         message: stripeError.message,
         type: stripeError.type,
-        code: stripeError.code,
-        stack: stripeError.stack,
-        raw: stripeError.raw
+        code: stripeError.code
       });
       throw stripeError;
     }
@@ -133,9 +111,7 @@ export default async function cartStripePayment(req: Request): Promise<Response>
     console.error('Payment processing error:', {
       message: err.message,
       type: err.type,
-      code: err.code,
-      stack: err.stack,
-      raw: err.raw
+      code: err.code
     });
     return new Response(JSON.stringify({ 
       error: err.message,

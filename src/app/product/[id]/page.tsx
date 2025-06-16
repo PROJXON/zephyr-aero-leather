@@ -4,7 +4,7 @@ import ProductReviews from "@/components/ProductReviews";
 import AddToCartButton from "@/components/AddToCartButton";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 import type { JSX } from "react";
-import type { Product } from "../../../../types/types";
+import type { Product, ProductPageProps } from "../../../../types/types";
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 
@@ -27,12 +27,9 @@ export async function generateStaticParams() {
   }
 }
 
-interface ProductPageProps {
-  params: { id: string };
-}
-
 export default async function ProductPage({ params }: ProductPageProps): Promise<JSX.Element> {
-  const { id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
   const product = await getProduct(id);
 
   if (!product) notFound();

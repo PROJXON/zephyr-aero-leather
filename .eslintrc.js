@@ -15,9 +15,8 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
   ],
   rules: {
-    // Add your project-specific rules here
     '@typescript-eslint/no-unused-vars': ['warn'],
-    'react/react-in-jsx-scope': 'off', // Not needed in Next.js
+    'react/react-in-jsx-scope': 'off', 
   },
   settings: {
     react: {

@@ -35,7 +35,6 @@ export async function POST(request: NextRequest): Promise<Response> {
       );
     }
 
-    // Check if user exists in WooCommerce
     const { data: users }: { data: WooCustomer[] } = await api.get(`customers?email=${encodeURIComponent(email)}`);
 
     if (!users || users.length === 0) {
@@ -45,16 +44,12 @@ export async function POST(request: NextRequest): Promise<Response> {
       );
     }
 
-    // Generate reset token
     const resetToken = crypto.randomBytes(32).toString("hex");
     const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour from now
 
-    // Store reset token in user meta
-    // First, get existing meta data
     const { data: existingUser }: { data: WooCustomer } = await api.get(`customers/${users[0].id}`);
     const existingMetaData: WooCustomerMeta[] = existingUser.meta_data || [];
 
-    // Update or add our new meta data
     const updatedMetaData: WooCustomerMeta[] = [
       ...existingMetaData.filter(meta =>
         meta.key !== "reset_token" && meta.key !== "reset_token_expiry"
@@ -73,7 +68,6 @@ export async function POST(request: NextRequest): Promise<Response> {
       meta_data: updatedMetaData,
     });
 
-    // Send reset email using Resend
     const resetUrl = `${process.env.PAGE_URL}/reset-password?token=${resetToken}`;
     await sendEmail({
       to: email,

@@ -18,6 +18,7 @@ export async function POST(req: NextRequest): Promise<Response> {
   try {
     event = stripeObj.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err: any) {
+    console.error('Webhook signature verification failed:', err.message);
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
 
@@ -31,7 +32,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       }
       break;
     case 'payment_intent.succeeded':
-      console.log(`Payment intent for ${paymentIntent.amount_received} was successful`);
       if (wooOrderId) {
         await fetchWooCommerce(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", {
           status: "completed",
@@ -44,7 +44,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       responseBody = { success: true };
       break;
     case 'payment_intent.payment_failed':
-      console.log(`Payment failed for ${event.data.object.id}`);
       if (wooOrderId) {
         await fetchWooCommerce(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", { status: "failed" });
       }

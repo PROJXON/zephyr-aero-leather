@@ -7,11 +7,9 @@ export async function GET(): Promise<Response> {
     const [token] = await getCookieInfo();
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    // Fetch user details
     const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch user data", token);
     const userId = userData.id;
 
-    // Fetch pending orders
     const orders = await fetchWooCommerce(`wc/v3/orders?customer=${userId}&status=pending`, "Failed to fetch orders");
     const pendingOrder = orders.find((order: any) => order.status === "pending");
 
@@ -33,11 +31,9 @@ export async function PUT(): Promise<Response> {
     const [token] = await getCookieInfo();
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    // Fetch user details
     const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch user", token);
     const userId = userData.id;
 
-    // Fetch pending orders
     const orders = await fetchWooCommerce(`wc/v3/orders?customer=${userId}&status=pending`, "Failed to fetch orders");
     const pendingOrder = orders.find((order: any) => order.status === "pending");
 
@@ -45,7 +41,6 @@ export async function PUT(): Promise<Response> {
       return NextResponse.json({ error: "No pending order found" }, { status: 404 });
     }
 
-    // Update the order to clear line items
     const result = await fetchWooCommerce(`wc/v3/orders/${pendingOrder.id}`, clearCartError, null, "PUT", { line_items: [] });
     return NextResponse.json({ message: "Cart cleared", data: result });
   } catch (error: any) {

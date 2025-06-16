@@ -123,7 +123,7 @@ const Register = (): JSX.Element => {
       const userResponse = await fetch("/api/auth/user", { credentials: "include" });
       const userData = await userResponse.json();
       if (userData.isAuthenticated) {
-        setUser(userData.user); // Make sure to set the latest user data
+        setUser(userData.user); 
       }
 
       router.push("/");
@@ -135,9 +135,7 @@ const Register = (): JSX.Element => {
   };  
 
   return(
-    // <section className="bg-gray-50 dark:bg-gray-900">
     <section className="relative flex items-center justify-center min-h-screen px-4">
-  {/* Background Image with 50% opacity overlay */}
   <div
     className="absolute inset-0 bg-cover bg-center opacity-50"
     style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}

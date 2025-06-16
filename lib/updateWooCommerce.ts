@@ -1,8 +1,6 @@
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-import type { WooRestApiOptions } from "@woocommerce/woocommerce-rest-api";
-import type { WooOrder, WooOrderUpdate } from "../types/types";
+import type { WooRestApiOptions, WooOrder, WooOrderUpdate } from "../types/woocommerce";
 
-// Runtime env check
 const { WOOCOMMERCE_API_URL, WOOCOMMERCE_API_KEY, WOOCOMMERCE_API_SECRET } = process.env;
 
 if (!WOOCOMMERCE_API_URL || !WOOCOMMERCE_API_KEY || !WOOCOMMERCE_API_SECRET) {
@@ -17,13 +15,11 @@ const api = new WooCommerceRestApi({
   timeout: 30000,
 } as WooRestApiOptions);
 
-// You can refine this return type later with a WooOrder interface
 export async function getWooOrder(id: number): Promise<WooOrder> {
   const res = await api.get(`orders/${id}`);
   return res.data as WooOrder;
 }
 
-// Accepts any shape — consider improving later with a proper WooOrderUpdate type
 export async function updateWooOrder(id: number, data: WooOrderUpdate): Promise<WooOrder> {
   try {
     const res = await api.put(`orders/${id}`, data);

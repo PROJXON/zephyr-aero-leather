@@ -1,4 +1,3 @@
-// types/woocommerce-rest-api.d.ts
 declare module '@woocommerce/woocommerce-rest-api' {
   interface WooRestApiOptions {
     url: string;
@@ -24,4 +23,4 @@ declare module '@woocommerce/woocommerce-rest-api' {
     put<T = any>(endpoint: string, data: any): Promise<WooRestResponse<T>>;
     delete<T = any>(endpoint: string): Promise<WooRestResponse<T>>;
   }
-}
+} 
