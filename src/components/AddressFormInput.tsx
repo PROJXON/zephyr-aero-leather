@@ -10,21 +10,26 @@ export default function AddressFormInput({ name, placeholder, value, span, error
     const displayPlaceholder = error || placeholder;
 
     return (<>
-        {type === "select" ? (<select
-            className={classes}
-            name={name}
-            value={value}
-            onChange={onChange}
-        >
-            <option value="">{displayPlaceholder}</option>
-            {states.map(state => <option key={state} value={state}>{state}</option>)}
-        </select>) : (<input
-            className={classes}
-            type={type}
-            name={name}
-            placeholder={displayPlaceholder}
-            value={error ? "" : value}
-            onChange={onChange}
-        />)}
-    </>);
+        {type === "select" ? (
+            <select
+                className={classes}
+                name={name}
+                value={value}
+                onChange={onChange}
+            >
+                <option value="">{displayPlaceholder}</option>
+                {states.map(state => <option key={state} value={state}>{state}</option>)}
+            </select>
+        ) : (
+            <input
+                className={classes}
+                type={type}
+                name={name}
+                placeholder={displayPlaceholder}
+                value={error ? "" : value}
+                onChange={onChange}
+            />
+        )}
+    </>
+    );
 }
