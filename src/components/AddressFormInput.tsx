@@ -9,27 +9,28 @@ export default function AddressFormInput({ name, placeholder, value, span, error
     const classes = `w-full p-2 border rounded col-span-${span}${error ? " border-red-400 placeholder-red-300" : ""}`;
     const displayPlaceholder = error || placeholder;
 
-    return (<>
-        {type === "select" ? (
-            <select
-                className={classes}
-                name={name}
-                value={value}
-                onChange={onChange}
-            >
-                <option value="">{displayPlaceholder}</option>
-                {states.map(state => <option key={state} value={state}>{state}</option>)}
-            </select>
-        ) : (
-            <input
-                className={classes}
-                type={type}
-                name={name}
-                placeholder={displayPlaceholder}
-                value={error ? "" : value}
-                onChange={onChange}
-            />
-        )}
-    </>
+    return (
+        <>
+            {type === "select" ? (
+                <select
+                    className={classes}
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                >
+                    <option value="">{displayPlaceholder}</option>
+                    {states.map(state => <option key={state} value={state}>{state}</option>)}
+                </select>
+            ) : (
+                <input
+                    className={classes}
+                    type={type}
+                    name={name}
+                    placeholder={displayPlaceholder}
+                    value={error ? "" : value}
+                    onChange={onChange}
+                />
+            )}
+        </>
     );
 }
