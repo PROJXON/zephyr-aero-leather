@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, Fragment, useCallback } from "react";
+import { useState, useEffect, Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -33,6 +33,14 @@ const collectionCategories = [
   { name: "Minimalist", slug: "minimalist" },
 ];
 
+const handleCartOpen = (setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
+  setIsCartOpen(true);
+};
+
+const handleCartClose = (setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
+  setIsCartOpen(false);
+};
+
 const Navbar = ({ allProducts }: NavbarProps) => {
   const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -43,14 +51,6 @@ const Navbar = ({ allProducts }: NavbarProps) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
-
-  const handleCartOpen = useCallback(() => {
-    setIsCartOpen(true);
-  }, []);
-
-  const handleCartClose = useCallback(() => {
-    setIsCartOpen(false);
-  }, []);
 
   useEffect(() => {
     fetchUserFromServer();

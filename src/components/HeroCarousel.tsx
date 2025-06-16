@@ -3,7 +3,6 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import type { HeroCarouselProps } from "../../types/types";
 import type { ReactElement } from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 export default function HeroCarousel({
   images,

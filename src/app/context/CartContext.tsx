@@ -9,6 +9,14 @@ interface CartProviderProps {
   children: ReactNode;
 }
 
+const loadGuestCart = (): CartItem[] => {
+  return JSON.parse(localStorage.getItem("guestCart") || "[]");
+};
+
+const saveGuestCart = (updatedCart: CartItem[]): void => {
+  localStorage.setItem("guestCart", JSON.stringify(updatedCart));
+};
+
 export const CartProvider = ({ children }: CartProviderProps) => {
   const { isAuthenticated, user } = useAuth();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -19,16 +27,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   const updateTimers = useRef<Record<number, NodeJS.Timeout>>({});
   const pendingRemovals = useRef<Record<number, boolean>>({});
   const removeTimers = useRef<Record<number, NodeJS.Timeout>>({});
-
-  const loadGuestCart = useCallback(() => {
-    const savedCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-    setCartItems(savedCart);
-  }, []);
-
-  const saveGuestCart = (updatedCart: CartItem[]) => {
-    setCartItems(updatedCart);
-    localStorage.setItem("guestCart", JSON.stringify(updatedCart));
-  };
 
   const fetchUserCart = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -56,9 +54,9 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     if (isAuthenticated) {
       fetchUserCart();
     } else {
-      loadGuestCart();
+      setCartItems(loadGuestCart());
     }
-  }, [isAuthenticated, fetchUserCart, loadGuestCart]);
+  }, [isAuthenticated, fetchUserCart]);
 
   const addToCart = async (productId: number, quantity: number = 1) => {
     if (isAuthenticated) {
