@@ -10,39 +10,6 @@ import StripeForm from "./StripeForm"
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js"
 
-const reducer = (details, action) => {
-  switch (action.type) {
-    case "FIRSTNAME":
-      return {
-        ...details,
-        name: { ...details.name, first: action.value }
-      }
-    case "LASTNAME":
-      return {
-        ...details,
-        name: { ...details.name, last: action.value }
-      }
-    case "ADDRESS1":
-      return {
-        ...details,
-        address: { ...details.address, line1: action.value }
-      }
-    case "ADDRESS2":
-      return {
-        ...details,
-        address: { ...details.address, line2: action.value }
-      }
-    case "CITY":
-      return { ...details, city: action.value }
-    case "ZIPCODE":
-      return { ...details, zipCode: action.value }
-    case "STATE":
-      return { ...details, state: action.value }
-    default:
-      return details
-  }
-}
-
 const defaultAddressDetails = {
   name: {
     first: "",
@@ -57,6 +24,29 @@ const defaultAddressDetails = {
   state: ""
 }
 
+const reducer = (details, action) => {
+  switch (action.type) {
+    case "FIRSTNAME":
+      return { ...details, name: { ...details.name, first: action.value } }
+    case "LASTNAME":
+      return { ...details, name: { ...details.name, last: action.value } }
+    case "ADDRESS1":
+      return { ...details, address: { ...details.address, line1: action.value } }
+    case "ADDRESS2":
+      return { ...details, address: { ...details.address, line2: action.value } }
+    case "CITY":
+      return { ...details, city: action.value }
+    case "ZIPCODE":
+      return { ...details, zipCode: action.value }
+    case "STATE":
+      return { ...details, state: action.value }
+    case "ALL": return { ...action.value };
+    case "RESET": return { ...defaultAddressDetails };
+    default:
+      return details
+  }
+}
+
 export const ChangeContext = createContext()
 export const StatesContext = createContext()
 
@@ -67,6 +57,7 @@ export default function Checkout({ products }) {
   const [newQty, setNewQty] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [paymentIntentId, setPaymentIntentId] = useState(null)
+  const [billToShipping, setBillToShipping] = useState(true)
   const [formError, setFormError] = useState(null)
   const [shippingErrors, setShippingErrors] = useState({})
   const [shippingDetails, shippingDispatch] = useReducer(reducer, defaultAddressDetails)
@@ -115,6 +106,19 @@ export default function Checkout({ products }) {
     }
   }, [cartItems, shippingDetails, billingDetails])
 
+  useEffect(() => {
+    if (billToShipping) {
+      billingDispatch({
+        type: "ALL",
+        value: shippingDetails
+      });
+    }
+  }, [billToShipping, shippingDetails]);
+
+  useEffect(() => {
+    if (!billToShipping) billingDispatch({ type: "RESET" });
+  }, [billToShipping]);
+
   const appearance = { theme: "stripe" };
   const options = { clientSecret, appearance };
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
@@ -149,8 +153,8 @@ export default function Checkout({ products }) {
     })
   }
 
-  const shippingChange = useCallback(handleChange(shippingDispatch, setShippingErrors), [shippingErrors]);
-  const billingChange = useCallback(handleChange(billingDispatch, setBillingErrors), [billingErrors]);
+  const shippingChange = useCallback(handleChange(shippingDispatch, setShippingErrors), [shippingDetails]);
+  const billingChange = useCallback(handleChange(billingDispatch, setBillingErrors), [billingDetails]);
 
   return (<>
     {cartItems?.length > 0 ? (<div className="flex flex-col gap-8">
@@ -165,15 +169,23 @@ export default function Checkout({ products }) {
       {clientSecret && (<div
         className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between max-w-7xl w-full mx-auto"
       >
-        <div className="w-full lg:max-w-xl">
+        <div className="w-full lg:max-w-xl grid gap-2">
           <StatesContext.Provider value={states}>
-            <ChangeContext.Provider value={billingChange}>
-              <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
-            </ChangeContext.Provider>
-            <br />
             <ChangeContext.Provider value={shippingChange}>
               <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
             </ChangeContext.Provider>
+            <div>
+              <input
+                type="checkbox"
+                name="billToShipping"
+                onChange={() => setBillToShipping(!billToShipping)}
+                checked={billToShipping}
+              />
+              <label htmlFor="billToShipping" className="ml-2">Bill to shipping address</label>
+            </div>
+            {!billToShipping && (<ChangeContext.Provider value={billingChange}>
+              <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
+            </ChangeContext.Provider>)}
           </StatesContext.Provider>
         </div>
         <div className="w-full lg:max-w-md">
@@ -182,10 +194,10 @@ export default function Checkout({ products }) {
               clientSecret={clientSecret}
               formError={formError}
               setFormError={setFormError}
-              validateBilling={() => validateAddress(billingDetails)}
-              setBillingErrors={setBillingErrors}
               validateShipping={() => validateAddress(shippingDetails)}
               setShippingErrors={setShippingErrors}
+              validateBilling={() => validateAddress(billingDetails)}
+              setBillingErrors={setBillingErrors}
             />
           </Elements>
         </div>

@@ -6,10 +6,10 @@ export default function StripeForm({
   clientSecret,
   formError,
   setFormError,
-  validateBilling,
-  setBillingErrors,
   validateShipping,
-  setShippingErrors
+  setShippingErrors,
+  validateBilling,
+  setBillingErrors
 }) {
   const stripe = useStripe()
   const elements = useElements()
@@ -28,14 +28,14 @@ export default function StripeForm({
     e.preventDefault()
     if (!stripe || !elements) return
 
+    const shippingError = checkAddressForm(validateShipping, setShippingErrors)
+    if (shippingError) {
+      setFormError("Fix the error(s) in the shipping form")
+      return
+    }
     const billingError = checkAddressForm(validateBilling, setBillingErrors)
     if (billingError) {
       setFormError("Fix the error(s) in the billing form")
-      return
-    }
-    const addressError = checkAddressForm(validateShipping, setShippingErrors)
-    if (addressError) {
-      setFormError("Fix the error(s) in the shipping form")
       return
     }
 
