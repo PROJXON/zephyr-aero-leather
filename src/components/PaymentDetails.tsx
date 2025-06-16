@@ -82,6 +82,7 @@ export default function PaymentDetails() {
           cartItems={paymentDetails.items}
           products={products}
           total={total}
+          showReviewLinks={true}
         />
       ) : (
         <p>Loading your payment details...</p>
