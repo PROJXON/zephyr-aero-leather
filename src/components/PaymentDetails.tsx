@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import OrderSummary from "./OrderSummary";
 import calculateTotal from "../../lib/calculateTotal";
 import { useAuth } from "@/app/context/AuthContext";
@@ -16,8 +16,9 @@ export default function PaymentDetails() {
   const [products, setProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [allowed, setAllowed] = useState<boolean>(false);
+  const cartClearedRef = useRef(false);
 
-  const { clearCart, refreshCart } = useCart();
+  const { clearCart } = useCart();
   const queryIntent = searchParams.get("payment_intent");
   const { isAuthenticated } = useAuth();
 
@@ -26,37 +27,25 @@ export default function PaymentDetails() {
       const intentFromURL = queryIntent;
       const intentFromSession = sessionStorage.getItem("payment_intent");
       const intent = intentFromURL || intentFromSession;
+      const paymentSuccess = sessionStorage.getItem("payment_success");
 
-      if (!intent) return router.replace("/");
+      // Only redirect if there's no intent AND no success marker
+      if (!intent && !paymentSuccess) {
+        return router.replace("/");
+      }
 
       setPaymentIntentId(intent);
       setAllowed(true);
 
-      // Clean up session markers
-      setTimeout(() => {
-        sessionStorage.removeItem("payment_success");
-        sessionStorage.removeItem("payment_intent");
-      }, 500);
-
-      await clearCart();
-
-      for (let i = 0; i < 10; i++) {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        const res = await fetch("/api/cart");
-        const data = await res.json();
-
-        if (!data.items || data.items.length === 0) {
-          break;
-        }
-
-        if (i === 9) console.warn("⚠️ Woo cart still not empty after polling");
+      // Only clear cart once
+      if (!cartClearedRef.current) {
+        cartClearedRef.current = true;
+        await clearCart();
       }
-
-      await refreshCart();
     };
 
     run();
-  }, [clearCart, queryIntent, refreshCart, router]);
+  }, [clearCart, queryIntent, router]);
 
   useEffect(() => {
     const getProducts = async () => {

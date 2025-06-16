@@ -5,7 +5,24 @@ import { CartItem, StripePaymentRequestBody, ShippingDetails, StripePaymentInten
 export default async function cartStripePayment(req: Request): Promise<Response> {
   try {
     const data: StripePaymentRequestBody = await req.json();
-    const { amount, items, woo_order_id, payment_intent_id, user_local_time, shipping } = data;
+    console.log('Payment request data:', {
+      amount: data.amount,
+      currency: data.currency,
+      items: data.items?.length,
+      woo_order_id: data.woo_order_id,
+      payment_intent_id: data.payment_intent_id,
+      has_shipping: !!data.shipping
+    });
+    
+    const { amount, currency, items, woo_order_id, payment_intent_id, user_local_time, shipping } = data;
+
+    if (!amount || amount <= 0) {
+      throw new Error('Invalid amount: Amount must be greater than 0');
+    }
+
+    if (!currency) {
+      throw new Error('Currency is required');
+    }
 
     let paymentIntent: StripePaymentIntent | null = null;
     const metadata: Record<string, string> = {};
@@ -14,7 +31,11 @@ export default async function cartStripePayment(req: Request): Promise<Response>
     if (woo_order_id) metadata.woo_order_id = String(woo_order_id);
     if (user_local_time) metadata.user_local_time = user_local_time;
 
-    const paymentIntentObj: Partial<StripePaymentIntent> & { metadata: Record<string, string> } = { metadata }; // Stripe accepts flexible objects
+    const paymentIntentObj: Partial<StripePaymentIntent> & { metadata: Record<string, string> } = { 
+      metadata,
+      currency: currency || 'usd',
+      payment_method_types: ['card']
+    };
 
     if (amount) paymentIntentObj.amount = amount;
 
@@ -33,40 +54,75 @@ export default async function cartStripePayment(req: Request): Promise<Response>
       };
 
       if (woo_order_id) {
-        await fetchWooCommerce(`wc/v3/orders/${woo_order_id}`, "Failed to update shipping details", null, "PUT", {
-          shipping: {
-            first_name: name.first,
-            last_name: name.last,
-            address_1: address.line1,
-            address_2: address.line2 || "",
-            city,
-            postcode: zipCode,
-            state,
-            country: "US"
-          },
-          meta_data: [
-            {
-              key: "user_local_time",
-              value: new Date().toISOString()
-            }
-          ]
-        });
+        try {
+          await fetchWooCommerce(`wc/v3/orders/${woo_order_id}`, "Failed to update shipping details", null, "PUT", {
+            shipping: {
+              first_name: name.first,
+              last_name: name.last,
+              address_1: address.line1,
+              address_2: address.line2 || "",
+              city,
+              postcode: zipCode,
+              state,
+              country: "US"
+            },
+            meta_data: [
+              {
+                key: "user_local_time",
+                value: new Date().toISOString()
+              }
+            ]
+          });
+        } catch (wooError: any) {
+          console.error('WooCommerce update error:', {
+            message: wooError.message,
+            status: wooError.status,
+            data: wooError.data
+          });
+          // Continue with Stripe payment even if WooCommerce update fails
+        }
       }
     }
 
     // Stripe expects PaymentIntentCreateParams, not our custom type
     const paymentIntentParams: any = { ...paymentIntentObj };
+    console.log('Stripe payment intent params:', {
+      amount: paymentIntentParams.amount,
+      currency: paymentIntentParams.currency,
+      metadata: paymentIntentParams.metadata,
+      has_shipping: !!paymentIntentParams.shipping
+    });
 
-    if (payment_intent_id) {
-      paymentIntent = (await stripeObj.paymentIntents.update(payment_intent_id, paymentIntentParams)) as any;
-    } else {
-      paymentIntent = (await stripeObj.paymentIntents.create(paymentIntentParams)) as any;
+    try {
+      if (payment_intent_id) {
+        paymentIntent = (await stripeObj.paymentIntents.update(payment_intent_id, paymentIntentParams)) as any;
+      } else {
+        paymentIntent = (await stripeObj.paymentIntents.create(paymentIntentParams)) as any;
+      }
+      console.log('Stripe payment intent created/updated:', {
+        id: paymentIntent.id,
+        amount: paymentIntent.amount,
+        status: paymentIntent.status
+      });
+    } catch (stripeError: any) {
+      console.error('Stripe API error:', {
+        message: stripeError.message,
+        type: stripeError.type,
+        code: stripeError.code,
+        stack: stripeError.stack,
+        raw: stripeError.raw
+      });
+      throw stripeError;
+    }
+
+    if (!paymentIntent) {
+      throw new Error('Failed to create or update payment intent');
     }
 
     return new Response(
       JSON.stringify({
-        clientSecret: paymentIntent?.client_secret ?? undefined,
-        payment_intent_id: paymentIntent?.id ?? undefined,
+        clientSecret: paymentIntent.client_secret,
+        payment_intent_id: paymentIntent.id,
       }),
       {
         status: 200,
@@ -74,7 +130,19 @@ export default async function cartStripePayment(req: Request): Promise<Response>
       }
     );
   } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error('Payment processing error:', {
+      message: err.message,
+      type: err.type,
+      code: err.code,
+      stack: err.stack,
+      raw: err.raw
+    });
+    return new Response(JSON.stringify({ 
+      error: err.message,
+      type: err.type,
+      code: err.code,
+      details: err.raw
+    }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
     });

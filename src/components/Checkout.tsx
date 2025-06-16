@@ -12,6 +12,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import type { CheckoutProps, ShippingDetailsState, ShippingDetailsAction, ShippingErrors } from "../../types/types";
 import type { StripeElementsOptions, Appearance } from "@stripe/stripe-js";
 
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
 function reducer(details: ShippingDetailsState, action: ShippingDetailsAction): ShippingDetailsState {
   switch (action.type) {
     case "FIRSTNAME":
@@ -88,18 +90,29 @@ export default function Checkout({ products }: CheckoutProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             amount: newTotal,
+            currency: 'usd',
             items: cartItems,
             woo_order_id: orderId,
             payment_intent_id: paymentIntentId,
             shipping: shippingDetails,
           }),
         })
-          .then((res) => res.json())
+          .then(async (res) => {
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.error || 'Payment request failed');
+            }
+            return data;
+          })
           .then((data) => {
             setClientSecret(data.clientSecret);
             if (data.payment_intent_id) {
               setPaymentIntentId(data.payment_intent_id);
             }
+          })
+          .catch((error) => {
+            console.error('Payment error:', error);
+            setFormError(error.message);
           });
       }, 500);
 
@@ -108,8 +121,10 @@ export default function Checkout({ products }: CheckoutProps) {
   }, [cartItems, shippingDetails, orderId, paymentIntentId, products]);
 
   const appearance: Appearance = { theme: "stripe" };
-  const options: StripeElementsOptions = { clientSecret, appearance };
-  const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+  const options: StripeElementsOptions = { 
+    clientSecret, 
+    appearance
+  };
 
   const validateShipping = (): ShippingErrors => {
     const errors: ShippingErrors = {};

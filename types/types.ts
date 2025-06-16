@@ -33,6 +33,7 @@ export type ShippingDetails = {
 
 export type StripePaymentRequestBody = {
   amount: number;
+  currency: string;
   items: CartItem[];
   woo_order_id?: number;
   payment_intent_id?: string;
