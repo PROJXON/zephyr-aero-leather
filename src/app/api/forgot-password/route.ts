@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import crypto from "crypto";
 import { sendEmail } from "../../../../lib/email";
 import type { NextRequest } from "next/server";
 import type { ForgotPasswordRequest } from "../../../../types/types";
 import type { WooCustomer, WooCustomerMeta } from "../../../../types/woocommerce";
+import getWooCommerceApi from "../../../../lib/woocommerceApi";
 
-const api = new WooCommerceRestApi({
-  url: process.env.WOOCOMMERCE_API_URL!,
-  consumerKey: process.env.WOOCOMMERCE_API_KEY!,
-  consumerSecret: process.env.WOOCOMMERCE_API_SECRET!,
-  version: "wc/v3",
-});
+const api = getWooCommerceApi();
 
 export async function POST(request: NextRequest): Promise<Response> {
   try {

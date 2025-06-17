@@ -1,22 +1,9 @@
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import categoryMap from "../src/utils/categoryMap";
 import type { Product, Category, CategoryKey, FetchProductsOptions } from "../types/types";
 import type { WooCommerceCategory } from "../types/woocommerce";
+import getWooCommerceApi from "./woocommerceApi";
 
-const { WOOCOMMERCE_API_URL, WOOCOMMERCE_API_KEY, WOOCOMMERCE_API_SECRET } = process.env;
-
-if (!WOOCOMMERCE_API_URL) throw new Error("WOOCOMMERCE_API_URL is not defined");
-if (!WOOCOMMERCE_API_KEY) throw new Error("WOOCOMMERCE_API_KEY is not defined");
-if (!WOOCOMMERCE_API_SECRET) throw new Error("WOOCOMMERCE_API_SECRET is not defined");
-
-const api = new WooCommerceRestApi({
-  url: WOOCOMMERCE_API_URL,
-  consumerKey: WOOCOMMERCE_API_KEY,
-  consumerSecret: WOOCOMMERCE_API_SECRET,
-  version: "wc/v3",
-  queryStringAuth: true,
-  timeout: 60000,
-});
+const api = getWooCommerceApi();
 
 const mapAndTag = (products: Product[]): Product[] =>
   products.map((product) => {
@@ -53,6 +40,7 @@ const fetchProducts = async ({
         return [];
       }
 
+      // @ts-expect-error - Custom type definition supports generic parameters
       const catResponse = await api.get<WooCommerceCategory[]>("products/categories?per_page=100");
       const matchedIds = catResponse.data
         .filter((cat: WooCommerceCategory) => slugs.includes(cat.slug))
@@ -68,6 +56,7 @@ const fetchProducts = async ({
         status: "publish",
         category: matchedIds.join(","),
       }).toString();
+      // @ts-expect-error - Custom type definition supports generic parameters
       const response = await api.get<Product[]>(`products?${query}`);
       return mapAndTag(response.data);
     } else {
@@ -79,6 +68,7 @@ const fetchProducts = async ({
           ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
           page: String(page),
         }).toString();
+        // @ts-expect-error - Custom type definition supports generic parameters
         const res = await api.get<Product[]>(`products?${query}`);
         if (!res.data.length) break;
 

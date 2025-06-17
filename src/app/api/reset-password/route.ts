@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import type { NextRequest } from "next/server";
-import type { ResetPasswordRequest,  WooCustomer } from "../../../../types/types";
+import type { ResetPasswordRequest } from "../../../../types/types";
+import type { WooCustomer, WooCustomerMeta } from "../../../../types/woocommerce";
+import getWooCommerceApi from "../../../../lib/woocommerceApi";
 
-const api = new WooCommerceRestApi({
-  url: process.env.WOOCOMMERCE_API_URL!,
-  consumerKey: process.env.WOOCOMMERCE_API_KEY!,
-  consumerSecret: process.env.WOOCOMMERCE_API_SECRET!,
-  version: "wc/v3",
-});
+const api = getWooCommerceApi();
 
 export async function POST(request: NextRequest): Promise<Response> {
   try {
@@ -27,7 +23,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     const user = users.find((user) =>
       user.meta_data?.some(
-        (meta) => meta.key === "reset_token" && meta.value === token
+        (meta: WooCustomerMeta) => meta.key === "reset_token" && meta.value === token
       )
     );
 
@@ -39,7 +35,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     }
 
     const resetTokenExpiry = user.meta_data?.find(
-      (meta) => meta.key === "reset_token_expiry"
+      (meta: WooCustomerMeta) => meta.key === "reset_token_expiry"
     )?.value;
 
     if (!resetTokenExpiry || new Date(resetTokenExpiry as string) < new Date()) {
@@ -51,7 +47,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     const updatedMetaData =
       user.meta_data?.filter(
-        (meta) => meta.key !== "reset_token" && meta.key !== "reset_token_expiry"
+        (meta: WooCustomerMeta) => meta.key !== "reset_token" && meta.key !== "reset_token_expiry"
       ) || [];
 
     await api.put(`customers/${user.id}`, {
