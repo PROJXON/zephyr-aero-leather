@@ -2,7 +2,6 @@
 
 import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
 import type { User } from "../../types/types";
@@ -37,7 +36,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { setIsAuthenticated, setUser, login } = useAuth();
+  const { setUser, login } = useAuth();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.target;

@@ -19,7 +19,7 @@ const saveGuestCart = (updatedCart: CartItem[]): void => {
 };
 
 export const CartProvider = ({ children }: CartProviderProps) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [orderId, setOrderId] = useState<number | null>(null);
   const [cartOpen, setCartOpen] = useState(false);

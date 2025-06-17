@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import type { ChangeQuantitySpan, ChangeQuantitySpansProps } from "../../types/types";
+import type { ChangeQuantitySpansProps } from "../../types/types";
 
 export default function ChangeQuantitySpans({ cqs, item }: ChangeQuantitySpansProps): ReactElement {
   return (

@@ -1,7 +1,7 @@
 "use client";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useState } from "react";
-import type { StripeFormProps, ValidateAddressFunc } from "../../types/types";
+import type { StripeFormProps, ValidateAddressFunc, AddressErrors } from "../../types/types";
 
 export default function StripeForm({
   clientSecret,
@@ -16,7 +16,7 @@ export default function StripeForm({
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const checkAddressForm = (validateFunc: Function, setter: ValidateAddressFunc) => {
+  const checkAddressForm = (validateFunc: () => AddressErrors, setter: ValidateAddressFunc) => {
     const errors = validateFunc();
     if (Object.keys(errors).length > 0) {
       setter(errors);

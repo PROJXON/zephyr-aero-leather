@@ -1,7 +1,5 @@
 import fetchProducts from "../../lib/woocommerce";
-import ProductList from "../components/ProductList";
 import ProductCarousel from "@/components/ProductCarousel";
-import Image from "next/image";
 import Link from "next/link";
 import Hero from "../components/Hero";
 import { GiDiamondHard, GiHandSaw } from "react-icons/gi";

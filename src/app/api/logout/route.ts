@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
-export async function POST(req: NextRequest): Promise<Response> {
+export async function POST(): Promise<Response> {
   const response = new NextResponse(JSON.stringify({ success: true }), {
     status: 200,
     headers: { "Content-Type": "application/json" },

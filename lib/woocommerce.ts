@@ -1,5 +1,5 @@
 import categoryMap from "../src/utils/categoryMap";
-import type { Product, Category, CategoryKey, FetchProductsOptions } from "../types/types";
+import type { Product, CategoryKey, FetchProductsOptions } from "../types/types";
 import type { WooCommerceCategory } from "../types/woocommerce";
 import getWooCommerceApi from "./woocommerceApi";
 
@@ -12,7 +12,7 @@ const mapAndTag = (products: Product[]): Product[] =>
       categories
         .map((cat: WooCommerceCategory) =>
           (Object.entries(categoryMap) as [CategoryKey, readonly string[]][])
-            .find(([_, slugs]) => slugs.includes(cat.slug))?.[0]
+            .find(entry => entry[1].includes(cat.slug))?.[0]
         )
         .find(Boolean) || "Uncategorized";
 
@@ -51,14 +51,27 @@ const fetchProducts = async ({
         return [];
       }
 
-      const query = new URLSearchParams({
-        per_page: String(per_page),
-        status: "publish",
-        category: matchedIds.join(","),
-      }).toString();
-      // @ts-expect-error - Custom type definition supports generic parameters
-      const response = await api.get<Product[]>(`products?${query}`);
-      return mapAndTag(response.data);
+      let page = 1;
+      let allProducts: Product[] = [];
+
+      while (true) {
+        const query = new URLSearchParams({
+          per_page: String(per_page),
+          status: "publish",
+          category: matchedIds.join(","),
+          page: String(page),
+        }).toString();
+        // @ts-expect-error - Custom type definition supports generic parameters
+        const response = await api.get<Product[]>(`products?${query}`);
+        if (!response.data.length) break;
+
+        allProducts = allProducts.concat(response.data);
+        if (response.data.length < per_page) break;
+
+        page++;
+      }
+
+      return mapAndTag(allProducts);
     } else {
       let page = 1;
       let allProducts: Product[] = [];

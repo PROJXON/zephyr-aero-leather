@@ -39,8 +39,23 @@ async function getProduct(id: string): Promise<WooCommerceProduct | null> {
 
 export async function generateStaticParams(): Promise<{ id: string }[]> {
   try {
-    const products = await fetchWooCommerce(`wc/v3/products?per_page=100`);
-    return products.map((product: WooCommerceProduct) => ({ id: product.id.toString() }));
+    let allProducts: Product[] = [];
+    let page = 1;
+    let hasMore = true;
+
+    // Keep fetching pages until we get all products
+    while (hasMore) {
+      const products: Product[] = await fetchWooCommerce(`wc/v3/products?per_page=100&page=${page}`);
+      if (products.length === 0) {
+        hasMore = false;
+      } else {
+        allProducts = [...allProducts, ...products];
+        page++;
+      }
+    }
+
+    console.log(`Pre-rendering ${allProducts.length} product pages`);
+    return allProducts.map((product) => ({ id: product.id.toString() }));
   } catch (error) {
     console.error("Error generating static params:", error);
     return [];

@@ -4,9 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import OrderSummary from "./OrderSummary";
 import calculateTotal from "../../lib/calculateTotal";
-import { useAuth } from "@/app/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
-import type { Product, CartItem, PaymentDetailsData } from "../../types/types";
+import type { Product, PaymentDetailsData } from "../../types/types";
 
 export default function PaymentDetails() {
   const router = useRouter();
@@ -20,7 +19,6 @@ export default function PaymentDetails() {
 
   const { clearCart } = useCart();
   const queryIntent = searchParams.get("payment_intent");
-  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const run = async () => {
