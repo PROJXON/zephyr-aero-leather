@@ -61,7 +61,7 @@ export default function ProductCarousel({ products, viewAllLink }) {
                     <div className="flex justify-end">
                       <AddToCartButton
                         productId={product.id}
-                        className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+                        className="py-1 px-2 sm:py-2 sm:px-4 text-xs sm:text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
                       />
                     </div>
                   </div>
