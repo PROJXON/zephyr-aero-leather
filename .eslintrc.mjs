@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   root: true,
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -23,4 +23,6 @@ module.exports = {
       version: 'detect',
     },
   },
-}
+};
+
+export default config;
