@@ -1,6 +1,6 @@
 import fetchWooCommerce from "./fetchWooCommerce";
 import { AddressDetailsState, State } from "../types/types";
-import { WooCommerceAddress, WooOrder } from "../types/woocommerce";
+import { WooCommerceAddress, WooOrderUpdate } from "../types/woocommerce";
 
 export default async function syncAddress(
   addressObj: AddressDetailsState,
@@ -9,7 +9,7 @@ export default async function syncAddress(
 ): Promise<void> {
   const { name, address, city, zipCode, state } = addressObj;
 
-  const wooDetails: WooOrder = {
+  const wooDetails: WooOrderUpdate = {
     meta_data: [
       {
         key: "user_local_time",
