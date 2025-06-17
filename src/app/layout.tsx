@@ -12,13 +12,11 @@ import Script from "next/script";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-  display: "swap",
 });
 
 export const metadata = {
@@ -54,6 +52,8 @@ export const metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 // Google Tag Manager script
@@ -91,7 +91,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <AuthProvider>
           <CartProvider>
             <Navbar allProducts={products} />
-            <main className="relative z-0">{children}</main>
+            <main className="relative z-0 overflow-x-hidden">{children}</main>
             <Footer />
           </CartProvider>
         </AuthProvider>
