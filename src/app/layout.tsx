@@ -22,6 +22,12 @@ export const metadata = {
   metadataBase: new URL("https://zephyraeroleather.com"),
   title: "Zephyr Aero Leather",
   description: "Designed for Flight. Made for Life",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
   icons: {
     icon: "/favicon.png",
   },
@@ -52,16 +58,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const products = await fetchProducts();
 
   return (
-    <html lang="en">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-[100dvh] grid grid-rows-[auto_1fr_auto]`}>
+    <html lang="en" className="overflow-x-hidden">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-[100dvh] grid grid-rows-[auto_1fr_auto] overflow-x-hidden`}>
         <AOSWrapper />
         <AuthProvider>
           <CartProvider>
             <Navbar allProducts={products} />
-            <main className="relative z-0">{children}</main>
+            <main className="relative z-0 overflow-x-hidden">{children}</main>
             <Footer />
           </CartProvider>
         </AuthProvider>
