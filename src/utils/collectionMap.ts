@@ -1,6 +1,6 @@
 import type { CollectionMap } from "../../types/types";
 
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
 
 const collectionMap: CollectionMap = {
   aviator: {
