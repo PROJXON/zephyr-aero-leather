@@ -51,14 +51,27 @@ const fetchProducts = async ({
         return [];
       }
 
-      const query = new URLSearchParams({
-        per_page: String(per_page),
-        status: "publish",
-        category: matchedIds.join(","),
-      }).toString();
-      // @ts-expect-error - Custom type definition supports generic parameters
-      const response = await api.get<Product[]>(`products?${query}`);
-      return mapAndTag(response.data);
+      let page = 1;
+      let allProducts: Product[] = [];
+
+      while (true) {
+        const query = new URLSearchParams({
+          per_page: String(per_page),
+          status: "publish",
+          category: matchedIds.join(","),
+          page: String(page),
+        }).toString();
+        // @ts-expect-error - Custom type definition supports generic parameters
+        const response = await api.get<Product[]>(`products?${query}`);
+        if (!response.data.length) break;
+
+        allProducts = allProducts.concat(response.data);
+        if (response.data.length < per_page) break;
+
+        page++;
+      }
+
+      return mapAndTag(allProducts);
     } else {
       let page = 1;
       let allProducts: Product[] = [];
