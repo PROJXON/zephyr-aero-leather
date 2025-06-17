@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import stripeObj from "../../../../lib/stripeObj";
+import type { StripeError } from "../../../../types/types";
 
 export async function POST(request: Request) {
   try {
@@ -17,10 +18,11 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating payment intent metadata:", error);
+    const err = error as StripeError;
     return NextResponse.json(
-      { error: error.message || "Failed to update payment intent metadata" },
+      { error: err.message || "Failed to update payment intent metadata" },
       { status: 500 }
     );
   }

@@ -29,6 +29,7 @@
     "@types/aos": "^3.0.7",
     "@types/node": "^24.0.1",
     "@types/react": "^19.1.8",
+    "@types/woocommerce__woocommerce-rest-api": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
     "@typescript-eslint/parser": "^8.34.0",
     "autoprefixer": "^10.4.20",

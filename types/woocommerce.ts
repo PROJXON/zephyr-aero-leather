@@ -1,3 +1,5 @@
+import { State } from "./types"
+
 // WooCommerce API Types
 export interface WooRestApiOptions {
   url: string;
@@ -7,44 +9,55 @@ export interface WooRestApiOptions {
   timeout?: number;
   wpAPI?: boolean;
   queryStringAuth?: boolean;
-  axiosConfig?: Record<string, any>;
+  axiosConfig?: Record<string, string | number | boolean>;
 }
 
-export interface WooRestResponse<T = any> {
+export interface WooRestResponse<T = unknown> {
   data: T;
   status: number;
-  headers: Record<string, any>;
+  headers: Record<string, string | number | boolean>;
+}
+
+export interface WooCommerceAddress {
+  first_name: string;
+  last_name: string;
+  address_1: string;
+  address_2?: string;
+  city: string;
+  postcode: string;
+  state: State;
+  country: "US";
 }
 
 // WooCommerce Order Types
+export interface WooOrderLineItem {
+  id: number;
+  name: string;
+  product_id: number;
+  quantity: number;
+  price: string;
+  [key: string]: unknown;
+}
+
+export interface WooOrderMetaData {
+  key: string;
+  value: unknown;
+}
+
 export interface WooOrder {
   id: number;
   status: string;
   total: string;
   currency: string;
-  line_items: Array<{
-    id: number;
-    name: string;
-    product_id: number;
-    quantity: number;
-    price: string;
-    [key: string]: any;
-  }>;
-  shipping: {
-    first_name: string;
-    last_name: string;
-    address_1: string;
-    address_2?: string;
-    city: string;
-    postcode: string;
-    state: string;
-    country: string;
-  };
-  meta_data?: Array<{ key: string; value: any }>;
-  [key: string]: any;
+  line_items: WooOrderLineItem[];
+  items: CartItemResponse[];
+  shipping: WooCommerceAddress;
+  billing?: WooCommerceAddress;
+  meta_data?: WooOrderMetaData[];
+  [key: string]: unknown;
 }
 
-export type WooOrderUpdate = Partial<Pick<WooOrder, 'shipping' | 'meta_data' | 'status' | 'line_items'>> & Record<string, any>;
+export type WooOrderUpdate = Partial<Pick<WooOrder, 'shipping' | 'meta_data' | 'status' | 'line_items' | 'billing' | 'customer_note' | 'payment_method' | 'payment_method_title' | 'set_paid'>>;
 
 // WooCommerce Product Types
 export interface WooProduct {
@@ -58,7 +71,7 @@ export interface WooProduct {
     height?: number;
   }[];
   categories?: WooCommerceCategory[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // WooCommerce Category Types
@@ -68,5 +81,29 @@ export interface WooCommerceCategory {
   slug: string;
 }
 
+// WooCommerce Customer Types
+export interface WooCustomerMeta {
+  id?: number;
+  key: string;
+  value: unknown;
+}
+
+export interface WooCustomer {
+  id: number;
+  email: string;
+  meta_data?: WooCustomerMeta[];
+  [key: string]: unknown;
+}
+
+// WooCommerce Cart Types
+export interface CartItemResponse {
+  id: number;
+  product_id: number;
+  quantity: number;
+  name?: string;
+  price?: string;
+  [key: string]: unknown;
+}
+
 // WooCommerce API Request Types
-export type WooRequestBody = Record<string, any>; 
+export type WooRequestBody = Record<string, unknown>;

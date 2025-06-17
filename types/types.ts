@@ -168,21 +168,6 @@ export interface CommitmentItem {
   icon?: string;
 }
 
-// Shipping Types
-export interface ShippingDetails {
-  name: {
-    first: string;
-    last: string;
-  };
-  address: {
-    line1: string;
-    line2?: string;
-  };
-  city: string;
-  zipCode: string;
-  state: string;
-}
-
 // Payment Types
 export interface StripePaymentRequestBody {
   amount: number;
@@ -191,41 +176,11 @@ export interface StripePaymentRequestBody {
   woo_order_id?: number;
   payment_intent_id?: string;
   user_local_time?: string;
-  shipping?: ShippingDetails;
+  shipping?: AddressDetailsState;
+  billing?: AddressDetailsState;
 }
 
 export type UpdateQuantityFn = (id: number, quantity: number) => void;
-
-// --- WooCommerce Order Types ---
-
-export interface WooOrder {
-  id: number;
-  status: string;
-  total: string;
-  currency: string;
-  line_items: Array<{
-    id: number;
-    name: string;
-    product_id: number;
-    quantity: number;
-    price: string;
-    [key: string]: any;
-  }>;
-  shipping: {
-    first_name: string;
-    last_name: string;
-    address_1: string;
-    address_2?: string;
-    city: string;
-    postcode: string;
-    state: string;
-    country: string;
-  };
-  meta_data?: Array<{ key: string; value: any }>;
-  [key: string]: any;
-};
-
-export type WooOrderUpdate = Partial<Pick<WooOrder, 'shipping' | 'meta_data' | 'status' | 'line_items'>> & Record<string, any>;
 
 // --- Stripe Types ---
 
@@ -236,8 +191,35 @@ export interface StripePaymentIntent {
   status: string;
   client_secret?: string;
   metadata?: Record<string, string>;
-  [key: string]: any;
-};
+  shipping?: {
+    name: string;
+    address: {
+      line1: string;
+      line2?: string;
+      city: string;
+      postal_code: string;
+      state: string;
+      country: string;
+    };
+  };
+  payment_method_types: string[];
+}
+
+export interface StripeError {
+  message: string;
+  type?: string;
+  code?: string;
+  raw?: unknown;
+}
+
+export interface StripePaymentResponse {
+  clientSecret: string;
+  payment_intent_id: string;
+  error?: string;
+  type?: string;
+  code?: string;
+  details?: unknown;
+}
 
 export type CategoryKey = keyof CategoryMap;
 
@@ -327,45 +309,56 @@ export interface DebugInfo {
 }
 
 export interface ChangeQuantitySpan {
-  onClick: (item: any) => void;
+  onClick: (item: CartItem) => void;
   icon: React.ElementType;
 }
 
 export interface ChangeQuantitySpansProps {
   cqs: ChangeQuantitySpan[];
-  item: any;
+  item: CartItem;
 }
 
 export interface CheckoutProps {
   products: Product[];
 }
 
-export interface ShippingDetailsState {
-  name: {
-    first: string;
-    last: string;
-  };
-  address: {
-    line1: string;
-    line2?: string;
-  };
+export interface AddressFormName {
+  first: string;
+  last: string;
+}
+
+export interface AddressFormAddress {
+  line1: string;
+  line2?: string;
+}
+
+export interface AddressDetailsState {
+  name: AddressFormName;
+  address: AddressFormAddress;
   city: string;
   zipCode: string;
   state: string;
 }
 
-export type ShippingDetailsAction =
-  | { type: "FIRSTNAME"; value: string }
-  | { type: "LASTNAME"; value: string }
-  | { type: "ADDRESS1"; value: string }
-  | { type: "ADDRESS2"; value: string }
-  | { type: "CITY"; value: string }
-  | { type: "ZIPCODE"; value: string }
-  | { type: "STATE"; value: string }
-  | { type: string; value: string };
+export type AddressDetailsAction =
+  | { type: "FIRSTNAME"; value: string; }
+  | { type: "LASTNAME"; value: string; }
+  | { type: "ADDRESS1"; value: string; }
+  | { type: "ADDRESS2"; value: string; }
+  | { type: "CITY"; value: string; }
+  | { type: "ZIPCODE"; value: string; }
+  | { type: "STATE"; value: string; }
+  | { type: "ALL"; value: AddressDetailsState }
+  | { type: "RESET"; };
 
-export interface ShippingErrors {
-  [key: string]: string;
+export interface AddressErrors {
+  [key: string]: string | undefined;
+  firstName?: string;
+  lastName?: string;
+  address?: string;
+  city?: string;
+  zipCode?: string;
+  state?: string;
 }
 
 export interface ContactFormData {
@@ -441,7 +434,6 @@ export interface QuantityControls {
 
 export interface PaymentDetailsData {
   items: CartItem[];
-  [key: string]: any;
 }
 
 export interface ProductCarouselProps {
@@ -472,8 +464,8 @@ export interface ResetPasswordFormState {
   loading: boolean;
 }
 
-export interface ShippingDetailsProps {
-  details: ShippingDetails;
+export interface AddressDetailsProps {
+  details: AddressDetailsState;
   errors: { [key: string]: string };
   states: string[];
 }
@@ -488,12 +480,16 @@ export interface ShippingFormInputProps {
   options?: string[];
 }
 
+export type ValidateAddressFunc = (errors: AddressErrors) => void;
+
 export interface StripeFormProps {
   clientSecret: string;
   formError: string | null;
   setFormError: (msg: string | null) => void;
-  validateShipping: () => Record<string, string>;
-  setShippingErrors: (errors: Record<string, string>) => void;
+  validateShipping: () => AddressErrors;
+  setShippingErrors: ValidateAddressFunc;
+  validateBilling: () => AddressErrors;
+  setBillingErrors: ValidateAddressFunc;
 }
 
 export interface SendEmailParams {
@@ -512,3 +508,162 @@ export type ViewAllProduct = {
 };
 
 export type CarouselProduct = Product | ViewAllProduct;
+
+export type State =
+  | "AL" | "AK" | "AZ" | "AR" | "CA" | "CO" | "CT" | "DE" | "FL" | "GA"
+  | "HI" | "ID" | "IL" | "IN" | "IA" | "KS" | "KY" | "LA" | "ME" | "MD"
+  | "MA" | "MI" | "MN" | "MS" | "MO" | "MT" | "NE" | "NV" | "NH" | "NJ"
+  | "NM" | "NY" | "NC" | "ND" | "OH" | "OK" | "OR" | "PA" | "RI" | "SC"
+  | "SD" | "TN" | "TX" | "UT" | "VT" | "VA" | "WA" | "WV" | "WI" | "WY";
+
+export interface AddressFormInputProps {
+  name: string;
+  placeholder: string;
+  value: string;
+  span: number;
+  error: string;
+  type: "select" |
+  "button" |
+  "checkbox" |
+  "color" |
+  "date" |
+  "datetime-local" |
+  "email" |
+  "file" |
+  "hidden" |
+  "image" |
+  "month" |
+  "number" |
+  "password" |
+  "radio" |
+  "range" |
+  "reset" |
+  "search" |
+  "submit" |
+  "tel" |
+  "text" |
+  "time" |
+  "url" |
+  "week"
+}
+
+export type AddressFormChange = React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+
+// Authentication Types
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
+  user: {
+    id: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
+  error?: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  error?: string;
+}
+
+export interface JWTResponse {
+  token: string;
+  user: {
+    id: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+export interface PaymentIntentResponse {
+  amount: number;
+  status: string;
+  items: unknown[];
+}
+
+// Stripe Types
+export interface StripePaymentIntentParams {
+  amount: number;
+  currency: string;
+  metadata: Record<string, string>;
+  payment_method_types?: string[];
+  shipping?: {
+    name: string;
+    address: {
+      line1: string;
+      line2?: string;
+      city: string;
+      postal_code: string;
+      state: string;
+      country: string;
+    };
+  };
+}
+
+export interface StripeEvent {
+  type: string;
+  data: {
+    object: {
+      id: string;
+      status: string;
+      metadata?: Record<string, string>;
+    };
+  };
+}
+
+export interface ResendError {
+  message: string;
+  name?: string;
+  statusCode?: number;
+}
+
+export interface WebhookResponse {
+  received?: boolean;
+  success?: boolean;
+  error?: boolean;
+}
+
+export interface WordPressUser {
+  id: number;
+  name: string;
+  email: string;
+  roles: string[];
+  [key: string]: unknown;
+}

@@ -54,6 +54,24 @@ const collectionCategories: Category[] = [
   { name: "Minimalist", slug: "minimalist" },
 ];
 
+const handleCartOpen = (setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
+  try {
+    return setIsCartOpen(true);
+  } catch (error) {
+    console.error('Error opening cart:', error);
+    return false;
+  }
+};
+
+const handleCartClose = (setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
+  try {
+    return setIsCartOpen(false);
+  } catch (error) {
+    console.error('Error closing cart:', error);
+    return false;
+  }
+};
+
 const Navbar = ({ allProducts }: NavbarProps) => {
   const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);

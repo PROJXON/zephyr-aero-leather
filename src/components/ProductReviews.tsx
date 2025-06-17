@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { FaStar, FaThumbsUp, FaFlag } from "react-icons/fa";
 import { useAuth } from "@/app/context/AuthContext";
+import type { WooOrder, CartItemResponse } from "../../types/woocommerce";
 import type { Review, User } from "../../types/types";
 import Link from "next/link";
 

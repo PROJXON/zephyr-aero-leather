@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 import type { NextRequest } from "next/server";
+import type { WooOrder, WooCustomer } from "../../../../types/woocommerce";
 
 export async function GET(req: NextRequest): Promise<Response> {
   const { searchParams } = new URL(req.url);
@@ -35,28 +36,28 @@ export async function POST(req: NextRequest): Promise<Response> {
   try {
     const { productId, rating, review, userId }: { productId: number; rating: number; review: string; userId: number } = await req.json();
 
-    const orders = await fetchWooCommerce(`wc/v3/orders?customer=${userId}`, "Failed to fetch orders");
-    const hasPurchased = orders.some((order: any) =>
-      order.line_items.some((item: any) => item.product_id === productId)
+    const orders = await fetchWooCommerce<WooOrder[]>(`wc/v3/orders?customer=${userId}`, "Failed to fetch orders");
+    const hasPurchased = orders.some((order) =>
+      order.line_items.some((item) => item.product_id === productId)
     );
 
     if (!hasPurchased) {
       return NextResponse.json({ error: "You must purchase this product before leaving a review" }, { status: 403 });
     }
 
-    const existingReviews = await fetchWooCommerce(`wc/v3/products/reviews?product=${productId}&customer=${userId}`, "Failed to fetch existing reviews");
+    const existingReviews = await fetchWooCommerce<Array<{ id: number }>>(`wc/v3/products/reviews?product=${productId}&customer=${userId}`, "Failed to fetch existing reviews");
 
     if (existingReviews.length > 0) {
       return NextResponse.json({ error: "You have already reviewed this product" }, { status: 403 });
     }
 
-    const user = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Failed to fetch user information");
+    const user = await fetchWooCommerce<WooCustomer>(`wc/v3/customers/${userId}`, "Failed to fetch user information");
 
     const newReview = await fetchWooCommerce("wc/v3/products/reviews", createReviewError, null, "POST", {
       product_id: productId,
       review,
       rating,
-      reviewer: user.first_name,
+      reviewer: user.first_name || user.email.split('@')[0],
       reviewer_email: user.email,
     });
 

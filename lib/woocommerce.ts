@@ -1,22 +1,9 @@
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import categoryMap from "../src/utils/categoryMap";
 import type { Product, Category, CategoryKey, FetchProductsOptions } from "../types/types";
 import type { WooCommerceCategory } from "../types/woocommerce";
+import getWooCommerceApi from "./woocommerceApi";
 
-const { WOOCOMMERCE_API_URL, WOOCOMMERCE_API_KEY, WOOCOMMERCE_API_SECRET } = process.env;
-
-if (!WOOCOMMERCE_API_URL) throw new Error("WOOCOMMERCE_API_URL is not defined");
-if (!WOOCOMMERCE_API_KEY) throw new Error("WOOCOMMERCE_API_KEY is not defined");
-if (!WOOCOMMERCE_API_SECRET) throw new Error("WOOCOMMERCE_API_SECRET is not defined");
-
-const api = new WooCommerceRestApi({
-  url: WOOCOMMERCE_API_URL,
-  consumerKey: WOOCOMMERCE_API_KEY,
-  consumerSecret: WOOCOMMERCE_API_SECRET,
-  version: "wc/v3",
-  queryStringAuth: true,
-  timeout: 60000,
-});
+const api = getWooCommerceApi();
 
 const mapAndTag = (products: Product[]): Product[] =>
   products.map((product) => {
@@ -40,7 +27,7 @@ const fetchProducts = async ({
   per_page = 100,
 }: FetchProductsOptions = {}): Promise<Product[]> => {
   try {
-    const params: Record<string, any> = {
+    const params: Record<string, string | number> = {
       per_page,
       status: "publish",
     };
@@ -53,7 +40,8 @@ const fetchProducts = async ({
         return [];
       }
 
-      const catResponse = await api.get("products/categories?per_page=100");
+      // @ts-expect-error - Custom type definition supports generic parameters
+      const catResponse = await api.get<WooCommerceCategory[]>("products/categories?per_page=100");
       const matchedIds = catResponse.data
         .filter((cat: WooCommerceCategory) => slugs.includes(cat.slug))
         .map((cat: WooCommerceCategory) => cat.id);
@@ -68,7 +56,8 @@ const fetchProducts = async ({
         status: "publish",
         category: matchedIds.join(","),
       }).toString();
-      const response = await api.get(`products?${query}`);
+      // @ts-expect-error - Custom type definition supports generic parameters
+      const response = await api.get<Product[]>(`products?${query}`);
       return mapAndTag(response.data);
     } else {
       let page = 1;
@@ -79,7 +68,8 @@ const fetchProducts = async ({
           ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
           page: String(page),
         }).toString();
-        const res = await api.get(`products?${query}`);
+        // @ts-expect-error - Custom type definition supports generic parameters
+        const res = await api.get<Product[]>(`products?${query}`);
         if (!res.data.length) break;
 
         allProducts = allProducts.concat(res.data);
@@ -90,11 +80,12 @@ const fetchProducts = async ({
 
       return mapAndTag(allProducts);
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string; response?: { data?: unknown; status?: number } };
     console.error("[WooCommerce] Error fetching products:", {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
+      message: err.message,
+      response: err.response?.data,
+      status: err.response?.status,
     });
     return [];
   }
