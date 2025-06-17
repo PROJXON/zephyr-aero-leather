@@ -47,23 +47,8 @@ export default async function cartStripePayment(req: Request): Promise<Response>
 
       await syncAddress(shipping, woo_order_id, false);
     }
-    if (billing) {
-      const { name, address, city, zipCode, state } = billing;
-      paymentIntentObj.payment_method_data = {
-        billing_details: {
-          name: `${name.first} ${name.last}`,
-          address: {
-            line1: address.line1,
-            line2: address.line2 || undefined,
-            city,
-            postal_code: zipCode,
-            state,
-            country: "US"
-          }
-        }
-      };
-      await syncAddress(billing, woo_order_id, true);
-    }
+
+    if (billing) await syncAddress(billing, woo_order_id, true);
 
     // Stripe expects PaymentIntentCreateParams, not our custom type
     const paymentIntentParams: any = { ...paymentIntentObj };
