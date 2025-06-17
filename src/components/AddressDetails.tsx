@@ -2,9 +2,9 @@ import AddressFormInput from "./AddressFormInput";
 import type { AddressDetailsState, AddressErrors, AddressFormInputProps } from "../../types/types";
 
 export default function AddressDetails({ title, details, errors }: {
-  title: string,
-  details: AddressDetailsState,
-  errors: AddressErrors
+  title: string;
+  details: AddressDetailsState;
+  errors: AddressErrors;
 }) {
   const { name, address, city, zipCode, state } = details;
 

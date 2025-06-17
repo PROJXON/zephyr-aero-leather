@@ -23,7 +23,7 @@ export default function StripeForm({
       return true;
     }
     return false;
-  }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,6 +34,7 @@ export default function StripeForm({
       setFormError("Fix the error(s) in the shipping form");
       return;
     }
+
     const billingError = checkAddressForm(validateBilling, setBillingErrors);
     if (billingError) {
       setFormError("Fix the error(s) in the billing form");

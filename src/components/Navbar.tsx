@@ -34,11 +34,21 @@ const collectionCategories = [
 ];
 
 const handleCartOpen = (setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
-  setIsCartOpen(true);
+  try {
+    return setIsCartOpen(true);
+  } catch (error) {
+    console.error('Error opening cart:', error);
+    return false;
+  }
 };
 
 const handleCartClose = (setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
-  setIsCartOpen(false);
+  try {
+    return setIsCartOpen(false);
+  } catch (error) {
+    console.error('Error closing cart:', error);
+    return false;
+  }
 };
 
 const Navbar = ({ allProducts }: NavbarProps) => {
@@ -247,8 +257,10 @@ const Navbar = ({ allProducts }: NavbarProps) => {
                   {cartItems?.length > 0 ? (
                     <>
                       <ul>
-                        {cartItems.map(item => {
-                          const itemName = allProducts.find(product => product.id === item.id)?.name || "Item";
+                        {cartItems.map((item) => {
+                          const itemName =
+                            allProducts.find((product) => product.id === item.id)
+                              ?.name || "Item";
                           return (
                             <li
                               key={`${item.id}-${item.lineItemId || "temp"}`}
@@ -265,7 +277,7 @@ const Navbar = ({ allProducts }: NavbarProps) => {
                                 </div>
                               </div>
                             </li>
-                          )
+                          );
                         })}
                       </ul>
                       <div className="mt-4 flex justify-end">
@@ -277,7 +289,9 @@ const Navbar = ({ allProducts }: NavbarProps) => {
                         </button>
                       </div>
                     </>
-                  ) : <p className="text-sm text-gray-900">Your cart is empty.</p>}
+                  ) : (
+                    <p className="text-sm text-gray-900">Your cart is empty.</p>
+                  )}
                 </div>
               )}
             </div>

@@ -2,7 +2,11 @@ import fetchWooCommerce from "./fetchWooCommerce";
 import { AddressDetailsState, State } from "../types/types";
 import { WooCommerceAddress, WooOrder } from "../types/woocommerce";
 
-export default async function syncAddress(addressObj: AddressDetailsState, woo_order_id: number | undefined, billing: boolean) {
+export default async function syncAddress(
+  addressObj: AddressDetailsState,
+  woo_order_id: number | undefined,
+  billing: boolean
+): Promise<void> {
   const { name, address, city, zipCode, state } = addressObj;
 
   const wooDetails: WooOrder = {
@@ -25,10 +29,13 @@ export default async function syncAddress(addressObj: AddressDetailsState, woo_o
     country: "US"
   };
 
-  if (billing) wooDetails.billing = wooAddress;
-  else wooDetails.shipping = wooAddress;
+  if (billing) {
+    wooDetails.billing = wooAddress;
+  } else {
+    wooDetails.shipping = wooAddress;
+  }
 
-  await fetchWooCommerce(
+  return await fetchWooCommerce(
     `wc/v3/orders/${woo_order_id}`,
     `Failed to update ${billing ? "billing" : "shipping"} details`,
     null,
