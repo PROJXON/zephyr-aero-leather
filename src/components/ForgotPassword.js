@@ -42,7 +42,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <section className="relative flex items-center justify-center min-h-screen px-4">
+    <section className="relative flex items-center justify-center min-h-screen px-4 py-8">
       <div
         className="absolute inset-0 bg-cover bg-center opacity-50"
         style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
@@ -50,13 +50,13 @@ export default function ForgotPassword() {
 
       <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Panel */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-neutral-dark text-white rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
-          <h2 className="text-2xl font-bold mb-4 mt-2">Remember Password?</h2>
-          <p className="text-center mt-2">Go back and sign in to your account.</p>
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 md:p-16 bg-neutral-dark text-white rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 mt-2">Remember Password?</h2>
+          <p className="text-center mt-2 mb-6">Go back and sign in to your account.</p>
 
           <button
             onClick={() => router.push("/login")}
-            className="mt-4 px-6 py-2 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors"
+            className="w-full md:w-auto px-6 py-2 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors"
           >
             Sign In
           </button>
@@ -64,8 +64,8 @@ export default function ForgotPassword() {
 
         {/* Right Panel */}
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white bg-opacity-90 rounded-b-xl md:rounded-r-xl md:rounded-bl-none">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4 mt-2">
+          <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 mt-2">
               Forgot Password
             </h1>
             {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -73,7 +73,7 @@ export default function ForgotPassword() {
 
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit} noValidate>
               <div>
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">
                   Email
                 </label>
                 <input
@@ -93,7 +93,7 @@ export default function ForgotPassword() {
                 disabled={loading}
                 className={`w-full py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors ${
                   loading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                  }`}
               >
                 {loading ? "Resetting..." : "Reset Password"}
               </button>
