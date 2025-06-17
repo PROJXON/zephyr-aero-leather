@@ -39,13 +39,16 @@ export default function ProductCarousel({ products, viewAllLink }) {
             <div className="w-full max-w-[120px] sm:max-w-[280px] mx-auto">
               <div className="group" data-aos="fade-up">
                 <Link href={`/product/${product.id}`}>
-                  <div className="relative aspect-square bg-card mb-3 overflow-hidden shadow-sm rounded-xl">
-                    <Image
-                      src={product.images[0]?.src || "/placeholder.jpg"}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                  <div className="relative w-full pt-[100%] bg-card mb-3 overflow-hidden shadow-sm rounded-xl">
+                    <div className="absolute inset-0">
+                      <Image
+                        src={product.images?.[0]?.src || "/placeholder.jpg"}
+                        alt={product.name}
+                        fill
+                        sizes="(max-width: 640px) 120px, (max-width: 1024px) 280px, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
                   </div>
                 </Link>
 
