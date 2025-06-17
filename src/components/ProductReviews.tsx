@@ -176,7 +176,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
           <p className="text-gray-600">You must purchase this product before leaving a review.</p>
         )
       ) : (
-        <p className="text-gray-600">Please <a href="/login" className="text-blue-500 hover:underline">login</a> to leave a review.</p>
+        <p className="text-gray-600">Please <a href="/login" className="hover:underline">login</a> to leave a review.</p>
       )}
     </div>
   );

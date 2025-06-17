@@ -141,7 +141,7 @@ const Navbar = ({ allProducts }: NavbarProps) => {
           replace("/order-history");
           setMenuOpen(false);
         },
-        classes: "block w-full text-left text-blue-600",
+        classes: "block w-full text-left text-lg",
       },
       show: isAuthenticated,
     },
@@ -149,7 +149,7 @@ const Navbar = ({ allProducts }: NavbarProps) => {
       label: "Logout",
       unique: {
         function: handleLogout,
-        classes: "block w-full text-left text-red-600",
+        classes: "block w-full text-left text-lg",
       },
       show: isAuthenticated,
     },

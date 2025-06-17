@@ -10,6 +10,11 @@ const config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        border: "var(--border)",
+        primary: "var(--primary)",
+        'neutral-dark': "var(--neutral-dark)",
+        'neutral-medium': "var(--neutral-medium)",
+        'neutral-light': "var(--neutral-light)",
       },
     },
   },
