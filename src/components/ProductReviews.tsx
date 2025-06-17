@@ -1,11 +1,39 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { FaStar, FaThumbsUp, FaFlag } from "react-icons/fa";
 import { useAuth } from "@/app/context/AuthContext";
+import type { Review, User } from "../../types/types";
+import Link from "next/link";
 
-export default function ProductReviews({ productId }) {
+interface ProductReviewsProps {
+  productId: string;
+}
+
+interface ReviewStats {
+  total: number;
+  average: number;
+  distribution: {
+    [key: number]: number;
+  };
+}
+
+interface Order {
+  line_items: {
+    product_id: string;
+  }[];
+}
+
+interface WooCommerceReview extends Review {
+  date_created: string;
+  helpful_count?: number;
+  reviewer: string;
+  review: string;
+}
+
+export default function ProductReviews({ productId }: ProductReviewsProps) {
   const { user, isAuthenticated } = useAuth();
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState<WooCommerceReview[]>([]);
   const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState(5);
   const [name, setName] = useState("");
@@ -14,7 +42,7 @@ export default function ProductReviews({ productId }) {
   const [loading, setLoading] = useState(true);
   const [hasPurchased, setHasPurchased] = useState(false);
   const [hasReviewed, setHasReviewed] = useState(false);
-  const [sortBy, setSortBy] = useState("newest");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "highest" | "lowest" | "helpful">("newest");
   const [filterRating, setFilterRating] = useState(0);
 
   useEffect(() => {
@@ -27,11 +55,11 @@ export default function ProductReviews({ productId }) {
 
   const checkPurchaseStatus = async () => {
     try {
-      const response = await fetch(`/api/order?userID=${user.id}`);
+      const response = await fetch(`/api/order?userID=${user?.id}`);
       const data = await response.json();
       const orders = data.orders || [];
       
-      const hasBought = orders.some(order => 
+      const hasBought = orders.some((order: Order) => 
         order.line_items.some(item => item.product_id === productId)
       );
       
@@ -43,7 +71,7 @@ export default function ProductReviews({ productId }) {
 
   const checkReviewStatus = async () => {
     try {
-      const response = await fetch(`/api/reviews?productId=${productId}&userId=${user.id}`);
+      const response = await fetch(`/api/reviews?productId=${productId}&userId=${user?.id}`);
       if (!response.ok) throw new Error("Failed to check review status");
       const data = await response.json();
       setHasReviewed(data.length > 0);
@@ -65,7 +93,7 @@ export default function ProductReviews({ productId }) {
     }
   };
 
-  const handleSubmitReview = async (e) => {
+  const handleSubmitReview = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
@@ -89,7 +117,7 @@ export default function ProductReviews({ productId }) {
           productId,
           rating,
           review: newReview,
-          userId: user.id,
+          userId: user?.id,
         }),
       });
 
@@ -103,18 +131,18 @@ export default function ProductReviews({ productId }) {
       setNewReview("");
       setRating(5);
     } catch (error) {
-      if (error.message === "You have already reviewed this product") {
+      if (error instanceof Error && error.message === "You have already reviewed this product") {
         setError("You have already reviewed this product. You can only leave one review per product.");
-      } else {
+      } else if (error instanceof Error) {
         setError(error.message);
       }
     }
   };
 
-  const reviewStats = {
+  const reviewStats: ReviewStats = {
     total: reviews.length,
     average: reviews.length > 0 
-      ? (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1)
+      ? Number((reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1))
       : 0,
     distribution: {
       5: reviews.filter(r => r.rating === 5).length,
@@ -125,16 +153,16 @@ export default function ProductReviews({ productId }) {
     }
   };
 
-  const sortReviews = (reviewsToSort) => {
+  const sortReviews = (reviewsToSort: WooCommerceReview[]) => {
     let filtered = filterRating > 0 
       ? reviewsToSort.filter(review => review.rating === filterRating)
       : reviewsToSort;
 
     switch (sortBy) {
       case "newest":
-        return [...filtered].sort((a, b) => new Date(b.date_created) - new Date(a.date_created));
+        return [...filtered].sort((a, b) => new Date(b.date_created).getTime() - new Date(a.date_created).getTime());
       case "oldest":
-        return [...filtered].sort((a, b) => new Date(a.date_created) - new Date(b.date_created));
+        return [...filtered].sort((a, b) => new Date(a.date_created).getTime() - new Date(b.date_created).getTime());
       case "highest":
         return [...filtered].sort((a, b) => b.rating - a.rating);
       case "lowest":
@@ -178,7 +206,7 @@ export default function ProductReviews({ productId }) {
             <label className="text-xs text-neutral-medium">Filter</label>
             <select
               value={filterRating}
-              onChange={(e) => setFilterRating(Number(e.target.value))}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => setFilterRating(Number(e.target.value))}
               className="text-sm border border-neutral-medium rounded px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-light w-full"
             >
               <option value={0}>All Ratings</option>
@@ -193,7 +221,7 @@ export default function ProductReviews({ productId }) {
             <label className="text-xs text-neutral-medium">Sort by</label>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => setSortBy(e.target.value as typeof sortBy)}
               className="text-sm border border-neutral-medium rounded px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-light w-full"
             >
               <option value="newest">Newest</option>
@@ -206,32 +234,6 @@ export default function ProductReviews({ productId }) {
         </div>
       </div>
 
-      {/* Rating Distribution - Temporarily disabled
-      {reviews.length > 0 && (
-        <div className="mb-8 p-4 bg-gray-50 rounded-lg">
-          <h3 className="text-sm font-medium mb-3">Rating Distribution</h3>
-          <div className="space-y-2">
-            {[5, 4, 3, 2, 1].map(rating => {
-              const count = reviewStats.distribution[rating];
-              const percentage = (count / reviewStats.total) * 100;
-              return (
-                <div key={rating} className="flex items-center gap-2">
-                  <span className="text-sm w-8">{rating} ★</span>
-                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-neutral-dark rounded-full"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                  <span className="text-sm text-neutral-medium w-12">{count}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-      */}
-      
       {/* List of reviews */}
       <div className="space-y-4 mb-8">
         {sortedReviews.length === 0 ? (
@@ -240,16 +242,16 @@ export default function ProductReviews({ productId }) {
           sortedReviews.map((review) => (
             <div key={review.id} className="border-b pb-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <div className="flex items-center gap-2">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar
-                      key={i}
-                      className={i < review.rating ? "text-neutral-dark" : "text-neutral-light"}
-                    />
-                  ))}
-                </div>
-                <span className="font-bold">{review.reviewer}</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar
+                        key={i}
+                        className={i < review.rating ? "text-neutral-dark" : "text-neutral-light"}
+                      />
+                    ))}
+                  </div>
+                  <span className="font-bold">{review.reviewer}</span>
                 </div>
                 <span className="text-sm text-neutral-medium sm:ml-4">
                   {new Date(review.date_created).toLocaleDateString()}
@@ -285,51 +287,61 @@ export default function ProductReviews({ productId }) {
           hasReviewed ? (
             <p className="text-gray-600">You have already reviewed this product.</p>
           ) : (
-            <form onSubmit={handleSubmitReview} className="space-y-4">
-              <div>
-                <label className="block mb-2">Rating</label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(star)}
-                      className="text-2xl"
-                    >
-                      <FaStar
-                        className={star <= rating ? "text-yellow-400" : "text-gray-300"}
-                      />
-                    </button>
-                  ))}
+            <div className="mt-8 p-6 bg-gray-50 rounded-lg">
+              <h3 className="text-lg font-medium mb-4">Write a Review</h3>
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 text-red-600 rounded">
+                  {error}
                 </div>
-              </div>
-
-              <div>
-                <label className="block mb-2">Your Review</label>
-                <textarea
-                  value={newReview}
-                  onChange={(e) => setNewReview(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  rows="4"
-                  required
-                />
-              </div>
-
-              {error && <p className="text-red-500">{error}</p>}
-
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                Submit Review
-              </button>
-            </form>
+              )}
+              <form onSubmit={handleSubmitReview} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Rating</label>
+                  <div className="flex gap-2">
+                    {[5, 4, 3, 2, 1].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        className="focus:outline-none"
+                      >
+                        <FaStar
+                          className={star <= rating ? "text-neutral-dark" : "text-neutral-light"}
+                          size={24}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="review" className="block text-sm font-medium mb-2">
+                    Your Review
+                  </label>
+                  <textarea
+                    id="review"
+                    value={newReview}
+                    onChange={(e) => setNewReview(e.target.value)}
+                    className="w-full p-3 border border-neutral-medium rounded focus:outline-none focus:ring-2 focus:ring-neutral-light"
+                    rows={4}
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-neutral-dark text-white rounded hover:bg-neutral-medium transition-colors"
+                >
+                  Submit Review
+                </button>
+              </form>
+            </div>
           )
         ) : (
           <p className="text-gray-600">You must purchase this product before leaving a review.</p>
         )
       ) : (
-        <p className="text-gray-600">Please <a href="/login" className="text-blue-500 hover:underline">login</a> to leave a review.</p>
+        <p className="text-gray-600">
+          Please <Link href="/login" className="text-blue-500 hover:underline">login</Link> to leave a review.
+        </p>
       )}
     </div>
   );

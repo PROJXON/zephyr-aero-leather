@@ -3,8 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import AddToCartButton from "./AddToCartButton";
+import type { Product } from "../../types/types";
 
-export default function ProductList({ products }) {
+interface ProductListProps {
+  products: Product[];
+}
+
+export default function ProductList({ products }: ProductListProps) {
   if (!products || products.length === 0) {
     return <p className="text-neutral-medium">No products found.</p>;
   }
@@ -53,4 +58,4 @@ export default function ProductList({ products }) {
       ))}
     </div>
   );
-}
+} 

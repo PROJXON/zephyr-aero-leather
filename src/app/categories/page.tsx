@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import categoriesMap from "@/utils/categoriesMap";
+import type { Category } from "../../../types/types";
 
 export default function CategoriesPage() {
   return (
@@ -42,4 +43,4 @@ export default function CategoriesPage() {
       </div>
     </div>
   );
-}
+} 

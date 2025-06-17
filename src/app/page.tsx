@@ -6,10 +6,42 @@ import Link from "next/link";
 import Hero from "../components/Hero";
 import { GiDiamondHard, GiHandSaw } from "react-icons/gi";
 import { FaLeaf } from "react-icons/fa";
+import type { Product } from "../../types/types";
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
 
 export const revalidate = 60;
+
+interface SectionProps {
+  title: string;
+  products: Product[];
+  link: string;
+}
+
+// Reusable Section component
+const Section = ({ title, products, link }: SectionProps) => {
+  if (!products || products.length === 0) return null;
+
+  return (
+    <section className="py-16" data-aos="fade-up">
+      <div className="container mx-auto px-4 md:px-12 lg:px-24">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h2 className="text-xl md:text-2xl font-bold text-neutral-dark mb-2">{title}</h2>
+            <div className="h-1 w-20 bg-neutral-light rounded-full"></div>
+          </div>
+          <Link
+            href={link}
+            className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+          >
+            View All
+          </Link>        
+        </div>
+        <ProductCarousel products={products} viewAllLink={link} />
+      </div>
+    </section>
+  );
+};
 
 export default async function Home() {
   const [
@@ -21,7 +53,7 @@ export default async function Home() {
     moto,
     holsters,
   ] = await Promise.all([
-     fetchProducts({ category: "wallets", per_page: 8 }),
+    fetchProducts({ category: "wallets", per_page: 8 }),
     fetchProducts({ category: "iphoneCases", per_page: 8 }),
     fetchProducts({ category: "sunglasses", per_page: 8 }),
     fetchProducts({ category: "belts", per_page: 8 }),
@@ -104,29 +136,4 @@ export default async function Home() {
       <Section title="Shoulder Holsters" products={holsters} link="/categories/holsters" />
     </div>
   );
-}
-
-// Reusable Section component
-const Section = ({ title, products, link }) => {
-  if (!products || products.length === 0) return null;
-
-  return (
-    <section className="py-16" data-aos="fade-up">
-      <div className="container mx-auto px-4 md:px-12 lg:px-24">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-xl md:text-2xl font-bold text-neutral-dark mb-2">{title}</h2>
-            <div className="h-1 w-20 bg-neutral-light rounded-full"></div>
-          </div>
-          <Link
-            href={link}
-            className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
-          >
-            View All
-          </Link>        
-        </div>
-        <ProductCarousel products={products} viewAllLink={link} />
-      </div>
-    </section>
-  );
-};
+} 

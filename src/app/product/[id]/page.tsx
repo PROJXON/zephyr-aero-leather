@@ -5,30 +5,50 @@ import AddToCartButton from "@/components/AddToCartButton";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 import Link from "next/link";
 import { FaChevronRight } from "react-icons/fa";
+import type { Product } from "../../../../types/types";
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds
 
-async function getProduct(id) {
+interface PageParams {
+  id: string;
+}
+
+interface ProductImage {
+  src: string;
+  alt?: string;
+}
+
+// WooCommerce specific product type that matches the API response
+interface WooCommerceProduct {
+  id: number;
+  name: string;
+  price: string;
+  description: string;
+  images: ProductImage[];
+}
+
+async function getProduct(id: string): Promise<WooCommerceProduct | null> {
   try {
-    return await fetchWooCommerce(`wc/v3/products/${id}`, "Product not found");
+    const product = await fetchWooCommerce(`wc/v3/products/${id}`, "Product not found");
+    return product as WooCommerceProduct;
   } catch (error) {
     console.error("Error fetching product:", error);
     return null;
   }
 }
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ id: string }[]> {
   try {
     const products = await fetchWooCommerce(`wc/v3/products?per_page=100`);
-    return products.map((product) => ({ id: product.id.toString() }));
+    return products.map((product: WooCommerceProduct) => ({ id: product.id.toString() }));
   } catch (error) {
     console.error("Error generating static params:", error);
     return [];
   }
 }
 
-export default async function ProductPage({ params }) {
-  const { id } = await params
+export default async function ProductPage({ params }: { params: PageParams }) {
+  const { id } = params;
   const product = await getProduct(id);
 
   if (!product) notFound();
@@ -112,8 +132,8 @@ export default async function ProductPage({ params }) {
         id="reviews" 
         className="mt-12 border-t border-neutral-light pt-8 scroll-mt-24"
       >
-        <ProductReviews productId={product.id} />
+        <ProductReviews productId={product.id.toString()} />
       </div>
     </div>
   );
-}
+} 

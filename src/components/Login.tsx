@@ -1,15 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
+import type { User } from "../../types/types";
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
+interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+interface ApiResponse {
+  user?: User;
+  error?: string;
+}
+
 const Login = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
@@ -17,10 +28,10 @@ const Login = () => {
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Added loading state
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({
       ...prev,
@@ -28,7 +39,7 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
 
@@ -37,7 +48,7 @@ const Login = () => {
       return;
     }
 
-    setLoading(true); // Disable button & show loading
+    setLoading(true);
 
     try {
       const response = await fetch("/api/login", {
@@ -55,11 +66,11 @@ const Login = () => {
       if (!response.ok) {
         const data = await response.json();
         setError(data.error || "Invalid email or password");
-        setLoading(false); // Re-enable button on error
+        setLoading(false);
         return;
       }
 
-      const data = await response.json();
+      const data: ApiResponse = await response.json();
 
       const userResponse = await fetch("/api/auth/user", {
         credentials: "include",
@@ -70,24 +81,23 @@ const Login = () => {
       if (userData.isAuthenticated) {
         login(userData.user);
       } else {
-        login(data.user);
+        login(data.user!);
       }
 
       router.push("/");
     } catch (error) {
       setError("An error occurred. Please try again.");
       console.error(error);
-      setLoading(false); // Re-enable button on error
+      setLoading(false);
     }
   };
 
   return (
     <section className="relative flex items-center justify-center min-h-screen px-4 py-8">
-  {/* Background Image with 50% opacity overlay */}
-  <div
-    className="absolute inset-0 bg-cover bg-center opacity-50"
-    style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
-  />
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-50"
+        style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
+      />
       <div className="relative w-full max-w-4xl h-[500px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Panel: Sign In Form */}
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-8 bg-white bg-opacity-90 rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
@@ -168,4 +178,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Login; 

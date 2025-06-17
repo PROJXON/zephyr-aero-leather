@@ -1,6 +1,7 @@
 import HeroCarousel from "./HeroCarousel";
+import type { HeroProps } from "../../types/types";
 
-const Hero = ({ title, subtitle, description, images }) => {
+const Hero = ({ title, subtitle, description, images }: HeroProps) => {
   return (
     <section className="relative bg-warm-bg">
       <div className="container mx-auto px-4 md:px-12 lg:px-24 py-16 md:py-16">
@@ -40,8 +41,7 @@ const Hero = ({ title, subtitle, description, images }) => {
         </div>
       </div>
     </section>
-
   );
 };
 
-export default Hero;
+export default Hero; 

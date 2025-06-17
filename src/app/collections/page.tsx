@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import collectionMap from "@/utils/collectionMap";
+import type { CollectionMap } from "../../../types/types";
 
 export default function CollectionsPage() {
   return (
@@ -42,4 +43,4 @@ export default function CollectionsPage() {
       </div>
     </div>
   );
-}
+} 

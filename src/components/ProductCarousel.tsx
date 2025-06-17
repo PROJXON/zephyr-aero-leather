@@ -5,8 +5,14 @@ import "@splidejs/react-splide/css";
 import Image from "next/image";
 import Link from "next/link";
 import AddToCartButton from "./AddToCartButton";
+import type { Product } from "../../types/types";
 
-export default function ProductCarousel({ products, viewAllLink }) {
+interface ProductCarouselProps {
+  products: Product[];
+  viewAllLink: string;
+}
+
+export default function ProductCarousel({ products, viewAllLink }: ProductCarouselProps) {
   // Show 6 products in the carousel
   const displayProducts = products.slice(0, 6);
 
@@ -76,4 +82,4 @@ export default function ProductCarousel({ products, viewAllLink }) {
       </Splide>
     </div>
   );
-}
+} 

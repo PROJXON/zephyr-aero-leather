@@ -1,24 +1,37 @@
 "use client"
-import { useState } from "react"
+
+import { useState, FormEvent } from "react"
 import { useRouter } from "next/navigation"
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
+interface ForgotPasswordFormState {
+  email: string;
+  message: string;
+  error: string;
+  loading: boolean;
+}
+
+interface ApiResponse {
+  success: boolean;
+  error?: string;
+}
+
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Added loading state
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
     setError("");
 
-    setLoading(true); // Disable button & show loading
+    setLoading(true);
 
     try {
       const response = await fetch("/api/forgot-password", {
@@ -29,7 +42,7 @@ export default function ForgotPassword() {
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
+      const data: ApiResponse = await response.json();
 
       if (data.success) {
         setMessage("Check your email for a password reset link.");
@@ -38,6 +51,8 @@ export default function ForgotPassword() {
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,7 +108,7 @@ export default function ForgotPassword() {
                 disabled={loading}
                 className={`w-full py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors ${
                   loading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                }`}
               >
                 {loading ? "Resetting..." : "Reset Password"}
               </button>
@@ -103,4 +118,4 @@ export default function ForgotPassword() {
       </div>
     </section>
   );
-}
+} 

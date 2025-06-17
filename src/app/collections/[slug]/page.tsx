@@ -2,6 +2,7 @@ import collectionMap from "@/utils/collectionMap";
 import ProductList from "@/components/ProductList";
 import fetchProducts from "../../../../lib/woocommerce";
 import Hero from "@/components/Hero";
+import type { CollectionPageProps, Product } from "../../../../types/types";
 
 export const revalidate = 60; // <-- Enable Incremental Static Regeneration
 
@@ -9,7 +10,7 @@ export async function generateStaticParams() {
   return Object.keys(collectionMap).map((slug) => ({ slug }));
 }
 
-export default async function CollectionPage({ params }) {
+export default async function CollectionPage({ params }: CollectionPageProps) {
   const { slug } = await params;
   const collection = collectionMap[slug];
   const images = collection?.carouselImages || [];
@@ -19,7 +20,7 @@ export default async function CollectionPage({ params }) {
   }
 
   const allProducts = await fetchProducts();
-  const collectionProducts = allProducts.filter((product) =>
+  const collectionProducts = allProducts.filter((product: Product) =>
     collection.productIds.includes(product.id)
   );
 
@@ -29,6 +30,7 @@ export default async function CollectionPage({ params }) {
         title={collection.name}
         subtitle={collection.description}
         images={images}
+        description={undefined}
       />
 
       <section className="container mx-auto px-6 md:px-12 lg:px-24 py-20">
@@ -54,4 +56,4 @@ export default async function CollectionPage({ params }) {
       </section>
     </div>
   );
-}
+} 
