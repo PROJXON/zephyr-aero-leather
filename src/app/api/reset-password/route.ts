@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import type { NextRequest } from "next/server";
+import type { ResetPasswordRequest,  WooCustomer } from "../../../../types/types";
 
 const api = new WooCommerceRestApi({
   url: process.env.WOOCOMMERCE_API_URL!,
@@ -9,23 +10,9 @@ const api = new WooCommerceRestApi({
   version: "wc/v3",
 });
 
-interface WooCustomerMeta {
-  id?: number;
-  key: string;
-  value: any;
-}
-
-interface WooCustomer {
-  id: number;
-  email: string;
-  meta_data?: WooCustomerMeta[];
-  [key: string]: any;
-}
-
 export async function POST(request: NextRequest): Promise<Response> {
   try {
-    const { token, password }: { token: string; password: string } =
-      await request.json();
+    const { token, password }: ResetPasswordRequest = await request.json();
 
     if (!token || !password) {
       return NextResponse.json(
@@ -55,7 +42,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       (meta) => meta.key === "reset_token_expiry"
     )?.value;
 
-    if (!resetTokenExpiry || new Date(resetTokenExpiry) < new Date()) {
+    if (!resetTokenExpiry || new Date(resetTokenExpiry as string) < new Date()) {
       return NextResponse.json(
         { error: "Reset token has expired" },
         { status: 400 }
@@ -76,7 +63,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       success: true,
       message: "Password has been reset successfully",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Reset password error:", error);
     return NextResponse.json(
       { error: "Failed to reset password" },

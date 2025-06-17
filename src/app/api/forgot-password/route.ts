@@ -3,6 +3,8 @@ import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import crypto from "crypto";
 import { sendEmail } from "../../../../lib/email";
 import type { NextRequest } from "next/server";
+import type { ForgotPasswordRequest } from "../../../../types/types";
+import type { WooCustomer, WooCustomerMeta } from "../../../../types/woocommerce";
 
 const api = new WooCommerceRestApi({
   url: process.env.WOOCOMMERCE_API_URL!,
@@ -11,22 +13,9 @@ const api = new WooCommerceRestApi({
   version: "wc/v3",
 });
 
-interface WooCustomerMeta {
-  id?: number;
-  key: string;
-  value: any;
-}
-
-interface WooCustomer {
-  id: number;
-  email: string;
-  meta_data?: WooCustomerMeta[];
-  [key: string]: any;
-}
-
 export async function POST(request: NextRequest): Promise<Response> {
   try {
-    const { email }: { email: string } = await request.json();
+    const { email }: ForgotPasswordRequest = await request.json();
 
     if (!email) {
       return NextResponse.json(
@@ -92,7 +81,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       success: true,
       message: "Password reset email sent",
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Forgot password error:", error);
     return NextResponse.json(
       { error: "Failed to process password reset request" },

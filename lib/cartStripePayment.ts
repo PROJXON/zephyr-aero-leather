@@ -1,7 +1,7 @@
 import fetchWooCommerce from "./fetchWooCommerce";
 import syncAddress from "./syncAddress";
 import stripeObj from "./stripeObj";
-import { StripePaymentRequestBody, StripePaymentIntent } from "../types/types";
+import type { StripePaymentRequestBody, StripePaymentIntent, StripeError, StripePaymentResponse, StripePaymentIntentParams } from "../types/types";
 
 export default async function cartStripePayment(req: Request): Promise<Response> {
   try {
@@ -23,17 +23,15 @@ export default async function cartStripePayment(req: Request): Promise<Response>
     if (woo_order_id) metadata.woo_order_id = String(woo_order_id);
     if (user_local_time) metadata.user_local_time = user_local_time;
 
-    const paymentIntentObj: Partial<StripePaymentIntent> & { metadata: Record<string, string> } = {
+    const basePaymentIntentObj: StripePaymentIntentParams = {
+      amount,
       metadata,
       currency: currency || 'usd',
-      payment_method_types: ['card']
     };
-
-    if (amount) paymentIntentObj.amount = amount;
 
     if (shipping) {
       const { name, address, city, zipCode, state } = shipping;
-      paymentIntentObj.shipping = {
+      basePaymentIntentObj.shipping = {
         name: `${name.first} ${name.last}`,
         address: {
           line1: address.line1,
@@ -50,50 +48,50 @@ export default async function cartStripePayment(req: Request): Promise<Response>
 
     if (billing) await syncAddress(billing, woo_order_id, true);
 
-    // Stripe expects PaymentIntentCreateParams, not our custom type
-    const paymentIntentParams: any = { ...paymentIntentObj };
-
     try {
       if (payment_intent_id) {
-        paymentIntent = (await stripeObj.paymentIntents.update(payment_intent_id, paymentIntentParams)) as any;
+        paymentIntent = await stripeObj.paymentIntents.update(payment_intent_id, basePaymentIntentObj) as StripePaymentIntent;
       } else {
-        paymentIntent = (await stripeObj.paymentIntents.create(paymentIntentParams)) as any;
+        paymentIntent = await stripeObj.paymentIntents.create({
+          ...basePaymentIntentObj,
+          payment_method_types: ['card']
+        }) as StripePaymentIntent;
       }
-    } catch (stripeError: any) {
+    } catch (stripeError: unknown) {
+      const error = stripeError as StripeError;
       console.error('Stripe API error:', {
-        message: stripeError.message,
-        type: stripeError.type,
-        code: stripeError.code
+        message: error.message,
+        type: error.type,
+        code: error.code
       });
-      throw stripeError;
+      throw error;
     }
 
     if (!paymentIntent) {
       throw new Error('Failed to create or update payment intent');
     }
 
-    return new Response(
-      JSON.stringify({
-        clientSecret: paymentIntent.client_secret,
-        payment_intent_id: paymentIntent.id,
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-  } catch (err: any) {
-    console.error('Payment processing error:', {
-      message: err.message,
-      type: err.type,
-      code: err.code
+    const response: StripePaymentResponse = {
+      clientSecret: paymentIntent.client_secret!,
+      payment_intent_id: paymentIntent.id,
+    };
+
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
     });
-    return new Response(JSON.stringify({
-      error: err.message,
-      type: err.type,
-      code: err.code,
-      details: err.raw
-    }), {
+  } catch (err: unknown) {
+    console.error('Payment processing error:', err);
+    const error = err as StripeError;
+    const response: StripePaymentResponse = {
+      clientSecret: '',
+      payment_intent_id: '',
+      error: error.message,
+      type: error.type,
+      code: error.code,
+      details: error.raw
+    };
+    return new Response(JSON.stringify(response), {
       status: 500,
       headers: { "Content-Type": "application/json" }
     });

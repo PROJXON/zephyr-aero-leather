@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
-import type { NextRequest } from "next/server";
+import type { RegisterRequest, RegisterResponse } from "../../../../types/types";
 
 export async function POST(req: NextRequest): Promise<Response> {
   try {
-    const { name, email, password }: { name: string; email: string; password: string } = await req.json();
+    const { name, email, password }: RegisterRequest = await req.json();
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       `${process.env.WOOCOMMERCE_API_URL}/wp-json/wc/v3/customers`,
       {
         email,
-        first_name: name, // WooCommerce uses `first_name` instead of `username`
+        first_name: name,
         password,
       },
       {
@@ -30,11 +30,12 @@ export async function POST(req: NextRequest): Promise<Response> {
     );
 
     return NextResponse.json(data, { status: 201 });
-  } catch (error: any) {
-    console.error("Registration error:", error);
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string }; status?: number } };
+    console.error("Registration error:", err);
     return NextResponse.json(
-      { error: error.response?.data?.message || "Server error, please try again" },
-      { status: error.response?.status || 500 }
+      { error: err.response?.data?.message || "Server error, please try again" },
+      { status: err.response?.status || 500 }
     );
   }
 }

@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import type { CartItem, CartContextType } from "../../../types/types";
+import type { CartItemResponse } from "../../../types/woocommerce";
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -36,15 +37,15 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
       const data = await response.json();
       setCartItems(
-        (data.items || []).map((item: any) => ({
+        (data.items || []).map((item: CartItemResponse) => ({
           lineItemId: item.id,
           id: item.product_id,
           quantity: item.quantity,
         }))
       );
       setOrderId(data.orderId || null);
-    } catch (error: any) {
-      console.error("Error fetching cart:", error.message);
+    } catch (error: unknown) {
+      console.error("Error fetching cart:", error instanceof Error ? error.message : 'Unknown error');
       setCartItems([]);
       setOrderId(null);
     }
@@ -181,7 +182,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         fetch("/api/cart")
           .then((res) => res.json())
           .then(({ orderId: freshOrderId, items }) => {
-            const existingItem = items.find((item: any) => item.product_id === productId);
+            const existingItem = items.find((item: CartItemResponse) => item.product_id === productId);
 
             if (!existingItem && finalQuantity > 0) {
               return fetch("/api/cart/item", {
@@ -191,7 +192,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
               });
             }
 
-            const line_items = items.map((item: any) => ({
+            const line_items = items.map((item: CartItemResponse) => ({
               id: item.id,
               quantity: item.product_id === productId ? finalQuantity : item.quantity,
             }));
@@ -238,7 +239,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     const data = await res.json();
 
     setCartItems(
-      (data.items || []).map((item: any) => ({
+      (data.items || []).map((item: CartItemResponse) => ({
         lineItemId: item.id,
         id: item.product_id,
         quantity: item.quantity,
@@ -264,8 +265,8 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
         setCartItems([]);
         setOrderId(null);
-      } catch (error: any) {
-        console.error("Error clearing cart:", error.message);
+      } catch (error: unknown) {
+        console.error("Error clearing cart:", error instanceof Error ? error.message : 'Unknown error');
       }
     } else {
       localStorage.removeItem("guestCart");

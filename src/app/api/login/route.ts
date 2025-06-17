@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 import type { NextRequest } from "next/server";
+import type { LoginRequest, LoginResponse, JWTResponse } from "../../../../types/types";
 
 export async function POST(req: NextRequest): Promise<Response> {
   try {
-    const { email, password }: { email: string; password: string } = await req.json();
+    const { email, password }: LoginRequest = await req.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
-    let jwtData: { token: string };
+    let jwtData: JWTResponse;
     try {
       jwtData = JSON.parse(rawJwtResponse);
     } catch (err) {
@@ -37,20 +38,21 @@ export async function POST(req: NextRequest): Promise<Response> {
     const token: string | undefined = jwtData.token;
     if (!token) return NextResponse.json({ error: "Authentication failed" }, { status: 401 });
 
-    let userData: any = null;
+    let userData: LoginResponse;
     const userDataError = "Failed to fetch user data";
 
     try {
-      userData = await fetchWooCommerce("wp/v2/users/me", userDataError, token);
+      userData = await fetchWooCommerce<LoginResponse>("wp/v2/users/me", userDataError, token);
     } catch {
       return NextResponse.json({ error: userDataError }, { status: 500 });
     }
+
     const userId: number = userData.id;
 
-    let customerData: any = null;
-    customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Error fetching WooCommerce customer data:");
-
-    if (!customerData) {
+    let customerData: LoginResponse;
+    try {
+      customerData = await fetchWooCommerce<LoginResponse>(`wc/v3/customers/${userId}`, "Error fetching WooCommerce customer data:");
+    } catch {
       return NextResponse.json({ error: "Failed to fetch WooCommerce customer Data" }, { status: 500 });
     }
 
@@ -74,7 +76,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
 
     return res;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Login error:", error);
 
     const response = new NextResponse(JSON.stringify({ error: "An error occurred" }), {

@@ -1,6 +1,6 @@
 import { WooRequestBody } from "../types/woocommerce";
 
-export default async function fetchWooCommerce<T = any>(
+export default async function fetchWooCommerce<T = unknown>(
   endpoint: string,
   errorMessage: string = "WooCommerce request failed",
   token: string | null = null,

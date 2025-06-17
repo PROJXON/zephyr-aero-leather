@@ -24,8 +24,9 @@ export async function updateWooOrder(id: number, data: WooOrderUpdate): Promise<
   try {
     const res = await api.put(`orders/${id}`, data);
     return res.data as WooOrder;
-  } catch (error: any) {
-    console.error("Failed to update WooCommerce order:", error.response?.data || error.message);
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string }; status?: number } };
+    console.error("Failed to update WooCommerce order:", err.response?.data || err);
     throw error;
   }
 }

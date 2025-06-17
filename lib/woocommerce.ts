@@ -40,7 +40,7 @@ const fetchProducts = async ({
   per_page = 100,
 }: FetchProductsOptions = {}): Promise<Product[]> => {
   try {
-    const params: Record<string, any> = {
+    const params: Record<string, string | number> = {
       per_page,
       status: "publish",
     };
@@ -53,7 +53,7 @@ const fetchProducts = async ({
         return [];
       }
 
-      const catResponse = await api.get("products/categories?per_page=100");
+      const catResponse = await api.get<WooCommerceCategory[]>("products/categories?per_page=100");
       const matchedIds = catResponse.data
         .filter((cat: WooCommerceCategory) => slugs.includes(cat.slug))
         .map((cat: WooCommerceCategory) => cat.id);
@@ -68,7 +68,7 @@ const fetchProducts = async ({
         status: "publish",
         category: matchedIds.join(","),
       }).toString();
-      const response = await api.get(`products?${query}`);
+      const response = await api.get<Product[]>(`products?${query}`);
       return mapAndTag(response.data);
     } else {
       let page = 1;
@@ -79,7 +79,7 @@ const fetchProducts = async ({
           ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
           page: String(page),
         }).toString();
-        const res = await api.get(`products?${query}`);
+        const res = await api.get<Product[]>(`products?${query}`);
         if (!res.data.length) break;
 
         allProducts = allProducts.concat(res.data);
@@ -90,11 +90,12 @@ const fetchProducts = async ({
 
       return mapAndTag(allProducts);
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string; response?: { data?: unknown; status?: number } };
     console.error("[WooCommerce] Error fetching products:", {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
+      message: err.message,
+      response: err.response?.data,
+      status: err.response?.status,
     });
     return [];
   }

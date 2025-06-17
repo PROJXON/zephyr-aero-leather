@@ -4,6 +4,7 @@ import fetchWooCommerce from '../../../../lib/fetchWooCommerce';
 import stripeObj from '../../../../lib/stripeObj';
 import type { NextRequest } from 'next/server';
 import type Stripe from 'stripe';
+import type { WebhookResponse } from '../../../../types/types';
 
 export async function POST(req: NextRequest): Promise<Response> {
   const rawBody = await req.text();
@@ -14,10 +15,11 @@ export async function POST(req: NextRequest): Promise<Response> {
   }
 
   let event;
-  let responseBody: any = { received: true };
+  let responseBody: WebhookResponse = { received: true };
   try {
     event = stripeObj.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET!);
-  } catch (err: any) {
+  } catch (error: unknown) {
+    const err = error as { message: string };
     console.error('Webhook signature verification failed:', err.message);
     return NextResponse.json({ error: err.message }, { status: 400 });
   }

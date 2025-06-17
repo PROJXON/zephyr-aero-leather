@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import getCookieInfo from "../../../../../lib/getCookieInfo";
 import fetchWooCommerce from "../../../../../lib/fetchWooCommerce";
 import type { NextRequest } from "next/server";
+import type { WordPressUser } from "../../../../../types/types";
 
 export async function GET(_request: NextRequest): Promise<Response> {
   try {
@@ -18,7 +19,7 @@ export async function GET(_request: NextRequest): Promise<Response> {
 
     if (!token) return NextResponse.json({ isAuthenticated: false, user: null });
 
-    const userData = await fetchWooCommerce("wp/v2/users/me", "Failed to fetch WordPress user", token);
+    const userData = await fetchWooCommerce<WordPressUser>("wp/v2/users/me", "Failed to fetch WordPress user", token);
     const userId = userData.id;
     const customerData = await fetchWooCommerce(`wc/v3/customers/${userId}`, "Failed to fetch WooCommerce customer");
     const response = NextResponse.json({ isAuthenticated: true, user: customerData });
@@ -31,8 +32,8 @@ export async function GET(_request: NextRequest): Promise<Response> {
     });
 
     return response;
-  } catch (error: any) {
-    console.error("Auth check error:", error.message);
+  } catch (error: unknown) {
+    console.error("Auth check error:", error instanceof Error ? error.message : 'Unknown error');
 
     const response = NextResponse.json({ isAuthenticated: false, user: null });
 

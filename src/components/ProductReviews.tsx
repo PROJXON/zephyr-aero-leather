@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
 import { useAuth } from "@/app/context/AuthContext";
 import type { ProductReview, ProductReviewsProps } from "../../types/types";
+import type { WooOrder, CartItemResponse } from "../../types/woocommerce";
 
 export default function ProductReviews({ productId }: ProductReviewsProps) {
   const { user, isAuthenticated } = useAuth();
@@ -33,9 +34,9 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
         const response = await fetch(`/api/order?userID=${user?.id}`);
         const data = await response.json();
         const orders = data.orders || [];
-        const hasBought = orders.some((order: any) =>
+        const hasBought = orders.some((order: WooOrder) =>
           Array.isArray(order.items) &&
-          order.items.some((item: any) => item.id === productId)
+          order.items.some((item: CartItemResponse) => item.product_id === productId)
         );
         setHasPurchased(hasBought);
       } catch (error) {
@@ -90,11 +91,11 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       setReviews([...reviews, data]);
       setNewReview("");
       setRating(5);
-    } catch (error: any) {
-      if (error.message === "You have already reviewed this product") {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message === "You have already reviewed this product") {
         setError("You have already reviewed this product. You can only leave one review per product.");
       } else {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : "An error occurred while submitting your review");
       }
     }
   };
