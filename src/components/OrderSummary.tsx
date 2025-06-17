@@ -71,16 +71,16 @@ export default function OrderSummary({
                         onBlur={() => {
                           const qty = parseInt(newQty || "0");
                           if (!isNaN(qty) && qty >= 0 && updateQuantity) updateQuantity(item.id, qty);
-                          setEditID && setEditID(null);
+                          if (setEditID) setEditID(null);
                         }}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                         }}
                       />
                     ) : (
-                      item.quantity > 1 ? (
+                      item.quantity > 1 && (
                         <span className="text-gray-400 text-sm">x{item.quantity}</span>
-                      ) : null
+                      )
                     )}
                     {editable && changeQuantity.length > 0 && <ChangeQuantitySpans cqs={changeQuantity} item={item} />}
                   </div>
