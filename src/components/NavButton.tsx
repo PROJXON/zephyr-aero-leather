@@ -5,7 +5,7 @@ export default function NavButton({ onClick, className = "", srOnly, d, text, fi
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center w-full justify-start gap-2 p-2 hover:bg-gray-100 text-gray-900 duration-300 rounded-lg font-medium ${className}`}
+      className={`inline-flex items-center w-full justify-start gap-2 p-2 hover:bg-gray-100 text-gray-900 duration-300 rounded-lg text-lg font-medium ${className}`}
     >
       {srOnly && <span className="sr-only">{srOnly}</span>}
       {d && (
