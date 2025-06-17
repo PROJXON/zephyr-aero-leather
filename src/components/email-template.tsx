@@ -64,7 +64,7 @@ export function EmailTemplate({ name, email, message }: EmailTemplateProps) {
   );
 }
 
-export function ConfirmationEmailTemplate({ name, email, message }: EmailTemplateProps) {
+export function ConfirmationEmailTemplate({ name, message }: EmailTemplateProps) {
   return (
     <div style={{
       fontFamily: 'Arial, sans-serif',

@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import getCookieInfo from "../../../../../lib/getCookieInfo";
 import fetchWooCommerce from "../../../../../lib/fetchWooCommerce";
-import type { NextRequest } from "next/server";
 import type { WordPressUser } from "../../../../../types/types";
 
-export async function GET(_request: NextRequest): Promise<Response> {
+export async function GET(): Promise<Response> {
   try {
     const [token, userCookie] = await getCookieInfo();
 

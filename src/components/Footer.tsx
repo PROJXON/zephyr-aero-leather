@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { FaFacebook, FaLinkedin, FaInstagram } from "react-icons/fa";
+import { FaFacebook, FaInstagram } from "react-icons/fa";
 import type { ReactElement } from "react";
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 import ZephyrLogo from "../../public/zephyrlogo.jpg";
 
 export default function Footer(): ReactElement {

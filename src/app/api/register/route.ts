@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
-import type { RegisterRequest, RegisterResponse } from "../../../../types/types";
+import type { RegisterRequest } from "../../../../types/types";
 
 export async function POST(req: NextRequest): Promise<Response> {
   try {

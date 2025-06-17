@@ -25,7 +25,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 
     const reviews = await fetchWooCommerce(endpoint, reviewsError);
     return NextResponse.json(reviews);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: reviewsError }, { status: 500 });
   }
 }
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
 
     return NextResponse.json(newReview);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: createReviewError }, { status: 500 });
   }
 }

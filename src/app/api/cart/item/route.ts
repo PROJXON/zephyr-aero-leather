@@ -11,7 +11,7 @@ export async function POST(req: Request): Promise<Response> {
 
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    let finalOrderId = orderId;
+    const finalOrderId = orderId;
 
     if (!finalOrderId) {
       const userData = await fetchWooCommerce<WordPressUser>("wp/v2/users/me", "Failed to fetch user info", token);

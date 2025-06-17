@@ -3,7 +3,7 @@ import ProductList from "../../../components/ProductList";
 import categoryMap from "@/utils/categoryMap";
 import categoryTitles from "@/utils/categoryTitles";
 import Hero from "@/components/Hero";
-import type { CategoryPageProps, Product } from "../../../../types/types";
+import type { CategoryPageProps } from "../../../../types/types";
 
 export async function generateStaticParams() {
   return Object.keys(categoryMap).map((slug) => ({ slug }));

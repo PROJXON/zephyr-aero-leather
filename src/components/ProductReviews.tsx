@@ -22,7 +22,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
         if (!response.ok) throw new Error("Failed to fetch reviews");
         const data = await response.json();
         setReviews(data);
-      } catch (error) {
+      } catch {
         setError("Error loading reviews");
       } finally {
         setLoading(false);

@@ -1,5 +1,5 @@
 import categoryMap from "../src/utils/categoryMap";
-import type { Product, Category, CategoryKey, FetchProductsOptions } from "../types/types";
+import type { Product, CategoryKey, FetchProductsOptions } from "../types/types";
 import type { WooCommerceCategory } from "../types/woocommerce";
 import getWooCommerceApi from "./woocommerceApi";
 
@@ -12,7 +12,7 @@ const mapAndTag = (products: Product[]): Product[] =>
       categories
         .map((cat: WooCommerceCategory) =>
           (Object.entries(categoryMap) as [CategoryKey, readonly string[]][])
-            .find(([_, slugs]) => slugs.includes(cat.slug))?.[0]
+            .find(entry => entry[1].includes(cat.slug))?.[0]
         )
         .find(Boolean) || "Uncategorized";
 

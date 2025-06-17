@@ -1,4 +1,3 @@
-import fetchWooCommerce from "./fetchWooCommerce";
 import syncAddress from "./syncAddress";
 import stripeObj from "./stripeObj";
 import type { StripePaymentRequestBody, StripePaymentIntent, StripeError, StripePaymentResponse, StripePaymentIntentParams } from "../types/types";

@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ChangeQuantitySpans from "./ChangeQuantitySpans";
 import getItemInfo from "../../lib/getItemInfo";
-import type { Product, CartItem, ChangeQuantitySpan, OrderSummaryProps, QuantityControls } from "../../types/types";
+import type { OrderSummaryProps, QuantityControls } from "../../types/types";
 
 export default function OrderSummary({
   cartItems,
@@ -78,9 +78,9 @@ export default function OrderSummary({
                         }}
                       />
                     ) : (
-                      item.quantity > 1 && (
+                      item.quantity > 1 ? (
                         <span className="text-gray-400 text-sm">x{item.quantity}</span>
-                      )
+                      ) : null
                     )}
                     {editable && changeQuantity.length > 0 && <ChangeQuantitySpans cqs={changeQuantity} item={item} />}
                   </div>
