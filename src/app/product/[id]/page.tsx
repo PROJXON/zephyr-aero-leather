@@ -37,12 +37,12 @@ export default async function ProductPage({ params }: ProductPageProps): Promise
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-8">
-        <div className="relative aspect-square">
+        <div className="relative aspect-square rounded-xl overflow-hidden">
           <Image
             src={product.images?.[0]?.src || "/placeholder.jpg"}
             alt={product.name}
             fill
-            className="object-contain rounded-xl"
+            className="object-cover"
             sizes="(max-width: 1000px) 100vw, 50vw"
           />
         </div>
