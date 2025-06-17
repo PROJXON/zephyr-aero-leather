@@ -7,7 +7,7 @@ import type { Review, User } from "../../types/types";
 import Link from "next/link";
 
 interface ProductReviewsProps {
-  productId: string;
+  productId: number;
 }
 
 interface ReviewStats {
@@ -20,7 +20,7 @@ interface ReviewStats {
 
 interface Order {
   line_items: {
-    product_id: string;
+    product_id: number;
   }[];
 }
 
