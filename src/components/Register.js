@@ -127,32 +127,29 @@ const Register = () => {
 
   return(
     // <section className="bg-gray-50 dark:bg-gray-900">
-    <section className="relative flex items-center justify-center min-h-screen px-4">
+    <section className="relative flex items-center justify-center min-h-screen px-4 py-8 md:py-4">
   {/* Background Image with 50% opacity overlay */}
   <div
     className="absolute inset-0 bg-cover bg-center opacity-50"
     style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
   />
 
-        <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
-
-          {/* Left: Already Have an Account? */}
-          <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-neutral-dark text-white rounded-r-xl">
-            <h2 className="text-3xl font-bold">Welcome Back!</h2>
-            <p className="text-center mt-2">Already have an account? Sign in now.</p>
+        <div className="relative w-full max-w-4xl h-[650px] md:h-[700px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden mb-8 md:mb-0">
+          {/* Left: Already Have an Account? - Hidden on mobile */}
+          <div className="hidden md:flex w-full md:w-1/2 flex-col justify-center items-center p-8 md:p-16 bg-neutral-dark text-white rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+            <h2 className="text-2xl md:text-3xl font-bold text-center">Welcome Back!</h2>
+            <p className="text-center mt-2 mb-6">Already have an account? Sign in now.</p>
             
             <Link href="/login">
-              <button className="mt-4 px-6 py-2 border border-white rounded-lg hover:bg-white hover:text-neutral-dark transition">
+              <button className="w-full md:w-auto px-6 py-2 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors">
                 Sign In
               </button>
             </Link>
          </div>
 
-
-
             {/* Right: Register Form */}
               <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white bg-opacity-90 rounded-b-xl md:rounded-r-xl md:rounded-bl-none">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-4 mt-2">
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                       Create an account
                   </h1>
                   {error && <p className="text-red-500 text-sm">{error}</p>}
