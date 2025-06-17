@@ -168,21 +168,6 @@ export interface CommitmentItem {
   icon?: string;
 }
 
-// Shipping Types
-export interface ShippingDetails {
-  name: {
-    first: string;
-    last: string;
-  };
-  address: {
-    line1: string;
-    line2?: string;
-  };
-  city: string;
-  zipCode: string;
-  state: string;
-}
-
 // Payment Types
 export interface StripePaymentRequestBody {
   amount: number;
@@ -191,7 +176,8 @@ export interface StripePaymentRequestBody {
   woo_order_id?: number;
   payment_intent_id?: string;
   user_local_time?: string;
-  shipping?: ShippingDetails;
+  shipping?: AddressDetailsState;
+  billing?: AddressDetailsState;
 }
 
 export type UpdateQuantityFn = (id: number, quantity: number) => void;
@@ -340,32 +326,43 @@ export interface CheckoutProps {
   products: Product[];
 }
 
-export interface ShippingDetailsState {
-  name: {
-    first: string;
-    last: string;
-  };
-  address: {
-    line1: string;
-    line2?: string;
-  };
+export interface AddressFormName {
+  first: string;
+  last: string;
+}
+
+export interface AddressFormAddress {
+  line1: string;
+  line2?: string;
+}
+
+export interface AddressDetailsState {
+  name: AddressFormName;
+  address: AddressFormAddress;
   city: string;
   zipCode: string;
   state: string;
 }
 
-export type ShippingDetailsAction =
-  | { type: "FIRSTNAME"; value: string }
-  | { type: "LASTNAME"; value: string }
-  | { type: "ADDRESS1"; value: string }
-  | { type: "ADDRESS2"; value: string }
-  | { type: "CITY"; value: string }
-  | { type: "ZIPCODE"; value: string }
-  | { type: "STATE"; value: string }
-  | { type: string; value: string };
+export type AddressDetailsAction =
+  | { type: "FIRSTNAME"; value: string; }
+  | { type: "LASTNAME"; value: string; }
+  | { type: "ADDRESS1"; value: string; }
+  | { type: "ADDRESS2"; value: string; }
+  | { type: "CITY"; value: string; }
+  | { type: "ZIPCODE"; value: string; }
+  | { type: "STATE"; value: string; }
+  | { type: "ALL"; value: AddressDetailsState }
+  | { type: "RESET"; };
 
-export interface ShippingErrors {
-  [key: string]: string;
+export interface AddressErrors {
+  [key: string]: string | undefined;
+  firstName?: string;
+  lastName?: string;
+  address?: string;
+  city?: string;
+  zipCode?: string;
+  state?: string;
 }
 
 export interface ContactFormData {
@@ -472,8 +469,8 @@ export interface ResetPasswordFormState {
   loading: boolean;
 }
 
-export interface ShippingDetailsProps {
-  details: ShippingDetails;
+export interface AddressDetailsProps {
+  details: AddressDetailsState;
   errors: { [key: string]: string };
   states: string[];
 }
@@ -488,12 +485,16 @@ export interface ShippingFormInputProps {
   options?: string[];
 }
 
+export type ValidateAddressFunc = (errors: AddressErrors) => void;
+
 export interface StripeFormProps {
   clientSecret: string;
   formError: string | null;
   setFormError: (msg: string | null) => void;
-  validateShipping: () => Record<string, string>;
-  setShippingErrors: (errors: Record<string, string>) => void;
+  validateShipping: () => AddressErrors;
+  setShippingErrors: ValidateAddressFunc;
+  validateBilling: () => AddressErrors;
+  setBillingErrors: ValidateAddressFunc;
 }
 
 export interface SendEmailParams {
@@ -512,3 +513,43 @@ export type ViewAllProduct = {
 };
 
 export type CarouselProduct = Product | ViewAllProduct;
+
+export type State =
+  | "AL" | "AK" | "AZ" | "AR" | "CA" | "CO" | "CT" | "DE" | "FL" | "GA"
+  | "HI" | "ID" | "IL" | "IN" | "IA" | "KS" | "KY" | "LA" | "ME" | "MD"
+  | "MA" | "MI" | "MN" | "MS" | "MO" | "MT" | "NE" | "NV" | "NH" | "NJ"
+  | "NM" | "NY" | "NC" | "ND" | "OH" | "OK" | "OR" | "PA" | "RI" | "SC"
+  | "SD" | "TN" | "TX" | "UT" | "VT" | "VA" | "WA" | "WV" | "WI" | "WY";
+
+export interface AddressFormInputProps {
+  name: string;
+  placeholder: string;
+  value: string;
+  span: number;
+  error: string;
+  type: "select" |
+  "button" |
+  "checkbox" |
+  "color" |
+  "date" |
+  "datetime-local" |
+  "email" |
+  "file" |
+  "hidden" |
+  "image" |
+  "month" |
+  "number" |
+  "password" |
+  "radio" |
+  "range" |
+  "reset" |
+  "search" |
+  "submit" |
+  "tel" |
+  "text" |
+  "time" |
+  "url" |
+  "week"
+}
+
+export type AddressFormChange = React.ChangeEvent<HTMLInputElement | HTMLSelectElement>

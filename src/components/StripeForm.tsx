@@ -1,21 +1,43 @@
 "use client";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useState } from "react";
-import type { StripeFormProps } from "../../types/types";
+import type { StripeFormProps, ValidateAddressFunc } from "../../types/types";
 
-export default function StripeForm({ clientSecret, formError, setFormError, validateShipping, setShippingErrors }: StripeFormProps) {
+export default function StripeForm({
+  clientSecret,
+  formError,
+  setFormError,
+  validateShipping,
+  setShippingErrors,
+  validateBilling,
+  setBillingErrors
+}: StripeFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const checkAddressForm = (validateFunc: Function, setter: ValidateAddressFunc) => {
+    const errors = validateFunc();
+    if (Object.keys(errors).length > 0) {
+      setter(errors);
+      return true;
+    }
+    return false;
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!stripe || !elements) return;
 
-    const errors = validateShipping();
-    if (Object.keys(errors).length > 0) {
-      setShippingErrors(errors);
+    const shippingError = checkAddressForm(validateShipping, setShippingErrors);
+    if (shippingError) {
       setFormError("Fix the error(s) in the shipping form");
+      return;
+    }
+
+    const billingError = checkAddressForm(validateBilling, setBillingErrors);
+    if (billingError) {
+      setFormError("Fix the error(s) in the billing form");
       return;
     }
 

@@ -1,11 +1,12 @@
 import fetchWooCommerce from "./fetchWooCommerce";
+import syncAddress from "./syncAddress";
 import stripeObj from "./stripeObj";
-import { CartItem, StripePaymentRequestBody, ShippingDetails, StripePaymentIntent } from "../types/types";
+import { StripePaymentRequestBody, StripePaymentIntent } from "../types/types";
 
 export default async function cartStripePayment(req: Request): Promise<Response> {
   try {
     const data: StripePaymentRequestBody = await req.json();
-    const { amount, currency, items, woo_order_id, payment_intent_id, user_local_time, shipping } = data;
+    const { amount, currency, items, woo_order_id, payment_intent_id, user_local_time, shipping, billing } = data;
 
     if (!amount || amount <= 0) {
       throw new Error('Invalid amount: Amount must be greater than 0');
@@ -22,7 +23,7 @@ export default async function cartStripePayment(req: Request): Promise<Response>
     if (woo_order_id) metadata.woo_order_id = String(woo_order_id);
     if (user_local_time) metadata.user_local_time = user_local_time;
 
-    const paymentIntentObj: Partial<StripePaymentIntent> & { metadata: Record<string, string> } = { 
+    const paymentIntentObj: Partial<StripePaymentIntent> & { metadata: Record<string, string> } = {
       metadata,
       currency: currency || 'usd',
       payment_method_types: ['card']
@@ -44,36 +45,10 @@ export default async function cartStripePayment(req: Request): Promise<Response>
         }
       };
 
-      if (woo_order_id) {
-        try {
-          await fetchWooCommerce(`wc/v3/orders/${woo_order_id}`, "Failed to update shipping details", null, "PUT", {
-            shipping: {
-              first_name: name.first,
-              last_name: name.last,
-              address_1: address.line1,
-              address_2: address.line2 || "",
-              city,
-              postcode: zipCode,
-              state,
-              country: "US"
-            },
-            meta_data: [
-              {
-                key: "user_local_time",
-                value: new Date().toISOString()
-              }
-            ]
-          });
-        } catch (wooError: any) {
-          console.error('WooCommerce update error:', {
-            message: wooError.message,
-            status: wooError.status,
-            data: wooError.data
-          });
-          // Continue with Stripe payment even if WooCommerce update fails
-        }
-      }
+      await syncAddress(shipping, woo_order_id, false);
     }
+
+    if (billing) await syncAddress(billing, woo_order_id, true);
 
     // Stripe expects PaymentIntentCreateParams, not our custom type
     const paymentIntentParams: any = { ...paymentIntentObj };
@@ -113,7 +88,7 @@ export default async function cartStripePayment(req: Request): Promise<Response>
       type: err.type,
       code: err.code
     });
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: err.message,
       type: err.type,
       code: err.code,

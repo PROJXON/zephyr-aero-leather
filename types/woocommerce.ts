@@ -1,3 +1,5 @@
+import { State } from "./types"
+
 // WooCommerce API Types
 export interface WooRestApiOptions {
   url: string;
@@ -16,13 +18,24 @@ export interface WooRestResponse<T = any> {
   headers: Record<string, any>;
 }
 
+export interface WooCommerceAddress {
+  first_name: string;
+  last_name: string;
+  address_1: string;
+  address_2: string;
+  city: string;
+  postcode: string;
+  state: State;
+  country: "US";
+}
+
 // WooCommerce Order Types
 export interface WooOrder {
-  id: number;
-  status: string;
-  total: string;
-  currency: string;
-  line_items: Array<{
+  id?: number;
+  status?: string;
+  total?: string;
+  currency?: string;
+  line_items?: Array<{
     id: number;
     name: string;
     product_id: number;
@@ -30,16 +43,8 @@ export interface WooOrder {
     price: string;
     [key: string]: any;
   }>;
-  shipping: {
-    first_name: string;
-    last_name: string;
-    address_1: string;
-    address_2?: string;
-    city: string;
-    postcode: string;
-    state: string;
-    country: string;
-  };
+  shipping?: WooCommerceAddress;
+  billing?: WooCommerceAddress;
   meta_data?: Array<{ key: string; value: any }>;
   [key: string]: any;
 }
@@ -69,4 +74,4 @@ export interface WooCommerceCategory {
 }
 
 // WooCommerce API Request Types
-export type WooRequestBody = Record<string, any>; 
+export type WooRequestBody = Record<string, any>;

@@ -12,7 +12,7 @@ const api = new WooCommerceRestApi({
   consumerKey: WOOCOMMERCE_API_KEY,
   consumerSecret: WOOCOMMERCE_API_SECRET,
   version: "wc/v3",
-  timeout: 30000,
+  timeout: 60000,
 } as WooRestApiOptions);
 
 export async function getWooOrder(id: number): Promise<WooOrder> {

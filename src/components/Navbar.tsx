@@ -34,11 +34,21 @@ const collectionCategories = [
 ];
 
 const handleCartOpen = (setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
-  setIsCartOpen(true);
+  try {
+    return setIsCartOpen(true);
+  } catch (error) {
+    console.error('Error opening cart:', error);
+    return false;
+  }
 };
 
 const handleCartClose = (setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
-  setIsCartOpen(false);
+  try {
+    return setIsCartOpen(false);
+  } catch (error) {
+    console.error('Error closing cart:', error);
+    return false;
+  }
 };
 
 const Navbar = ({ allProducts }: NavbarProps) => {
