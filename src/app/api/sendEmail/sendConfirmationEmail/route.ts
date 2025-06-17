@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { ConfirmationEmailTemplate } from '@/components/email-template';
 import type { NextRequest } from 'next/server';
+import type { ResendError } from '../../../../../types/types';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const fromEmail = process.env.CONTACT_FORM_FROM_EMAIL!;
@@ -17,8 +18,9 @@ export async function POST(request: NextRequest): Promise<Response> {
       react: ConfirmationEmailTemplate({ name, email, message }),
     });
     return NextResponse.json(data);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(error);
-    return NextResponse.json({ error: error?.message || 'Failed to send confirmation email' });
+    const err = error as ResendError;
+    return NextResponse.json({ error: err?.message || 'Failed to send confirmation email' });
   }
 }

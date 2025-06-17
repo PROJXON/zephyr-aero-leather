@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 import { EmailTemplate } from '@/components/email-template';
-import type { NextRequest } from 'next/server';
+import type { SendEmailParams } from "../../../../types/types";
+import type { ResendError } from '../../../../types/types';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const toEmail = process.env.CONTACT_FORM_TO_EMAIL!;
@@ -18,8 +19,9 @@ export async function POST(request: NextRequest): Promise<Response> {
       react: EmailTemplate({ name, email, message }),
     });
     return NextResponse.json(data);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(error);
-    return NextResponse.json({ error: error?.message || 'Failed to send email' });
+    const err = error as ResendError;
+    return NextResponse.json({ error: err?.message || 'Failed to send email' });
   }
 }

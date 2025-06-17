@@ -1,26 +1,36 @@
+import { WooRestApiOptions, WooRestResponse } from './woocommerce';
+
 declare module '@woocommerce/woocommerce-rest-api' {
-  interface WooRestApiOptions {
-    url: string;
-    consumerKey: string;
-    consumerSecret: string;
-    version?: string;
-    timeout?: number;
-    wpAPI?: boolean;
-    queryStringAuth?: boolean;
-    axiosConfig?: Record<string, any>;
-  }
-
-  interface WooRestResponse<T = any> {
-    data: T;
-    status: number;
-    headers: Record<string, any>;
-  }
-
   export default class WooCommerceRestApi {
-    constructor(options: WooRestApiOptions);
-    get<T = any>(endpoint: string): Promise<WooRestResponse<T>>;
-    post<T = any>(endpoint: string, data: any): Promise<WooRestResponse<T>>;
-    put<T = any>(endpoint: string, data: any): Promise<WooRestResponse<T>>;
-    delete<T = any>(endpoint: string): Promise<WooRestResponse<T>>;
+    constructor(options: {
+      url: string;
+      consumerKey: string;
+      consumerSecret: string;
+      version?: string;
+      timeout?: number;
+      wpAPI?: boolean;
+      queryStringAuth?: boolean;
+      axiosConfig?: Record<string, string | number | boolean>;
+    });
+    get<T = unknown>(endpoint: string): Promise<{
+      data: T;
+      status: number;
+      headers: Record<string, string | number | boolean>;
+    }>;
+    post<T = unknown>(endpoint: string, data: unknown): Promise<{
+      data: T;
+      status: number;
+      headers: Record<string, string | number | boolean>;
+    }>;
+    put<T = unknown>(endpoint: string, data: unknown): Promise<{
+      data: T;
+      status: number;
+      headers: Record<string, string | number | boolean>;
+    }>;
+    delete<T = unknown>(endpoint: string): Promise<{
+      data: T;
+      status: number;
+      headers: Record<string, string | number | boolean>;
+    }>;
   }
 } 

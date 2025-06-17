@@ -1,4 +1,4 @@
-require("dotenv").config();
+import "dotenv/config";
 
 const nextConfig = {
   images: {
@@ -23,4 +23,4 @@ if (process.env.NODE_ENV === "development") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-module.exports = nextConfig;
+export default nextConfig;

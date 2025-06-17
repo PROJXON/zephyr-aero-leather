@@ -42,8 +42,8 @@ export default async function ProductPage({ params }: ProductPageProps): Promise
             src={product.images?.[0]?.src || "/placeholder.jpg"}
             alt={product.name}
             fill
-            className="object-cover rounded-xl"
-            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-contain rounded-xl"
+            sizes="(max-width: 1000px) 100vw, 50vw"
           />
         </div>
 
