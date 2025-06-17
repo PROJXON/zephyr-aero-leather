@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ChangeQuantitySpans from "./ChangeQuantitySpans";
 import getItemInfo from "../../lib/getItemInfo";
-import type { Product, CartItem, ChangeQuantitySpan, OrderSummaryProps, QuantityControls } from "../../types/types";
+import type { OrderSummaryProps, QuantityControls } from "../../types/types";
 
 export default function OrderSummary({
   cartItems,
@@ -71,7 +71,7 @@ export default function OrderSummary({
                         onBlur={() => {
                           const qty = parseInt(newQty || "0");
                           if (!isNaN(qty) && qty >= 0 && updateQuantity) updateQuantity(item.id, qty);
-                          setEditID && setEditID(null);
+                          if (setEditID) setEditID(null);
                         }}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") (e.target as HTMLInputElement).blur();

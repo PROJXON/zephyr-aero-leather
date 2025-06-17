@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { EmailTemplate } from '@/components/email-template';
-import type { SendEmailParams } from "../../../../types/types";
 import type { ResendError } from '../../../../types/types';
 
 const resend = new Resend(process.env.RESEND_API_KEY);

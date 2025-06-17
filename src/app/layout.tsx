@@ -22,12 +22,6 @@ export const metadata = {
   metadataBase: new URL("https://zephyraeroleather.com"),
   title: "Zephyr Aero Leather",
   description: "Designed for Flight. Made for Life",
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   icons: {
     icon: "/favicon.png",
   },
@@ -52,6 +46,13 @@ export const metadata = {
     description: "Designed for Flight. Made for Life",
     images: ["/og-image.png"],
   },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }): Promise<JSX.Element> {

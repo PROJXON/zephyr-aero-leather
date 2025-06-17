@@ -2,7 +2,7 @@
 import { useState, useEffect, Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import ZephyrLogo from "../../public/zephyrlogotransperant.png";
 import { useAuth } from "@/app/context/AuthContext";
 import NavButton from "./NavButton";
@@ -33,32 +33,12 @@ const collectionCategories = [
   { name: "Minimalist", slug: "minimalist" },
 ];
 
-const handleCartOpen = (setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
-  try {
-    return setIsCartOpen(true);
-  } catch (error) {
-    console.error('Error opening cart:', error);
-    return false;
-  }
-};
-
-const handleCartClose = (setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>) => {
-  try {
-    return setIsCartOpen(false);
-  } catch (error) {
-    console.error('Error closing cart:', error);
-    return false;
-  }
-};
-
 const Navbar = ({ allProducts }: NavbarProps) => {
   const { isAuthenticated, user, logout, fetchUserFromServer } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const { cartItems, updateQuantity, setCartOpen, cartOpen } = useCart();
   const { replace } = useRouter();
-  const pathname = usePathname();
-  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
 

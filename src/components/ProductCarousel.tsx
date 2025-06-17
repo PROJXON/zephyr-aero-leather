@@ -5,7 +5,7 @@ import "@splidejs/react-splide/css";
 import Image from "next/image";
 import Link from "next/link";
 import AddToCartButton from "./AddToCartButton";
-import type { Product, ProductCarouselProps, CarouselProduct } from "../../types/types";
+import type { ProductCarouselProps, CarouselProduct } from "../../types/types";
 
 export default function ProductCarousel({
   products,
