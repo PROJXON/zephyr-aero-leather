@@ -14,7 +14,8 @@ import type {
   AddressDetailsState,
   AddressDetailsAction,
   AddressErrors,
-  AddressFormChange
+  AddressFormChange,
+  State
 } from "../../types/types";
 import type { StripeElementsOptions, Appearance } from "@stripe/stripe-js";
 import type { Dispatch, SetStateAction } from "react";
@@ -32,7 +33,7 @@ const defaultAddressDetails = {
   },
   city: "",
   zipCode: "",
-  state: ""
+  state: "" as State
 };
 
 function reducer(details: AddressDetailsState, action: AddressDetailsAction): AddressDetailsState {
@@ -50,7 +51,7 @@ function reducer(details: AddressDetailsState, action: AddressDetailsAction): Ad
     case "ZIPCODE":
       return { ...details, zipCode: action.value };
     case "STATE":
-      return { ...details, state: action.value };
+      return { ...details, state: action.value as State };
     case "ALL": return { ...action.value };
     case "RESET": return { ...defaultAddressDetails };
     default: return details;
@@ -58,7 +59,7 @@ function reducer(details: AddressDetailsState, action: AddressDetailsAction): Ad
 }
 
 export const ChangeContext = createContext<((event: AddressFormChange) => void)>(() => { });
-export const StatesContext = createContext<(string[])>([]);
+export const StatesContext = createContext<(State[])>([]);
 
 export default function Checkout({ products }: CheckoutProps) {
   const { cartItems, updateQuantity, orderId } = useCart();
@@ -74,7 +75,7 @@ export default function Checkout({ products }: CheckoutProps) {
   const [billingErrors, setBillingErrors] = useState<AddressErrors>({});
   const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
 
-  const states = [
+  const states: State[] = [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
   ];
 
@@ -156,13 +157,13 @@ export default function Checkout({ products }: CheckoutProps) {
     if (!details.name.last.trim()) errors.lastName = "Last name is required";
     if (!details.address.line1.trim()) errors.address = "Address is required";
     if (!details.city.trim()) errors.city = "City is required";
-    
+
     // ZIP code validation for 5-digit or 9-digit format (XXXXX-XXXX)
     const zipCode = details.zipCode.trim();
     if (!/^\d{5}(-\d{4})?$/.test(zipCode)) {
       errors.zipCode = "Enter a valid ZIP code (5 or 9 digits)";
     }
-    
+
     const statesSet = new Set(states);
     if (!statesSet.has(details.state)) errors.state = "Please select a state";
 
