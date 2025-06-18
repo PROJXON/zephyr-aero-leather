@@ -105,5 +105,19 @@ export interface CartItemResponse {
   [key: string]: unknown;
 }
 
+// WooCommerce Review Types
+export interface WooCommerceReview {
+  id: number;
+  product_id: number;
+  reviewer_id: number;
+  reviewer: string;
+  reviewer_email: string;
+  rating: number;
+  review: string;
+  date_created: string;
+  date_created_gmt: string;
+  [key: string]: unknown;
+}
+
 // WooCommerce API Request Types
 export type WooRequestBody = Record<string, unknown>;

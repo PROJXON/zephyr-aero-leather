@@ -39,7 +39,7 @@ export default function OrderSummary({
 
           const imageInfo = itemInfo.images?.[0];
           const productLink = `/product/${item.id}`;
-          const alreadyReviewed = reviewedProductIds.includes(item.id);
+          const alreadyReviewed = reviewedProductIds.includes(item.productId || item.id);
 
           return (
             <div key={item.id} className="flex gap-4 border rounded-lg p-4">

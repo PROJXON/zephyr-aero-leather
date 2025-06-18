@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/AuthContext"
 import OrderSummary from "./OrderSummary"
 import calculateTotal from "../../lib/calculateTotal"
-import type { Product, Review, CartItem } from "../../types/types"
-import type { WooOrder, CartItemResponse } from "../../types/woocommerce"
+import type { Product, CartItem } from "../../types/types"
+import type { WooOrder, CartItemResponse, WooCommerceReview } from "../../types/woocommerce"
 
 export default function OrderHistory({ products }: { products: Product[] }) {
   const { isAuthenticated, user } = useAuth()
@@ -48,19 +48,24 @@ export default function OrderHistory({ products }: { products: Product[] }) {
   }, [isAuthenticated])
 
   useEffect(() => {
-    (async () => {
-      if (isAuthenticated && user?.id) {
-        try {
-          const res = await fetch(`/api/reviews?userId=${user.id}`)
-          const data = await res.json()
-          const ids = data.map((review: Review) => review.productId)
-          setReviewedProductIds(ids)
-        } catch (err) {
-          console.error("Error fetching user reviews:", err)
+    const fetchReviewedProducts = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await fetch(`/api/reviews?userId=${user.id}`);
+        if (response.ok) {
+          const data: WooCommerceReview[] = await response.json();
+          // Use the WooCommerce API response directly - product_id is already the field name
+          const productIds = data.map((review: WooCommerceReview) => Number(review.product_id));
+          setReviewedProductIds(productIds);
         }
+      } catch (error) {
+        console.error('Error fetching reviewed products:', error);
       }
-    })()
-  }, [isAuthenticated, user])
+    };
+
+    fetchReviewedProducts();
+  }, [user]);
 
   const convertToCartItem = (item: CartItemResponse): CartItem => ({
     id: item.id,
