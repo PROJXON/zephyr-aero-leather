@@ -151,12 +151,12 @@ export default function ResetPasswordForm(): JSX.Element {
         </div>
         <button
           type="submit"
-          disabled={formState.loading}
+          disabled={formState.loading || !!formState.message}
           className={`w-full py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors ${
-            formState.loading ? "opacity-50 cursor-not-allowed" : ""
+            (formState.loading || !!formState.message) ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
-          {formState.loading ? "Resetting..." : "Reset Password"}
+          {formState.loading ? "Resetting..." : formState.message ? "Password Reset Successful!" : "Reset Password"}
         </button>
       </form>
     </div>
