@@ -1,5 +1,5 @@
 import AddressFormInput from "./AddressFormInput";
-import type { AddressDetailsState, AddressErrors, AddressFormInputProps } from "../../types/types";
+import type { AddressDetailsState, AddressErrors } from "../../types/types";
 
 export default function AddressDetails({ title, details, errors }: {
   title: string;
@@ -7,58 +7,6 @@ export default function AddressDetails({ title, details, errors }: {
   errors: AddressErrors;
 }) {
   const { name, address, city, zipCode, state } = details;
-
-  const inputs = [
-    {
-      name: "firstName",
-      placeholder: "First Name",
-      value: name.first,
-      span: 1,
-      error: errors.firstName
-    },
-    {
-      name: "lastName",
-      placeholder: "Last Name",
-      value: name.last,
-      span: 1,
-      error: errors.lastName
-    },
-    {
-      name: "address1",
-      placeholder: "Address (line 1)",
-      value: address.line1,
-      span: 1,
-      error: errors.address
-    },
-    {
-      name: "address2",
-      placeholder: "Address (line 2, optional)",
-      value: address.line2,
-      span: 1
-    },
-    {
-      name: "city",
-      placeholder: "City",
-      value: city,
-      span: 1,
-      error: errors.city
-    },
-    {
-      name: "zipCode",
-      placeholder: "Zip Code",
-      value: zipCode,
-      span: 1,
-      error: errors.zipCode
-    },
-    {
-      name: "state",
-      placeholder: "State",
-      value: state,
-      span: 1,
-      error: errors.state,
-      type: "select"
-    }
-  ];
 
   return (
     <div className="block">
