@@ -369,6 +369,7 @@ export interface NavButtonProps {
   d?: string;
   text?: string;
   fill?: string;
+  badgeCount?: number;
 }
 
 export interface NavLinkProps {
