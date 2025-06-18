@@ -2,12 +2,9 @@ import collectionMap from "@/utils/collectionMap";
 import ProductList from "@/components/ProductList";
 import fetchProducts from "../../../../lib/woocommerce";
 import Hero from "@/components/Hero";
-import type { Collection, CollectionPageProps } from "../../../../types/types";
-import type { Product } from "../../../../types/types";
+import type { CollectionPageProps, Product } from "../../../../types/types";
 
 export const revalidate = 60; // Enable Incremental Static Regeneration
-
-type CollectionKey = keyof typeof collectionMap;
 
 export async function generateStaticParams() {
   return Object.keys(collectionMap).map((slug) => ({ slug }));
@@ -16,7 +13,7 @@ export async function generateStaticParams() {
 export default async function CollectionPage({ params }: CollectionPageProps) {
   const resolvedParams = await params;
   const { slug } = resolvedParams;
-  const collection = collectionMap[slug as CollectionKey] as Collection | undefined;
+  const collection = collectionMap[slug];
   const images = collection?.carouselImages || [];
 
   if (!collection) {
@@ -24,7 +21,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   }
 
   const allProducts: Product[] = await fetchProducts();
-  const collectionProducts = allProducts.filter((product) =>
+  const collectionProducts = allProducts.filter((product: Product) =>
     collection.productIds.includes(product.id)
   );
 
@@ -40,10 +37,11 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
       <section className="py-16">
         <div className="container mx-auto px-4">
           {collectionProducts.length > 0 ? (
+            
             <ProductList products={collectionProducts} />
           ) : (
-            <p className="text-neutral-medium">
-              No products assigned to this collection.
+            <p className="text-neutral-medium text-center text-lg font-light">
+              No products assigned to this collection
             </p>
           )}
         </div>

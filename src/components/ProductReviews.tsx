@@ -2,12 +2,12 @@
 import { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
 import { useAuth } from "@/app/context/AuthContext";
-import type { ProductReview, ProductReviewsProps } from "../../types/types";
-import type { WooOrder, CartItemResponse } from "../../types/woocommerce";
+import type { ProductReviewsProps } from "../../types/types";
+import type { WooOrder, CartItemResponse, WooCommerceReview } from "../../types/woocommerce";
 
 export default function ProductReviews({ productId }: ProductReviewsProps) {
   const { user, isAuthenticated } = useAuth();
-  const [reviews, setReviews] = useState<ProductReview[]>([]);
+  const [reviews, setReviews] = useState<WooCommerceReview[]>([]);
   const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState<number>(5);
   const [error, setError] = useState("");
@@ -20,8 +20,12 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       try {
         const response = await fetch(`/api/reviews?productId=${productId}`);
         if (!response.ok) throw new Error("Failed to fetch reviews");
-        const data = await response.json();
-        setReviews(data);
+        const data: WooCommerceReview[] = await response.json();
+        // Sort reviews by date_created in descending order (newest first)
+        const sortedReviews = data.sort((a, b) => 
+          new Date(b.date_created).getTime() - new Date(a.date_created).getTime()
+        );
+        setReviews(sortedReviews);
       } catch {
         setError("Error loading reviews");
       } finally {
@@ -31,27 +35,34 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
 
     async function checkPurchaseStatus() {
       try {
-        const response = await fetch(`/api/order?userID=${user?.id}`);
+        const response = await fetch("/api/order");
+        if (!response.ok) throw new Error("Failed to fetch orders");
         const data = await response.json();
-        const orders = data.orders || [];
-        const hasBought = orders.some((order: WooOrder) =>
-          Array.isArray(order.items) &&
-          order.items.some((item: CartItemResponse) => item.product_id === productId)
-        );
+        const orders: WooOrder[] = data.orders || [];
+        
+        // Check if any order contains this product - simplified approach
+        const hasBought = orders.some((order: WooOrder) => {
+          return Array.isArray(order.items) &&
+            order.items.some((item: CartItemResponse) => {
+              return item.id === productId;
+            });
+        });
+        
         setHasPurchased(hasBought);
-      } catch (error) {
-        console.error("Error checking purchase status:", error);
+      } catch {
+        setHasPurchased(false);
       }
     }
 
     async function checkReviewStatus() {
       try {
         const response = await fetch(`/api/reviews?productId=${productId}&userId=${user?.id}`);
-        if (!response.ok) throw new Error("Failed to check review status");
-        const data = await response.json();
+        if (!response.ok) throw new Error("Failed to fetch user reviews");
+        const data: WooCommerceReview[] = await response.json();
+        // Check if user has reviewed this specific product
         setHasReviewed(data.length > 0);
-      } catch (error) {
-        console.error("Error checking review status:", error);
+      } catch {
+        setHasReviewed(false);
       }
     }
 
@@ -84,16 +95,18 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
           userId: user?.id,
         }),
       });
-      const data = await response.json();
+      const data: WooCommerceReview | { error?: string } = await response.json();
       if (!response.ok) {
-        throw new Error(data.error || "Failed to submit review");
+        throw new Error((data as { error?: string }).error || "Failed to submit review");
       }
-      setReviews([...reviews, data]);
+      setReviews([data as WooCommerceReview, ...reviews]);
+      setHasReviewed(true);
       setNewReview("");
       setRating(5);
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error && error.message === "You have already reviewed this product") {
-        setError("You have already reviewed this product. You can only leave one review per product.");
+        setError("You have already reviewed this product");
+        setHasReviewed(true);
       } else {
         setError(error instanceof Error ? error.message : "An error occurred while submitting your review");
       }
@@ -121,6 +134,13 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                   ))}
                 </div>
                 <span className="font-bold">{review.reviewer}</span>
+                <span className="text-neutral-medium text-sm">
+                  {new Date(review.date_created).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
               </div>
               <div
                 className="mt-2 prose max-w-none"
@@ -133,7 +153,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       {isAuthenticated ? (
         hasPurchased ? (
           hasReviewed ? (
-            <p className="text-gray-600">You have already reviewed this product.</p>
+            <p className="text-gray-600">You have already reviewed this product</p>
           ) : (
             <form onSubmit={handleSubmitReview} className="space-y-4">
               <div>
@@ -157,7 +177,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                 <label className="block mb-2">Your Review</label>
                 <textarea
                   value={newReview}
-                  onChange={(e) => setNewReview(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewReview(e.target.value)}
                   className="w-full p-2 border rounded"
                   rows={4}
                   required
@@ -173,10 +193,10 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
             </form>
           )
         ) : (
-          <p className="text-gray-600">You must purchase this product before leaving a review.</p>
+          <p className="text-gray-600">You must purchase this product before leaving a review</p>
         )
       ) : (
-        <p className="text-gray-600">Please <a href="/login" className="hover:underline">login</a> to leave a review.</p>
+        <p className="text-gray-600">Please <a href="/login" className="hover:underline">login</a> to leave a review</p>
       )}
     </div>
   );

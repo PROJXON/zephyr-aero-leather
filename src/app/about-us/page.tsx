@@ -4,7 +4,7 @@ import type { JSX } from "react";
 import AboutUs from "@/components/AboutUs";
 import Hero from "@/components/Hero";
 
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL as string;
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
 
 export const metadata = {
   title: "About Us | Zephyr Aero Leather",

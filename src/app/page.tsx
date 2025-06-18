@@ -7,7 +7,7 @@ import { FaLeaf } from "react-icons/fa";
 import type { JSX } from "react";
 import type { SectionProps } from "../../types/types";
 
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
 
 export const revalidate = 60;
 

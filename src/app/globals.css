@@ -5,14 +5,14 @@
 
 :root {
   --foreground-rgb: 51, 51, 51;
-  --background-rgb: 250, 249, 246;
+  --background-rgb: 240, 230, 220;
   --accent-color: #00a896;
   --accent-hover: #008b7d;
   --warm-bg: #f5f2eb;
   --card-bg: #ffffff;
   --neutral-dark: #3a3a3a;
   --neutral-medium: #6c6c6c;
-  --neutral-light: #e5e2d9;
+  --neutral-light: #d4d1c8;
   --leather-brown: #8b5a2b;
 }
 
@@ -218,3 +218,19 @@ body {
 .group:hover .animate-carousel {
   animation-play-state: paused;
 } */
+
+/* Fade-in animation for mobile cart feedback */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}

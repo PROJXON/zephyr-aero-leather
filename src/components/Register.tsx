@@ -1,21 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
+import type { AuthApiResponse, RegisterFormData } from "../../types/types";
 import type { JSX } from "react";
 
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL as string;
-
-interface RegisterFormData {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  termsAccepted: boolean;
-}
-
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '') as string;
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
 const Register = (): JSX.Element => {
@@ -35,7 +27,7 @@ const Register = (): JSX.Element => {
 
   const { setUser, login } = useAuth();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.target;
     setFormdata((prev) => ({
       ...prev,
@@ -43,11 +35,11 @@ const Register = (): JSX.Element => {
     }));
   };
 
-  const isValidEmail = (email: string) => {
+  const isValidEmail = (email: string): boolean => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); 
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
 
@@ -91,7 +83,7 @@ const Register = (): JSX.Element => {
         }),
       });
   
-      const data = await response.json();
+      const data: AuthApiResponse = await response.json();
   
       if (!response.ok) {
         setError(data.error || "Failed to create an account");
@@ -111,8 +103,8 @@ const Register = (): JSX.Element => {
         credentials: "include", 
       });
 
-      const loginData = await loginResponse.json();
-      login(loginData.user);
+      const loginData: AuthApiResponse = await loginResponse.json();
+      login(loginData.user!);
   
       if (!loginResponse.ok) {
         setError(loginData.error || "Failed to log in");
@@ -122,7 +114,7 @@ const Register = (): JSX.Element => {
       const userResponse = await fetch("/api/auth/user", { credentials: "include" });
       const userData = await userResponse.json();
       if (userData.isAuthenticated) {
-        setUser(userData.user); 
+        setUser(userData.user); // Make sure to set the latest user data
       }
 
       router.push("/");
@@ -133,140 +125,151 @@ const Register = (): JSX.Element => {
     }
   };  
 
-  return(
-    <section className="relative flex items-center justify-center min-h-screen px-4">
-  <div
-    className="absolute inset-0 bg-cover bg-center opacity-50"
-    style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
-  />
-
-        <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
-
-          {/* Left: Already Have an Account? */}
-          <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-16 bg-[#605137] text-white rounded-r-xl">
-            <h2 className="text-3xl font-bold">Welcome Back!</h2>
-            <p className="text-center mt-2">Already have an account? Sign in now.</p>
+  return (
+    <section className="relative flex items-center justify-center min-h-screen px-4 py-8">
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-50"
+        style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
+      />
+      <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
+        {/* Left Panel: Register Form */}
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-8 bg-white bg-opacity-90 rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Create an account</h2>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+          <form className="w-full" onSubmit={handleSubmit} noValidate>
+            <input 
+              type="text" 
+              name="name" 
+              id="name" 
+              autoComplete="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all" 
+              placeholder="Name or Callsign" 
+              required 
+              disabled={loading}
+            />
+            <input 
+              type="email" 
+              name="email" 
+              id="email"
+              autoComplete="email" 
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all" 
+              placeholder="maverick@topgun.com" 
+              required 
+              disabled={loading}
+            />
             
-            <Link href="/login">
-              <button className="mt-4 px-6 py-2 border border-white rounded-full hover:bg-white hover:text-[#605137] transition">
-                Sign In
+            <div className="relative mb-4">
+              <input 
+                type={showPassword ? "text" : "password"}
+                name="password" 
+                id="password" 
+                autoComplete="new-password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all pr-16" 
+                placeholder="••••••••" 
+                required 
+                disabled={loading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-4 flex items-center text-sm text-neutral-dark font-semibold focus:outline-none"
+                disabled={loading}
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                )}
               </button>
-            </Link>
-         </div>
-
-
-
-            {/* Right: Register Form */}
-              <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white bg-opacity-90 rounded-b-xl md:rounded-r-xl md:rounded-bl-none">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-4 mt-2">
-                      Create an account
-                  </h1>
-                  {error && <p className="text-red-500 text-sm">{error}</p>}
-                  <form className="w-full" onSubmit={handleSubmit} noValidate>
-                      <div>
-                          <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pilot Callsign or Name</label>
-                          <input 
-                            type="text" 
-                            name="name" 
-                            id="name" 
-                            autoComplete="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
-                            placeholder="Maverick" 
-                            required 
-                            disabled={loading} // Disable input when loading
-                          />
-                      </div>
-                      <div>
-                          <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                          <input 
-                            type="email" 
-                            name="email" 
-                            id="email"
-                            autoComplete="email" 
-                            value={formData.email}
-                            onChange={handleChange}
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
-                            placeholder="name@company.com" 
-                            required 
-                            disabled={loading} // Disable input when loading
-                          />
-                      </div>
-                      <div className="relative w-full">
-                          <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                          <input 
-                            type={showPassword ? "text" : "password"}
-                            name="password" 
-                            id="password" 
-                            autoComplete="new-password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            placeholder="••••••••" 
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
-                            required 
-                            disabled={loading} // Disable input when loading
-                          />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword((prev) => !prev)}
-                              className="absolute inset-y-0 right-4 flex items-center text-sm text-[#605137] font-semibold hover:underline focus:outline-none">
-                              {showPassword ? "Hide" : "Show"}
-                            </button>
-                      </div>
-                      <div className="relative w-full mt-4">
-                          <label htmlFor="confirm-password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
-                          <input 
-                            type={showPassword ? "text" : "password"}
-                            name="confirmPassword" 
-                            id="confirm-password"
-                            autoComplete="new-password"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            placeholder="••••••••" 
-                            className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-700 text-gray-900 rounded-lg focus:ring-2 focus:ring-[#605137] placeholder-gray-400 transition-all" 
-                            required
-                            disabled={loading} // Disable input when loading
-                          />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword((prev) => !prev)}
-                                className="absolute inset-y-0 right-4 flex items-center text-sm text-[#605137] font-semibold hover:underline focus:outline-none">
-                              {showPassword ? "Hide" : "Show"}
-                            </button>
-                      </div>
-                      <div className="flex items-start">
-                          <div className="flex items-center h-5">
-                            <input 
-                              id="terms"
-                              aria-describedby="terms" 
-                              type="checkbox"
-                              name="termsAccepted"
-                              checked={formData.termsAccepted}
-                              onChange={handleChange}
-                              className="w-5 h-5 border border-gray-700 rounded bg-gray-50 focus:ring-2 focus:ring-[#605137] transition checked:bg-[#605137] checked:border-[#30291C] checked:appearance-auto"
-                              required
-                              disabled={loading} // Disable input when loading
-                            />
-                          </div>
-                          <div className="ml-3 text-sm">
-                            <label htmlFor="terms" className="font-light text-gray-500 dark:text-gray-300">I accept the <a className="font-medium text-primary-600 hover:underline dark:text-primary-500" href="/terms">Terms and Conditions</a></label>
-                          </div>
-                      </div>
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className={`w-full py-2 bg-[#30291C] text-white font-bold rounded-full mt-4 ${
-                          loading ? "opacity-50 cursor-not-allowed" : ""
-                        }`}
-                      >
-                        {loading ? "Creating Account..." : "Create Account"}
-                      </button>
-                  </form>
+            </div>
+            
+            <div className="relative mb-4">
+              <input 
+                type={showPassword ? "text" : "password"}
+                name="confirmPassword" 
+                id="confirmPassword" 
+                autoComplete="new-password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all pr-16" 
+                placeholder="••••••••" 
+                required
+                disabled={loading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-4 flex items-center text-sm text-neutral-dark font-semibold focus:outline-none"
+                disabled={loading}
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                )}
+              </button>
+            </div>
+            
+            <div className="flex items-start mb-4">
+              <div className="flex items-center h-5">
+                <input 
+                  id="terms"
+                  aria-describedby="terms" 
+                  type="checkbox"
+                  name="termsAccepted"
+                  checked={formData.termsAccepted}
+                  onChange={handleChange}
+                  className="w-5 h-5 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-neutral-dark transition accent-neutral-dark"
+                  required
+                  disabled={loading}
+                />
               </div>
+              <div className="ml-3 text-sm">
+                <label htmlFor="terms" className="font-light">I accept the <a className="font-medium text-neutral-dark hover:underline" href="/terms">Terms and Conditions</a></label>
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {loading ? "Creating Account..." : "Create Account"}
+            </button>
+          </form>
         </div>
-    </section>
-  )
-}
 
-export default Register;
+        {/* Right Panel: Sign In Prompt */}
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 md:p-16 bg-neutral-dark text-white rounded-b-xl md:rounded-r-xl md:rounded-bl-none">
+          <h2 className="text-2xl md:text-3xl font-bold text-center">Welcome Back!</h2>
+          <p className="text-center mt-2 mb-6">Already have an account? Sign in now.</p>
+
+          <Link href="/login">
+            <button className="w-full md:w-auto px-6 py-2 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors">
+              Sign In
+            </button>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Register; 

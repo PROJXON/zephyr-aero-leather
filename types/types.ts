@@ -36,35 +36,6 @@ export interface Cart {
   itemCount: number;
 }
 
-// Order Types
-export interface Order {
-  id: string;
-  status: string;
-  total: number;
-  items: CartItem[];
-  shipping: {
-    firstName: string;
-    lastName: string;
-    address1: string;
-    address2?: string;
-    city: string;
-    state: string;
-    postcode: string;
-    country: string;
-  };
-  createdAt: string;
-}
-
-// Review Types
-export interface Review {
-  id: number;
-  productId: number;
-  rating: number;
-  comment: string;
-  userName: string;
-  createdAt: string;
-}
-
 // Product Types
 export interface Product {
   id: number;
@@ -98,6 +69,9 @@ export interface Product {
   stock: number;
   rating?: number;
   reviewCount?: number;
+  date_modified?: string;
+  date_created?: string;
+  modified?: string;
 }
 
 // Category Types
@@ -154,9 +128,15 @@ export interface AuthState {
 }
 
 // API Response Types
-export interface ApiResponse<T> {
-  data: T;
+export interface ApiResponse<T = void> {
+  data?: T;
   error?: string;
+  message?: string;
+  success?: boolean;
+}
+
+export interface AuthApiResponse extends ApiResponse<User> {
+  user?: User;
 }
 
 // Utility Types
@@ -220,7 +200,7 @@ export interface StripePaymentResponse {
   error?: string;
   type?: string;
   code?: string;
-  details?: unknown;
+  details?: Record<string, unknown> | string;
 }
 
 export type CategoryKey = keyof CategoryMap;
@@ -304,9 +284,9 @@ export interface AddToCartButtonProps {
 }
 
 export interface DebugInfo {
-  localStorage: unknown;
+  localStorage: Record<string, unknown> | null;
   cookies: string | null;
-  apiResponse: unknown;
+  apiResponse: Record<string, unknown> | string | null;
   timestamp: string | null;
 }
 
@@ -391,6 +371,7 @@ export interface NavButtonProps {
   d?: string;
   text?: string;
   fill?: string;
+  badgeCount?: number;
 }
 
 export interface NavLinkProps {
@@ -450,9 +431,13 @@ export interface ProductListProps {
 
 export interface ProductReview {
   id: number;
+  productId: number;
+  userId: number;
   reviewer: string;
   rating: number;
   review: string;
+  date_created: string;
+  error?: string;
 }
 
 export interface ProductReviewsProps {
@@ -609,16 +594,19 @@ export interface ResetPasswordRequest {
   password: string;
 }
 
+import type { WooCustomer } from "./woocommerce";
+
 export interface ResetPasswordResponse {
   success: boolean;
   message?: string;
   error?: string;
+  user?: WooCustomer;
 }
 
 export interface PaymentIntentResponse {
   amount: number;
   status: string;
-  items: unknown[];
+  items: CartItem[];
 }
 
 // Stripe Types
@@ -669,4 +657,17 @@ export interface WordPressUser {
   email: string;
   roles: string[];
   [key: string]: unknown;
+}
+
+export interface ForgotPasswordFormState {
+  email: string;
+  message: string;
+  error: string;
+  loading: boolean;
+}
+
+export interface ProductImageCardProps {
+  src: string;
+  alt: string;
+  className?: string;
 }

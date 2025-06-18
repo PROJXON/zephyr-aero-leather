@@ -117,6 +117,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       }
 
       saveGuestCart(updatedCart);
+      setCartItems(updatedCart);
     }
   };
 
@@ -149,6 +150,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     } else {
       const updatedCart = cartItems.filter((item) => item.id !== productId);
       saveGuestCart(updatedCart);
+      setCartItems(updatedCart);
     }
   };
 
@@ -229,6 +231,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       }
 
       saveGuestCart(updatedCart);
+      setCartItems(updatedCart);
     }
   };
 

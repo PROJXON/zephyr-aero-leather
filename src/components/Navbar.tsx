@@ -13,9 +13,9 @@ import getChangeQuantity from "../../lib/getChangeQuantity";
 import { Sling as Hamburger } from "hamburger-react";
 import TopNavLink from "./TopNavLink";
 import NavLink from "./NavLink";
-import type { NavbarProps } from "../../types/types";
+import type { NavbarProps, TopNavLinkDropdownItem } from "../../types/types";
 
-const productCategories = [
+const productCategories: TopNavLinkDropdownItem[] = [
   { name: "Wallets", slug: "wallets" },
   { name: "iPhone Leather Cases", slug: "iphoneCases" },
   { name: "Sunglass Cases", slug: "sunglasses" },
@@ -25,7 +25,7 @@ const productCategories = [
   { name: "Moto Guzzi Collection", slug: "moto" },
 ];
 
-const collectionCategories = [
+const collectionCategories: TopNavLinkDropdownItem[] = [
   { name: "Aviator", slug: "aviator" },
   { name: "Explorer", slug: "explorer" },
   { name: "Traveler", slug: "traveler" },
@@ -74,17 +74,17 @@ const Navbar = ({ allProducts }: NavbarProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [accountOpen, cartOpen, setCartOpen]);
 
-  const navItems = ["About Us"];
+  const navItems: string[] = ["About Us"];
   const navItemsWithDropdown = [
     {
       label: "Collections",
       items: collectionCategories,
-      basePath: "collections",
+      basePath: "/collections",
     },
     {
       label: "Categories",
       items: productCategories,
-      basePath: "categories",
+      basePath: "/categories",
     },
   ];
 
@@ -134,14 +134,14 @@ const Navbar = ({ allProducts }: NavbarProps) => {
       show: isAuthenticated,
     },
     {
-      label: "View Cart",
+      label: `View Cart${cartItems?.length > 0 ? ` (${cartItems.reduce((total, item) => total + item.quantity, 0)})` : ""}`,
       unique: "/checkout",
       show: true,
     },
   ];
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 py-2">
+    <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 z-50 py-2">
       <div className="max-w-screen-xl px-4 mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo and Desktop Menu */}
@@ -226,6 +226,8 @@ const Navbar = ({ allProducts }: NavbarProps) => {
                 srOnly="Cart"
                 d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"
                 text={isAuthenticated ? "My Cart" : "Guest Cart"}
+                badgeCount={cartItems?.length > 0 ? cartItems.reduce((total, item) => total + item.quantity, 0) : undefined}
+                fill="none"
               />
               {cartOpen && (
                 <div
@@ -277,7 +279,23 @@ const Navbar = ({ allProducts }: NavbarProps) => {
             </div>
 
             {/* Hamburger - Mobile Only */}
-            <div className="lg:hidden">
+            <div className="lg:hidden flex items-center gap-2">
+              {/* Mobile Cart Indicator */}
+              {cartItems?.length > 0 && (
+                <div className="relative">
+                  <button
+                    onClick={() => replace("/checkout")}
+                    className="flex items-center justify-center"
+                  >
+                    <svg className="w-6 h-6 text-neutral-dark hover:text-accent-color transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312" />
+                    </svg>
+                    <span className="absolute -top-2 -right-1 text-neutral-dark text-xs font-medium">
+                      {cartItems.reduce((total, item) => total + item.quantity, 0)}
+                    </span>
+                  </button>
+                </div>
+              )}
               <Hamburger toggled={menuOpen} toggle={setMenuOpen} />
             </div>
           </div>
