@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ReactElement } from "react";
 import type { CommitmentItem, WhyShopItem } from "../../types/types";
 
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
 
 export default function AboutUs(): ReactElement {
   const commitmentItems: CommitmentItem[] = [

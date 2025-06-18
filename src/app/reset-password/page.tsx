@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import ResetPasswordForm from "../../components/ResetPasswordForm";
 
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
 export default function ResetPasswordPage() {
