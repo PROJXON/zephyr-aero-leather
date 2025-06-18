@@ -189,7 +189,7 @@ export interface StripeError {
   message: string;
   type?: string;
   code?: string;
-  raw?: Error | string | Record<string, unknown>;
+  raw?: unknown;
 }
 
 export interface StripePaymentResponse {

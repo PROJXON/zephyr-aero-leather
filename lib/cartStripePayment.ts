@@ -102,7 +102,7 @@ export default async function cartStripePayment(req: Request): Promise<Response>
       error: error.message,
       type: error.type,
       code: error.code,
-      details: error.raw
+      details: error.raw as string | Record<string, unknown> | undefined
     };
     return new Response(JSON.stringify(response), {
       status: 500,
