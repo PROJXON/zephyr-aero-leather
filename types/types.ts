@@ -153,11 +153,14 @@ export interface AuthState {
 
 // API Response Types
 export interface ApiResponse<T = void> {
-  user?: User;
-  error?: string;
   data?: T;
+  error?: string;
   message?: string;
   success?: boolean;
+}
+
+export interface AuthApiResponse extends ApiResponse<User> {
+  user?: User;
 }
 
 // Utility Types

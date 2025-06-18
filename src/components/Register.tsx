@@ -4,7 +4,7 @@ import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
-import type { User, LoginFormData, ApiResponse } from "../../types/types";
+import type { AuthApiResponse } from "../../types/types";
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
@@ -89,7 +89,7 @@ const Register = () => {
         }),
       });
   
-      const data: ApiResponse<User> = await response.json();
+      const data: AuthApiResponse = await response.json();
   
       if (!response.ok) {
         setError(data.error || "Failed to create an account");
@@ -109,7 +109,7 @@ const Register = () => {
         credentials: "include", 
       });
 
-      const loginData: ApiResponse<User> = await loginResponse.json();
+      const loginData: AuthApiResponse = await loginResponse.json();
       login(loginData.user!);
   
       if (!loginResponse.ok) {

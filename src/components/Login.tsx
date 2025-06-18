@@ -4,41 +4,36 @@ import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
-import type { LoginFormData, ApiResponse, User } from "../../types/types";
+import type { LoginFormData, AuthApiResponse } from "../../types/types";
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
 const Login = () => {
-  const [formData, setFormData] = useState<LoginFormData>({
+  const [form, setForm] = useState<LoginFormData>({
     email: "",
     password: "",
   });
-
-  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm({ ...form, [event.target.name]: event.target.value });
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setError("");
+    setError(null);
 
-    if (!formData.email || !formData.password) {
+    if (!form.email || !form.password) {
       setError("Email and password are required");
       return;
     }
 
-    setLoading(true);
+    setLoading(true); // Disable button & show loading
 
     try {
       const response = await fetch("/api/login", {
@@ -47,8 +42,8 @@ const Login = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
+          email: form.email,
+          password: form.password,
         }),
         credentials: "include",
       });
@@ -56,11 +51,11 @@ const Login = () => {
       if (!response.ok) {
         const data = await response.json();
         setError(data.error || "Invalid email or password");
-        setLoading(false);
+        setLoading(false); // Re-enable button on error
         return;
       }
 
-      const data: ApiResponse<User> = await response.json();
+      const data: AuthApiResponse = await response.json();
 
       const userResponse = await fetch("/api/auth/user", {
         credentials: "include",
@@ -78,7 +73,7 @@ const Login = () => {
     } catch (error) {
       setError("An error occurred. Please try again.");
       console.error(error);
-      setLoading(false);
+      setLoading(false); // Re-enable button on error
     }
   };
 
@@ -99,7 +94,7 @@ const Login = () => {
               type="email"
               name="email"
               placeholder="name@company.com"
-              value={formData.email}
+              value={form.email}
               onChange={handleChange}
               className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all"
               required
@@ -112,7 +107,7 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Enter your password"
-                value={formData.password}
+                value={form.password}
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all pr-16"
                 required
