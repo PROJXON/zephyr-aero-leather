@@ -13,6 +13,7 @@ export default function OrderHistory({ products }: { products: Product[] }) {
   const [orders, setOrders] = useState<WooOrder[]>([])
   const [localTimes, setLocalTimes] = useState<Date[]>([])
   const [reviewedProductIds, setReviewedProductIds] = useState<number[]>([])
+  const [loading, setLoading] = useState(true)
 
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -42,6 +43,8 @@ export default function OrderHistory({ products }: { products: Product[] }) {
           setLocalTimes(times)
         } catch (err) {
           console.error("Error fetching orders:", err)
+        } finally {
+          setLoading(false)
         }
       }
     })()
@@ -78,6 +81,10 @@ export default function OrderHistory({ products }: { products: Product[] }) {
   // Don't render anything if not authenticated (will redirect)
   if (!isAuthenticated) {
     return null
+  }
+
+  if (loading) {
+    return <div className="text-center py-8">Loading Orders...</div>
   }
 
   return (
