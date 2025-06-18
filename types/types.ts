@@ -96,6 +96,9 @@ export interface Product {
   stock: number;
   rating?: number;
   reviewCount?: number;
+  date_modified?: string;
+  date_created?: string;
+  modified?: string;
 }
 
 // Category Types
