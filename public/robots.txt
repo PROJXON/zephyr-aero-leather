@@ -1,0 +1,26 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://zephyraeroleather.com/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /wp-admin/
+Disallow: /wp-login.php
+
+# Allow product pages
+Allow: /product/
+Allow: /products/
+
+# Allow category pages
+Allow: /category/
+Allow: /collections/
+
+# Allow static pages
+Allow: /about-us
+Allow: /contact
+Allow: /privacy-policy
+Allow: /terms-of-service 
