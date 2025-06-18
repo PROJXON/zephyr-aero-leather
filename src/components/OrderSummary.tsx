@@ -11,6 +11,7 @@ export default function OrderSummary({
   quantityControls = {},
   showReviewLinks = false,
   reviewedProductIds = [],
+  shippingDetails
 }: OrderSummaryProps) {
   const {
     updateQuantity,
@@ -107,6 +108,21 @@ export default function OrderSummary({
           );
         })}
       </div>
+        {shippingDetails && (
+          <div className="text-sm bg-gray-50 border border-gray-200 rounded p-4">
+            <h3 className="font-semibold mb-2">Shipping To</h3>
+            <p>
+              {shippingDetails.first_name} {shippingDetails.last_name}
+            </p>
+            <p>
+              {shippingDetails.address_1}
+              {shippingDetails.address_2 ? `, ${shippingDetails.address_2}` : ""}
+            </p>
+            <p>
+              {shippingDetails.city}, {shippingDetails.state} {shippingDetails.postcode}
+            </p>
+          </div>
+        )}
 
       <div className="space-y-2 text-sm pt-4 border-t">
         <div className="flex justify-between">

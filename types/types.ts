@@ -1,3 +1,5 @@
+import { WooCommerceAddress } from "./woocommerce";
+
 // Next.js Page Props Types
 export interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -421,6 +423,7 @@ export interface OrderSummaryProps {
   quantityControls?: Partial<QuantityControls>;
   showReviewLinks?: boolean;
   reviewedProductIds?: number[];
+  shippingDetails?: WooCommerceAddress;
 }
 
 export interface QuantityControls {

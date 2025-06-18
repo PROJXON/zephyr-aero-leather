@@ -91,6 +91,7 @@ export default function OrderHistory({ products }: { products: Product[] }) {
                       total={total}
                       showReviewLinks={true}
                       reviewedProductIds={reviewedProductIds}
+                      shippingDetails={order.shipping}
                     />
                   </li>
                 )
