@@ -453,9 +453,13 @@ export interface ProductListProps {
 
 export interface ProductReview {
   id: number;
+  productId: number;
+  userId: number;
   reviewer: string;
   rating: number;
   review: string;
+  date_created: string;
+  error?: string;
 }
 
 export interface ProductReviewsProps {
