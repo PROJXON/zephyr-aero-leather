@@ -6,34 +6,40 @@ import type { AddToCartButtonProps, CartContextType } from "../../types/types";
 export default function AddToCartButton({ productId, className = "" }: AddToCartButtonProps) {
   const { updateQuantity, cartItems } = useCart() as CartContextType;
   const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
 
   const currentItem = cartItems.find(item => item.id === productId);
   const currentQty = currentItem?.quantity || 0;
 
+  const showToast = (message: string) => {
+    setFeedbackMessage(message);
+    setShowFeedback(true);
+    setTimeout(() => setShowFeedback(false), 1500); // Shorter, consistent duration
+  };
+
   const handleAddToCart = () => {
     updateQuantity(productId, currentQty + 1);
-    
-    // Show feedback toast on both mobile and desktop
-    setShowFeedback(true);
-    setTimeout(() => setShowFeedback(false), 2000);
+    showToast("Cart updated!");
   };
 
   const handleIncrease = () => {
     updateQuantity(productId, currentQty + 1);
-    setShowFeedback(true);
-    setTimeout(() => setShowFeedback(false), 2000);
+    showToast("Cart updated!");
   };
 
   const handleDecrease = () => {
     if (currentQty > 1) {
       updateQuantity(productId, currentQty - 1);
+      showToast("Cart updated!");
     } else {
       updateQuantity(productId, 0); // Remove item
+      showToast("Removed from cart!");
     }
   };
 
   const handleRemove = () => {
     updateQuantity(productId, 0);
+    showToast("Removed from cart!");
   };
 
   // If item is in cart, show quantity controls
@@ -79,7 +85,7 @@ export default function AddToCartButton({ productId, className = "" }: AddToCart
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              <span>Cart updated!</span>
+              <span>{feedbackMessage}</span>
             </div>
           </div>
         )}
@@ -104,7 +110,7 @@ export default function AddToCartButton({ productId, className = "" }: AddToCart
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            <span>Added to cart!</span>
+            <span>{feedbackMessage}</span>
           </div>
         </div>
       )}
