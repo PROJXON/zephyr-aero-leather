@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/AuthContext"
 import OrderSummary from "./OrderSummary"
 import calculateTotal from "../../lib/calculateTotal"
@@ -8,6 +9,7 @@ import type { WooOrder, CartItemResponse } from "../../types/woocommerce"
 
 export default function OrderHistory({ products }: { products: Product[] }) {
   const { isAuthenticated, user } = useAuth()
+  const router = useRouter()
   const [orders, setOrders] = useState<WooOrder[]>([])
   const [localTimes, setLocalTimes] = useState<Date[]>([])
   const [reviewedProductIds, setReviewedProductIds] = useState<number[]>([])
@@ -16,6 +18,13 @@ export default function OrderHistory({ products }: { products: Product[] }) {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ]
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/')
+    }
+  }, [isAuthenticated, router])
 
   useEffect(() => {
     (async () => {
@@ -61,46 +70,45 @@ export default function OrderHistory({ products }: { products: Product[] }) {
     productId: item.product_id
   })
 
-  return (
-    <>
-      {isAuthenticated ? (
-        <div>
-          {orders.length === 0 ? (
-            <p>No orders found</p>
-          ) : (
-            <ul>
-              {orders.map((order: WooOrder, i: number) => {
-                const datePaid = localTimes[i]
-                const items = order.items.map(convertToCartItem)
-                const total = calculateTotal(items, products)
+  // Don't render anything if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null
+  }
 
-                return (
-                  <li key={order.id}>
-                    <h2 className="font-bold text-xl text-center">
-                      <div className={`p-2${i !== 0 ? " border-t-2 border-black" : ""}`}>
-                        {months[datePaid.getMonth()]} {datePaid.getDate()}, {datePaid.getFullYear()}{" "}
-                        {datePaid.toLocaleString([], {
-                          hour: "numeric",
-                          minute: "2-digit"
-                        })}
-                      </div>
-                    </h2>
-                    <OrderSummary
-                      cartItems={items}
-                      products={products}
-                      total={total}
-                      showReviewLinks={true}
-                      reviewedProductIds={reviewedProductIds}
-                    />
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-        </div>
+  return (
+    <div>
+      {orders.length === 0 ? (
+        <p>No orders found</p>
       ) : (
-        <p>Loading...</p>
+        <ul>
+          {orders.map((order: WooOrder, i: number) => {
+            const datePaid = localTimes[i]
+            const items = order.items.map(convertToCartItem)
+            const total = calculateTotal(items, products)
+
+            return (
+              <li key={order.id}>
+                <h2 className="font-bold text-xl text-center">
+                  <div className={`p-2${i !== 0 ? " border-t-2 border-black" : ""}`}>
+                    {months[datePaid.getMonth()]} {datePaid.getDate()}, {datePaid.getFullYear()}{" "}
+                    {datePaid.toLocaleString([], {
+                      hour: "numeric",
+                      minute: "2-digit"
+                    })}
+                  </div>
+                </h2>
+                <OrderSummary
+                  cartItems={items}
+                  products={products}
+                  total={total}
+                  showReviewLinks={true}
+                  reviewedProductIds={reviewedProductIds}
+                />
+              </li>
+            )
+          })}
+        </ul>
       )}
-    </>
+    </div>
   )
 }

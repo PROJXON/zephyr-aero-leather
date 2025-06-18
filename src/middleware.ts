@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
   const isAuthPage = authPages.some(page => path.startsWith(page));
 
-  // If user is on order history and logs out, redirect to home
+  // If user is on order history without token, redirect to home
   if (!hasToken && path === "/order-history") {
     return NextResponse.redirect(new URL("/", request.url));
   }

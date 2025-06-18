@@ -37,7 +37,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         {products.length > 0 ? (
           <ProductList products={products} />
         ) : (
-          <p className="text-neutral-medium text-center text-lg font-light">No products found in this category.</p>
+          <p className="text-neutral-medium text-center text-lg font-light">No products found in this category</p>
         )}
       </section>
     </div>

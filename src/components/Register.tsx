@@ -126,31 +126,15 @@ const Register = (): JSX.Element => {
   };  
 
   return (
-    <section className="relative flex items-center justify-center min-h-screen px-4 py-8 md:py-4">
-      {/* Background Image with 50% opacity overlay */}
+    <section className="relative flex items-center justify-center min-h-screen px-4 py-8">
       <div
         className="absolute inset-0 bg-cover bg-center opacity-50"
         style={{ backgroundImage: `url(${backgroundImageUrl})`, zIndex: -1 }}
       />
-
-      <div className="relative w-full max-w-4xl h-[650px] md:h-[700px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden mb-8 md:mb-0">
-        {/* Left: Already Have an Account? - Hidden on mobile */}
-        <div className="hidden md:flex w-full md:w-1/2 flex-col justify-center items-center p-8 md:p-16 bg-neutral-dark text-white rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
-          <h2 className="text-2xl md:text-3xl font-bold text-center">Welcome Back!</h2>
-          <p className="text-center mt-2 mb-6">Already have an account? Sign in now.</p>
-          
-          <Link href="/login">
-            <button className="w-full md:w-auto px-6 py-2 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors">
-              Sign In
-            </button>
-          </Link>
-        </div>
-
-        {/* Right: Register Form */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white bg-opacity-90 rounded-b-xl md:rounded-r-xl md:rounded-bl-none">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-            Create an account
-          </h1>
+      <div className="relative w-full max-w-4xl min-h-[600px] bg-white shadow-lg rounded-xl flex flex-col md:flex-row overflow-hidden">
+        {/* Left Panel: Register Form */}
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-8 bg-white bg-opacity-90 rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Create an account</h2>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <form className="w-full" onSubmit={handleSubmit} noValidate>
             <input 
@@ -177,6 +161,7 @@ const Register = (): JSX.Element => {
               required 
               disabled={loading}
             />
+            
             <div className="relative mb-4">
               <input 
                 type={showPassword ? "text" : "password"}
@@ -185,7 +170,7 @@ const Register = (): JSX.Element => {
                 autoComplete="new-password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all" 
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all pr-16" 
                 placeholder="••••••••" 
                 required 
                 disabled={loading}
@@ -193,7 +178,8 @@ const Register = (): JSX.Element => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                className="absolute inset-y-0 right-4 flex items-center text-sm text-neutral-dark font-semibold focus:outline-none"
+                disabled={loading}
               >
                 {showPassword ? (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -207,6 +193,7 @@ const Register = (): JSX.Element => {
                 )}
               </button>
             </div>
+            
             <div className="relative mb-4">
               <input 
                 type={showPassword ? "text" : "password"}
@@ -215,7 +202,7 @@ const Register = (): JSX.Element => {
                 autoComplete="new-password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all" 
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all pr-16" 
                 placeholder="••••••••" 
                 required
                 disabled={loading}
@@ -223,7 +210,8 @@ const Register = (): JSX.Element => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                className="absolute inset-y-0 right-4 flex items-center text-sm text-neutral-dark font-semibold focus:outline-none"
+                disabled={loading}
               >
                 {showPassword ? (
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
@@ -237,6 +225,7 @@ const Register = (): JSX.Element => {
                 )}
               </button>
             </div>
+            
             <div className="flex items-start mb-4">
               <div className="flex items-center h-5">
                 <input 
@@ -265,6 +254,18 @@ const Register = (): JSX.Element => {
               {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
+        </div>
+
+        {/* Right Panel: Sign In Prompt */}
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 md:p-16 bg-neutral-dark text-white rounded-b-xl md:rounded-r-xl md:rounded-bl-none">
+          <h2 className="text-2xl md:text-3xl font-bold text-center">Welcome Back!</h2>
+          <p className="text-center mt-2 mb-6">Already have an account? Sign in now.</p>
+
+          <Link href="/login">
+            <button className="w-full md:w-auto px-6 py-2 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors">
+              Sign In
+            </button>
+          </Link>
         </div>
       </div>
     </section>

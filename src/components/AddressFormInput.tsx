@@ -3,10 +3,10 @@ import { useContext } from "react";
 import { ChangeContext, StatesContext } from "./Checkout";
 import type { AddressFormInputProps } from "../../types/types";
 
-export default function AddressFormInput({ name, placeholder, value, span, error, type = "text" }: AddressFormInputProps) {
+export default function AddressFormInput({ name, placeholder, value = "", error, type = "text" }: AddressFormInputProps) {
     const onChange = useContext(ChangeContext);
     const states = useContext(StatesContext);
-    const classes = `w-full p-2 border rounded col-span-${span}${error ? " border-red-400 placeholder-red-300" : ""}`;
+    const classes = `w-full p-4 border border-gray-300 rounded-md bg-white shadow-sm text-base text-gray-900 font-inherit placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-neutral-dark focus:border-neutral-dark transition-all${error ? " border-red-400 placeholder-red-300" : ""}`;
     const displayPlaceholder = error || placeholder;
 
     return (

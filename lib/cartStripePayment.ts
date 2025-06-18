@@ -42,10 +42,24 @@ export default async function cartStripePayment(req: Request): Promise<Response>
         }
       };
 
-      await syncAddress(shipping, woo_order_id, false);
+      // Only sync with WooCommerce if we have a woo_order_id (signed-in user)
+      if (woo_order_id) {
+        await syncAddress(shipping, woo_order_id, false);
+      } else {
+        // For guest users, store shipping in metadata
+        metadata.shipping = JSON.stringify(shipping);
+      }
     }
 
-    if (billing) await syncAddress(billing, woo_order_id, true);
+    if (billing) {
+      // Only sync with WooCommerce if we have a woo_order_id (signed-in user)
+      if (woo_order_id) {
+        await syncAddress(billing, woo_order_id, true);
+      } else {
+        // For guest users, store billing in metadata
+        metadata.billing = JSON.stringify(billing);
+      }
+    }
 
     try {
       if (payment_intent_id) {
