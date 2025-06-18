@@ -662,3 +662,9 @@ export interface ForgotPasswordFormState {
   error: string;
   loading: boolean;
 }
+
+export interface ProductImageCardProps {
+  src: string;
+  alt: string;
+  className?: string;
+}
