@@ -4,29 +4,23 @@ import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
-import type { AuthApiResponse } from "../../types/types";
+import type { AuthApiResponse, RegisterFormData } from "../../types/types";
+import type { JSX } from "react";
 
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '') as string;
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
-interface RegisterFormData {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  termsAccepted: boolean;
-}
-
-const Register = () => {
+const Register = (): JSX.Element => {
   const [formData, setFormdata] = useState<RegisterFormData>({
     name: "",
     email: "",
     password: "",
-    confirmPassword: "", 
+    confirmPassword: "",
     termsAccepted: false,
   });
 
   const [error, setError] = useState("");
+  
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -174,8 +168,8 @@ const Register = () => {
             <input 
               type="email" 
               name="email" 
-              id="email" 
-              autoComplete="email"
+              id="email"
+              autoComplete="email" 
               value={formData.email}
               onChange={handleChange}
               className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all" 
@@ -185,7 +179,7 @@ const Register = () => {
             />
             <div className="relative mb-4">
               <input 
-                type={showPassword ? "text" : "password"} 
+                type={showPassword ? "text" : "password"}
                 name="password" 
                 id="password" 
                 autoComplete="new-password"
@@ -215,7 +209,7 @@ const Register = () => {
             </div>
             <div className="relative mb-4">
               <input 
-                type={showPassword ? "text" : "password"} 
+                type={showPassword ? "text" : "password"}
                 name="confirmPassword" 
                 id="confirmPassword" 
                 autoComplete="new-password"
@@ -223,7 +217,7 @@ const Register = () => {
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all" 
                 placeholder="••••••••" 
-                required 
+                required
                 disabled={loading}
               />
               <button
