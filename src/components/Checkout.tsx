@@ -71,12 +71,12 @@ export default function Checkout({ products }: CheckoutProps) {
   const [billToShipping, setBillToShipping] = useState<boolean>(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [shippingErrors, setShippingErrors] = useState<AddressErrors>({});
-  const [shippingDetails, shippingDispatch] = useReducer(reducer, defaultAddressDetails)
+  const [shippingDetails, shippingDispatch] = useReducer(reducer, defaultAddressDetails);
   const [billingErrors, setBillingErrors] = useState<AddressErrors>({});
-  const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
+  const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails);
 
   const states: State[] = [
-    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+    "AA", "AE", "AL", "AK", "AP", "AS", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FM", "FL", "GA", "GU", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MH", "MD", "MA", "MI", "MN", "MS", "MO", "MP", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PW", "PA", "PR", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VI", "VA", "WA", "WV", "WI", "WY"
   ];
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
@@ -232,13 +232,19 @@ export default function Checkout({ products }: CheckoutProps) {
                       checked={billToShipping}
                       className="w-5 h-5 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-neutral-dark transition accent-neutral-dark"
                     />
-                    <label htmlFor="billToShipping" onClick={toggleBillToShipping} className="ml-2 text-neutral-dark">
+                    <label
+                      htmlFor="billToShipping"
+                      onClick={toggleBillToShipping}
+                      className="ml-2 text-neutral-dark"
+                    >
                       Bill to shipping address
                     </label>
                   </div>
-                  {!billToShipping && (<ChangeContext.Provider value={billingChange}>
-                    <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
-                  </ChangeContext.Provider>)}
+                  {!billToShipping && (
+                    <ChangeContext.Provider value={billingChange}>
+                      <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
+                    </ChangeContext.Provider>
+                  )}
                 </StatesContext.Provider>
               </div>
               <div className="w-full lg:w-1/2">
