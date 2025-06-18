@@ -8,7 +8,7 @@ import ZephyrLogo from "../../public/zephyrlogo.jpg";
 
 export default function Footer(): ReactElement {
   return (
-    <footer className="bg-black text-white py-8 md:py-10">
+    <footer className="bg-neutral-dark text-white py-8 md:py-10">
       <div className="max-w-screen-xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
           {/* Logo & About Section */}
