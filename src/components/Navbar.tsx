@@ -79,12 +79,12 @@ const Navbar = ({ allProducts }: NavbarProps) => {
     {
       label: "Collections",
       items: collectionCategories,
-      basePath: "collections",
+      basePath: "/collections",
     },
     {
       label: "Categories",
       items: productCategories,
-      basePath: "categories",
+      basePath: "/categories",
     },
   ];
 

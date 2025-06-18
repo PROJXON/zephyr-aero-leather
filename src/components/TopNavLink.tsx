@@ -13,7 +13,7 @@ export default function TopNavLink({ href, label, dropdownItems }: TopNavLinkPro
                         {dropdownItems.map(item => (
                             <li key={item.slug}>
                                 <NavLink
-                                    href={`/${href}/${item.slug}`}
+                                    href={`${href}/${item.slug}`}
                                     classes="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-800"
                                     label={item.name}
                                 />
