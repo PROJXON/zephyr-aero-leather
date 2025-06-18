@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import ProductReviews from "@/components/ProductReviews";
 import AddToCartButton from "@/components/AddToCartButton";
+import ProductImageCard from "@/components/ProductImageCard";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 import type { JSX } from "react";
 import type { Product, ProductPageProps } from "../../../../types/types";
@@ -51,15 +51,11 @@ export default async function ProductPage({ params }: ProductPageProps): Promise
   return (
     <div className="container mx-auto px-4 py-8 mt-8">
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-8">
-        <div className="relative aspect-square rounded-xl overflow-hidden">
-          <Image
-            src={product.images?.[0]?.src || "/placeholder.jpg"}
-            alt={product.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 1000px) 100vw, 50vw"
-          />
-        </div>
+        <ProductImageCard
+          src={product.images?.[0]?.src || "/placeholder.jpg"}
+          alt={product.name}
+          className="w-full"
+        />
 
         <div className="py-10">
           <h1 className="text-3xl mb-4 text-center">{product.name}</h1>
