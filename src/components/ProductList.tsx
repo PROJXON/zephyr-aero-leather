@@ -7,7 +7,7 @@ import type { ProductListProps } from "../../types/types";
 
 export default function ProductList({ products }: ProductListProps) {
   if (!products || products.length === 0) {
-    return <p className="text-neutral-medium">No products found.</p>;
+    return <p className="text-neutral-medium">No products found</p>;
   }
 
   return (

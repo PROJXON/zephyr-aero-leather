@@ -4,7 +4,7 @@ import type { TopNavLinkProps } from "../../types/types";
 export default function TopNavLink({ href, label, dropdownItems }: TopNavLinkProps) {
     return (
         <li className="relative group">
-            <NavLink href={`/${href}`} classes="text-lg font-medium text-black" label={label} />
+            <NavLink href={href} classes="text-lg font-medium text-black" label={label} />
             <span className="absolute left-0 bottom-0 w-full h-[2px] bg-black transition-transform duration-300 transform scale-x-0 group-hover:scale-x-100"></span>
 
             {dropdownItems && (

@@ -68,7 +68,7 @@ export default function AboutUs(): ReactElement {
       </section>
 
       {/* Why Shop With Us */}
-      <section className="py-16 px-6 md:px-20 bg-neutral-light">
+      <section className="py-16 px-6 md:px-20">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-3xl font-normal mb-12 text-neutral-dark">
             Why Shop With Us

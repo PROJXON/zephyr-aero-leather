@@ -151,13 +151,22 @@ export default function Checkout({ products }: CheckoutProps) {
   const validateAddress = (details: AddressDetailsState): AddressErrors => {
     const errors: AddressErrors = {};
 
-    if (!details.name.first.trim()) errors.firstName = "Enter your first name";
-    if (!details.name.last.trim()) errors.lastName = "Enter your last name";
-    if (!details.address.line1.trim()) errors.address = "Enter your address";
-    if (!details.city.trim()) errors.city = "Enter your city";
-    if (!/^\d{5}$/.test(details.zipCode.trim())) errors.zipCode = "Enter a valid ZIP code";
+    // Required fields
+    if (!details.name.first.trim()) errors.firstName = "First name is required";
+    if (!details.name.last.trim()) errors.lastName = "Last name is required";
+    if (!details.address.line1.trim()) errors.address = "Address is required";
+    if (!details.city.trim()) errors.city = "City is required";
+    
+    // ZIP code validation for 5-digit or 9-digit format (XXXXX-XXXX)
+    const zipCode = details.zipCode.trim();
+    if (!/^\d{5}(-\d{4})?$/.test(zipCode)) {
+      errors.zipCode = "Enter a valid ZIP code (5 or 9 digits)";
+    }
+    
     const statesSet = new Set(states);
-    if (!statesSet.has(details.state)) errors.state = "Select a valid state";
+    if (!statesSet.has(details.state)) errors.state = "Please select a state";
+
+    // Address line 2 is optional, no validation needed
 
     return errors;
   };
@@ -208,20 +217,21 @@ export default function Checkout({ products }: CheckoutProps) {
             }}
           />
           {clientSecret && (
-            <div className="flex flex-wrap lg:flex-nowrap gap-2 place-content-between max-w-7xl w-full mx-auto">
-              <div className="w-full lg:max-w-xl grid gap-2">
+            <div className="flex flex-wrap lg:flex-nowrap gap-8 max-w-7xl w-full mx-auto">
+              <div className="w-full lg:w-1/2">
                 <StatesContext.Provider value={states}>
                   <ChangeContext.Provider value={shippingChange}>
                     <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
                   </ChangeContext.Provider>
-                  <div>
+                  <div className="mt-4">
                     <input
                       type="checkbox"
                       name="billToShipping"
                       onChange={toggleBillToShipping}
                       checked={billToShipping}
+                      className="w-5 h-5 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-neutral-dark transition accent-neutral-dark"
                     />
-                    <label htmlFor="billToShipping" className="ml-2" onClick={toggleBillToShipping}>
+                    <label htmlFor="billToShipping" onClick={toggleBillToShipping} className="ml-2 text-neutral-dark">
                       Bill to shipping address
                     </label>
                   </div>
@@ -230,7 +240,7 @@ export default function Checkout({ products }: CheckoutProps) {
                   </ChangeContext.Provider>)}
                 </StatesContext.Provider>
               </div>
-              <div className="w-full lg:max-w-md">
+              <div className="w-full lg:w-1/2">
                 <Elements stripe={stripePromise} options={options}>
                   <StripeForm
                     clientSecret={clientSecret}

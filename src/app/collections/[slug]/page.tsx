@@ -41,7 +41,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
             <ProductList products={collectionProducts} />
           ) : (
             <p className="text-neutral-medium text-center text-lg font-light">
-              No products assigned to this collection.
+              No products assigned to this collection
             </p>
           )}
         </div>

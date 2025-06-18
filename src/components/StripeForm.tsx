@@ -79,37 +79,45 @@ export default function StripeForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 lg:max-w-md mt-9">
-      <div className="border border-gray-300 rounded-md p-4 bg-white shadow-sm">
-        <CardElement
-          options={{
-            style: {
-              base: {
-                fontSize: '16px',
-                color: '#333',
-                fontFamily: 'inherit',
-                '::placeholder': {
-                  color: '#888',
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="max-w-md mx-auto">
+        <h2 className="text-xl font-semibold mb-4">Payment Information</h2>
+        <div className="border border-gray-300 rounded-md p-4 bg-white shadow-sm mb-4">
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#333',
+                  fontFamily: 'inherit',
+                  '::placeholder': {
+                    color: '#888',
+                  },
+                  ':-webkit-autofill': {
+                    color: '#333',
+                  },
+                  iconColor: '#333',
+                },
+                invalid: {
+                  color: '#e5424d',
+                  iconColor: '#e5424d',
                 },
               },
-              invalid: {
-                color: '#e5424d',
-              },
-            },
-            hidePostalCode: true,
-          }}
-        />
+              hidePostalCode: true,
+            }}
+          />
+        </div>
+
+        {formError && <p className="text-red-500 text-sm mb-4">{formError}</p>}
+
+        <button
+          type="submit"
+          disabled={isProcessing}
+          className="w-full bg-neutral-light text-neutral-dark px-4 py-2 rounded hover:bg-neutral-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isProcessing ? 'Processing...' : 'Pay Now'}
+        </button>
       </div>
-
-      {formError && <p className="text-red-500 text-sm">{formError}</p>}
-
-      <button
-        type="submit"
-        disabled={isProcessing}
-        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
-      >
-        {isProcessing ? 'Processing...' : 'Pay Now'}
-      </button>
     </form>
   );
 }

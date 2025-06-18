@@ -82,7 +82,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </Script>
         )}
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-[100dvh] grid grid-rows-[auto_1fr_auto] overflow-x-hidden`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col overflow-x-hidden`}>
         {GTM_ID && (
           <noscript>
             <iframe 
@@ -98,7 +98,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <AuthProvider>
           <CartProvider>
             <Navbar allProducts={products} />
-            <main className="relative z-0 overflow-x-hidden">{children}</main>
+            <main className="flex-1 relative z-0 overflow-x-hidden pt-12">{children}</main>
             <Footer />
           </CartProvider>
         </AuthProvider>
