@@ -49,7 +49,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
         });
         
         setHasPurchased(hasBought);
-      } catch (error) {
+      } catch {
         setHasPurchased(false);
       }
     }
@@ -61,7 +61,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
         const data: WooCommerceReview[] = await response.json();
         // Check if user has reviewed this specific product
         setHasReviewed(data.length > 0);
-      } catch (error) {
+      } catch {
         setHasReviewed(false);
       }
     }
@@ -103,7 +103,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       setHasReviewed(true);
       setNewReview("");
       setRating(5);
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof Error && error.message === "You have already reviewed this product") {
         setError("You have already reviewed this product");
         setHasReviewed(true);

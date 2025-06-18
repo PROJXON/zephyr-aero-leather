@@ -57,7 +57,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     });
 
     // Get the updated user data after password reset
-    const updatedUser = await fetchWooCommerce(`wc/v3/customers/${user.id}`, "Failed to fetch updated user data");
+    const updatedUser = await fetchWooCommerce<WooCustomer>(`wc/v3/customers/${user.id}`, "Failed to fetch updated user data");
 
     return NextResponse.json({
       success: true,

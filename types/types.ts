@@ -189,7 +189,7 @@ export interface StripeError {
   message: string;
   type?: string;
   code?: string;
-  raw?: unknown;
+  raw?: Error | string | Record<string, unknown>;
 }
 
 export interface StripePaymentResponse {
@@ -198,7 +198,7 @@ export interface StripePaymentResponse {
   error?: string;
   type?: string;
   code?: string;
-  details?: unknown;
+  details?: Record<string, unknown> | string;
 }
 
 export type CategoryKey = keyof CategoryMap;
@@ -282,9 +282,9 @@ export interface AddToCartButtonProps {
 }
 
 export interface DebugInfo {
-  localStorage: unknown;
+  localStorage: Record<string, unknown> | null;
   cookies: string | null;
-  apiResponse: unknown;
+  apiResponse: Record<string, unknown> | string | null;
   timestamp: string | null;
 }
 
@@ -590,17 +590,19 @@ export interface ResetPasswordRequest {
   password: string;
 }
 
+import type { WooCustomer } from "./woocommerce";
+
 export interface ResetPasswordResponse {
   success: boolean;
   message?: string;
   error?: string;
-  user?: any; // User data returned after successful password reset
+  user?: WooCustomer;
 }
 
 export interface PaymentIntentResponse {
   amount: number;
   status: string;
-  items: unknown[];
+  items: CartItem[];
 }
 
 // Stripe Types

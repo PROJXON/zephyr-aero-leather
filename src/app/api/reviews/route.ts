@@ -104,7 +104,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
 
     return NextResponse.json(newReview);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: createReviewError }, { status: 500 });
   }
 }
