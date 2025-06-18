@@ -1,7 +1,7 @@
 import type { NavButtonProps } from "../../types/types";
 import type { ReactElement } from "react";
 
-export default function NavButton({ onClick, className = "", srOnly, d, text, fill = "currentColor" }: NavButtonProps): ReactElement {
+export default function NavButton({ onClick, className = "", srOnly, d, text, fill = "currentColor", badgeCount }: NavButtonProps): ReactElement {
   return (
     <button
       onClick={onClick}
@@ -9,20 +9,27 @@ export default function NavButton({ onClick, className = "", srOnly, d, text, fi
     >
       {srOnly && <span className="sr-only">{srOnly}</span>}
       {d && (
-        <svg
-          className="w-5 h-5"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill={fill}
-        >
-          <path
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d={d}
-          />
-        </svg>
+        <div className="relative">
+          <svg
+            className="w-5 h-5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill={fill}
+          >
+            <path
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d={d}
+            />
+          </svg>
+          {badgeCount && badgeCount > 0 && (
+            <span className="absolute -top-2 -right-1 text-neutral-dark text-xs font-medium">
+              {badgeCount}
+            </span>
+          )}
+        </div>
       )}
       {text && <span className="break-words">{text}</span>}
     </button>
