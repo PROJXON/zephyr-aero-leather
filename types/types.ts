@@ -34,35 +34,6 @@ export interface Cart {
   itemCount: number;
 }
 
-// Order Types
-export interface Order {
-  id: string;
-  status: string;
-  total: number;
-  items: CartItem[];
-  shipping: {
-    firstName: string;
-    lastName: string;
-    address1: string;
-    address2?: string;
-    city: string;
-    state: string;
-    postcode: string;
-    country: string;
-  };
-  createdAt: string;
-}
-
-// Review Types
-export interface Review {
-  id: number;
-  productId: number;
-  rating: number;
-  comment: string;
-  userName: string;
-  createdAt: string;
-}
-
 // Product Types
 export interface Product {
   id: number;

@@ -1,4 +1,3 @@
-import React from 'react';
 import type { EmailTemplateProps } from '../../types/types';
 
 export function EmailTemplate({ name, email, message }: EmailTemplateProps) {
