@@ -67,7 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const products = await fetchProducts();
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className="overflow-x-hidden">
       <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="" />
         {GTM_ID && (
@@ -82,7 +82,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </Script>
         )}
       </head>
-      <body className="antialiased min-h-[100dvh] grid grid-rows-[auto_1fr_auto]">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-[100dvh] grid grid-rows-[auto_1fr_auto] overflow-x-hidden`}>
         {GTM_ID && (
           <noscript>
             <iframe 
@@ -94,7 +94,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             />
           </noscript>
         )}
-
         <AOSWrapper />
         <AuthProvider>
           <CartProvider>
