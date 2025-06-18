@@ -134,7 +134,7 @@ const Navbar = ({ allProducts }: NavbarProps) => {
       show: isAuthenticated,
     },
     {
-      label: "View Cart",
+      label: `View Cart${cartItems?.length > 0 ? ` (${cartItems.reduce((total, item) => total + item.quantity, 0)})` : ""}`,
       unique: "/checkout",
       show: true,
     },
@@ -277,7 +277,23 @@ const Navbar = ({ allProducts }: NavbarProps) => {
             </div>
 
             {/* Hamburger - Mobile Only */}
-            <div className="lg:hidden">
+            <div className="lg:hidden flex items-center gap-2">
+              {/* Mobile Cart Indicator */}
+              {cartItems?.length > 0 && (
+                <div className="relative">
+                  <button
+                    onClick={() => replace("/checkout")}
+                    className="flex items-center justify-center"
+                  >
+                    <svg className="w-6 h-6 text-neutral-dark hover:text-accent-color transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312" />
+                    </svg>
+                    <span className="absolute -top-2 -right-1 text-neutral-dark text-xs font-medium">
+                      {cartItems.reduce((total, item) => total + item.quantity, 0)}
+                    </span>
+                  </button>
+                </div>
+              )}
               <Hamburger toggled={menuOpen} toggle={setMenuOpen} />
             </div>
           </div>
