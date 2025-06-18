@@ -1,8 +1,7 @@
 import HeroCarousel from "./HeroCarousel";
 import type { HeroProps } from "../../types/types";
-import type { ReactElement } from "react";
 
-const Hero = ({ title, subtitle, description, images }: HeroProps): ReactElement => {
+const Hero = ({ title, subtitle, description, images }: HeroProps) => {
   return (
     <section className="relative bg-warm-bg">
       <div className="container mx-auto px-4 py-16 md:py-24">
@@ -13,7 +12,9 @@ const Hero = ({ title, subtitle, description, images }: HeroProps): ReactElement
             data-aos="fade-right"
           >
             <h1 className="text-4xl md:text-5xl font-light text-neutral-dark leading-tight">
-              {title}
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-neutral-dark to-neutral-medium">
+                {title}
+              </span>
               {subtitle && (
                 <>
                   <br />
@@ -41,4 +42,4 @@ const Hero = ({ title, subtitle, description, images }: HeroProps): ReactElement
   );
 };
 
-export default Hero;
+export default Hero; 

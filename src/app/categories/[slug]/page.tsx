@@ -3,7 +3,7 @@ import ProductList from "../../../components/ProductList";
 import categoryMap from "@/utils/categoryMap";
 import categoryTitles from "@/utils/categoryTitles";
 import Hero from "@/components/Hero";
-import type { CategoryPageProps } from "../../../../types/types";
+import type { CategoryPageProps, Product } from "../../../../types/types";
 
 export async function generateStaticParams() {
   return Object.keys(categoryMap).map((slug) => ({ slug }));
@@ -19,7 +19,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const hero = categoryTitles[slug];
 
   const carouselImages = products
-    .map((product) => product?.images?.[0]?.src)
+    .map((product: Product) => product?.images?.[0]?.src)
     .filter(Boolean)
     .slice(0, 5);
 
@@ -37,9 +37,9 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         {products.length > 0 ? (
           <ProductList products={products} />
         ) : (
-          <p className="text-neutral-medium">No products found in this category.</p>
+          <p className="text-neutral-medium text-center text-lg font-light">No products found in this category.</p>
         )}
       </section>
     </div>
   );
-}
+} 

@@ -20,7 +20,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       try {
         const response = await fetch(`/api/reviews?productId=${productId}`);
         if (!response.ok) throw new Error("Failed to fetch reviews");
-        const data = await response.json();
+        const data: ProductReview[] = await response.json();
         setReviews(data);
       } catch {
         setError("Error loading reviews");
@@ -48,7 +48,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       try {
         const response = await fetch(`/api/reviews?productId=${productId}&userId=${user?.id}`);
         if (!response.ok) throw new Error("Failed to check review status");
-        const data = await response.json();
+        const data: ProductReview[] = await response.json();
         setHasReviewed(data.length > 0);
       } catch (error) {
         console.error("Error checking review status:", error);
@@ -84,7 +84,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
           userId: user?.id,
         }),
       });
-      const data = await response.json();
+      const data: ProductReview = await response.json();
       if (!response.ok) {
         throw new Error(data.error || "Failed to submit review");
       }
@@ -121,6 +121,13 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                   ))}
                 </div>
                 <span className="font-bold">{review.reviewer}</span>
+                <span className="text-neutral-medium text-sm">
+                  {new Date(review.date_created).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
               </div>
               <div
                 className="mt-2 prose max-w-none"
@@ -157,7 +164,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                 <label className="block mb-2">Your Review</label>
                 <textarea
                   value={newReview}
-                  onChange={(e) => setNewReview(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewReview(e.target.value)}
                   className="w-full p-2 border rounded"
                   rows={4}
                   required

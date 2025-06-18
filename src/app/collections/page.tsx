@@ -9,7 +9,9 @@ export default function CollectionsPage(): JSX.Element {
     <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-center mb-12 text-neutral-dark">
-          Our Collections
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-neutral-dark to-neutral-medium">
+            Our Collections
+          </span>
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

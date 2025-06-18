@@ -13,9 +13,9 @@ import getChangeQuantity from "../../lib/getChangeQuantity";
 import { Sling as Hamburger } from "hamburger-react";
 import TopNavLink from "./TopNavLink";
 import NavLink from "./NavLink";
-import type { NavbarProps } from "../../types/types";
+import type { NavbarProps, TopNavLinkDropdownItem } from "../../types/types";
 
-const productCategories = [
+const productCategories: TopNavLinkDropdownItem[] = [
   { name: "Wallets", slug: "wallets" },
   { name: "iPhone Leather Cases", slug: "iphoneCases" },
   { name: "Sunglass Cases", slug: "sunglasses" },
@@ -25,7 +25,7 @@ const productCategories = [
   { name: "Moto Guzzi Collection", slug: "moto" },
 ];
 
-const collectionCategories = [
+const collectionCategories: TopNavLinkDropdownItem[] = [
   { name: "Aviator", slug: "aviator" },
   { name: "Explorer", slug: "explorer" },
   { name: "Traveler", slug: "traveler" },
@@ -74,7 +74,7 @@ const Navbar = ({ allProducts }: NavbarProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [accountOpen, cartOpen, setCartOpen]);
 
-  const navItems = ["About Us"];
+  const navItems: string[] = ["About Us"];
   const navItemsWithDropdown = [
     {
       label: "Collections",
@@ -141,7 +141,7 @@ const Navbar = ({ allProducts }: NavbarProps) => {
   ];
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 py-2">
+    <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 z-50 py-2">
       <div className="max-w-screen-xl px-4 mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo and Desktop Menu */}

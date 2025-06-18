@@ -152,9 +152,15 @@ export interface AuthState {
 }
 
 // API Response Types
-export interface ApiResponse<T> {
-  data: T;
+export interface ApiResponse<T = void> {
+  data?: T;
   error?: string;
+  message?: string;
+  success?: boolean;
+}
+
+export interface AuthApiResponse extends ApiResponse<User> {
+  user?: User;
 }
 
 // Utility Types
@@ -447,9 +453,13 @@ export interface ProductListProps {
 
 export interface ProductReview {
   id: number;
+  productId: number;
+  userId: number;
   reviewer: string;
   rating: number;
   review: string;
+  date_created: string;
+  error?: string;
 }
 
 export interface ProductReviewsProps {
@@ -666,4 +676,11 @@ export interface WordPressUser {
   email: string;
   roles: string[];
   [key: string]: unknown;
+}
+
+export interface ForgotPasswordFormState {
+  email: string;
+  message: string;
+  error: string;
+  loading: boolean;
 }
