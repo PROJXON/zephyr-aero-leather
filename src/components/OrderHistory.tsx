@@ -75,7 +75,7 @@ export default function OrderHistory({ products }: { products: Product[] }) {
     quantity: item.quantity,
     name: item.name,
     price: item.price ? parseFloat(item.price) : undefined,
-    productId: item.product_id
+    productId: item.id
   })
 
   // Don't render anything if not authenticated (will redirect)

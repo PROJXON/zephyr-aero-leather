@@ -34,7 +34,6 @@ export async function generateStaticParams() {
       }
     }
 
-    console.log(`Pre-rendering ${allProducts.length} product pages`);
     return allProducts.map((product) => ({ id: product.id.toString() }));
   } catch (error) {
     console.error("Error generating static params:", error);

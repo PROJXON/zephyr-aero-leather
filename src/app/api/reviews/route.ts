@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
+import getCookieInfo from "../../../../lib/getCookieInfo";
 import type { NextRequest } from "next/server";
-import type { WooOrder, WooCustomer } from "../../../../types/woocommerce";
+import type { WooOrder, WooCustomer, WooCommerceReview } from "../../../../types/woocommerce";
 
 export async function GET(req: NextRequest): Promise<Response> {
   const { searchParams } = new URL(req.url);
@@ -20,11 +21,41 @@ export async function GET(req: NextRequest): Promise<Response> {
     const query = new URLSearchParams();
     if (productId) query.set("product", productId);
     if (userId) query.set("customer", userId);
-
-    endpoint += `?${query.toString()}`;
-
-    const reviews = await fetchWooCommerce(endpoint, reviewsError);
-    return NextResponse.json(reviews);
+    
+    // If only userId is provided (no productId), we need to fetch all pages
+    // to get all reviews by this user
+    if (userId && !productId) {
+      const allReviews: WooCommerceReview[] = [];
+      let page = 1;
+      const perPage = 100; // Maximum per page
+      
+      while (true) {
+        query.set("page", page.toString());
+        query.set("per_page", perPage.toString());
+        
+        const pageEndpoint = `${endpoint}?${query.toString()}`;
+        const pageReviews = await fetchWooCommerce(pageEndpoint, reviewsError) as WooCommerceReview[];
+        
+        if (pageReviews.length === 0) {
+          break; // No more reviews
+        }
+        
+        allReviews.push(...pageReviews);
+        
+        if (pageReviews.length < perPage) {
+          break; // This was the last page
+        }
+        
+        page++;
+      }
+      
+      return NextResponse.json(allReviews);
+    } else {
+      // For specific product reviews, just get the first page
+      endpoint += `?${query.toString()}`;
+      const reviews = await fetchWooCommerce(endpoint, reviewsError);
+      return NextResponse.json(reviews);
+    }
   } catch {
     return NextResponse.json({ error: reviewsError }, { status: 500 });
   }
@@ -36,22 +67,32 @@ export async function POST(req: NextRequest): Promise<Response> {
   try {
     const { productId, rating, review, userId }: { productId: number; rating: number; review: string; userId: number } = await req.json();
 
-    const orders = await fetchWooCommerce<WooOrder[]>(`wc/v3/orders?customer=${userId}`, "Failed to fetch orders");
-    const hasPurchased = orders.some((order) =>
-      (order.status === "completed" || order.status === "processing") &&
-      order.line_items.some((item) => item.product_id === productId)
+    // Use the same approach as /api/order endpoint
+    const [token] = await getCookieInfo();
+    
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const orders = await fetchWooCommerce("customcarteditor/v1/get-orders", "Failed to fetch orders", token) as WooOrder[];
+    
+    const hasPurchased = orders.some((order: WooOrder) =>
+      Array.isArray(order.items) &&
+      order.items.some((item) => item.id === productId)
     );
 
     if (!hasPurchased) {
       return NextResponse.json({ error: "You must purchase this product before leaving a review" }, { status: 403 });
     }
 
-    const existingReviews = await fetchWooCommerce<Array<{ id: number }>>(`wc/v3/products/reviews?product=${productId}&customer=${userId}`, "Failed to fetch existing reviews");
+    // Check if user has already reviewed this product
+    const existingReviews = await fetchWooCommerce(`wc/v3/products/reviews?product=${productId}&customer=${userId}`, "Failed to fetch existing reviews") as WooCommerceReview[];
 
     if (existingReviews.length > 0) {
       return NextResponse.json({ error: "You have already reviewed this product" }, { status: 403 });
     }
 
+    // Get user info for the review
     const user = await fetchWooCommerce<WooCustomer>(`wc/v3/customers/${userId}`, "Failed to fetch user information");
 
     const newReview = await fetchWooCommerce("wc/v3/products/reviews", createReviewError, null, "POST", {
@@ -63,7 +104,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     });
 
     return NextResponse.json(newReview);
-  } catch {
+  } catch (error) {
     return NextResponse.json({ error: createReviewError }, { status: 500 });
   }
 }

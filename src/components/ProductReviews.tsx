@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
 import { useAuth } from "@/app/context/AuthContext";
-import type { ProductReview, ProductReviewsProps } from "../../types/types";
+import type { ProductReviewsProps } from "../../types/types";
 import type { WooOrder, CartItemResponse, WooCommerceReview } from "../../types/woocommerce";
 
 export default function ProductReviews({ productId }: ProductReviewsProps) {
@@ -41,14 +41,15 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
         const orders: WooOrder[] = data.orders || [];
         
         // Check if any order contains this product - simplified approach
-        const hasBought = orders.some((order: WooOrder) =>
-          Array.isArray(order.items) &&
-          order.items.some((item: CartItemResponse) => item.id === productId)
-        );
+        const hasBought = orders.some((order: WooOrder) => {
+          return Array.isArray(order.items) &&
+            order.items.some((item: CartItemResponse) => {
+              return item.id === productId;
+            });
+        });
         
         setHasPurchased(hasBought);
       } catch (error) {
-        console.error("Error checking purchase status:", error);
         setHasPurchased(false);
       }
     }
@@ -56,11 +57,12 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     async function checkReviewStatus() {
       try {
         const response = await fetch(`/api/reviews?productId=${productId}&userId=${user?.id}`);
-        if (!response.ok) throw new Error("Failed to check review status");
+        if (!response.ok) throw new Error("Failed to fetch user reviews");
         const data: WooCommerceReview[] = await response.json();
+        // Check if user has reviewed this specific product
         setHasReviewed(data.length > 0);
       } catch (error) {
-        console.error("Error checking review status:", error);
+        setHasReviewed(false);
       }
     }
 
@@ -93,9 +95,9 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
           userId: user?.id,
         }),
       });
-      const data = await response.json();
+      const data: WooCommerceReview | { error?: string } = await response.json();
       if (!response.ok) {
-        throw new Error((data as any).error || "Failed to submit review");
+        throw new Error((data as { error?: string }).error || "Failed to submit review");
       }
       setReviews([data as WooCommerceReview, ...reviews]);
       setHasReviewed(true);
@@ -104,6 +106,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     } catch (error: unknown) {
       if (error instanceof Error && error.message === "You have already reviewed this product") {
         setError("You have already reviewed this product");
+        setHasReviewed(true);
       } else {
         setError(error instanceof Error ? error.message : "An error occurred while submitting your review");
       }
