@@ -1,9 +1,8 @@
 "use client";
-
 import { useState, useEffect, Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import ZephyrLogo from "../../public/zephyrlogotransperant.png";
 import { useAuth } from "@/app/context/AuthContext";
 import NavButton from "./NavButton";
@@ -14,29 +13,9 @@ import getChangeQuantity from "../../lib/getChangeQuantity";
 import { Sling as Hamburger } from "hamburger-react";
 import TopNavLink from "./TopNavLink";
 import NavLink from "./NavLink";
-import type { Product, NavbarProps } from "../../types/types";
+import type { NavbarProps, TopNavLinkDropdownItem } from "../../types/types";
 
-interface Category {
-  name: string;
-  slug: string;
-}
-
-interface NavItemWithDropdown {
-  label: string;
-  items: Category[];
-  basePath: string;
-}
-
-interface MobileMenuLink {
-  label: string;
-  unique: string | {
-    function: () => void;
-    classes: string;
-  };
-  show: boolean;
-}
-
-const productCategories: Category[] = [
+const productCategories: TopNavLinkDropdownItem[] = [
   { name: "Wallets", slug: "wallets" },
   { name: "iPhone Leather Cases", slug: "iphoneCases" },
   { name: "Sunglass Cases", slug: "sunglasses" },
@@ -46,7 +25,7 @@ const productCategories: Category[] = [
   { name: "Moto Guzzi Collection", slug: "moto" },
 ];
 
-const collectionCategories: Category[] = [
+const collectionCategories: TopNavLinkDropdownItem[] = [
   { name: "Aviator", slug: "aviator" },
   { name: "Explorer", slug: "explorer" },
   { name: "Traveler", slug: "traveler" },
@@ -60,17 +39,18 @@ const Navbar = ({ allProducts }: NavbarProps) => {
   const [accountOpen, setAccountOpen] = useState(false);
   const { cartItems, updateQuantity, setCartOpen, cartOpen } = useCart();
   const { replace } = useRouter();
-  const pathname = usePathname();
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
 
   useEffect(() => {
     fetchUserFromServer();
-  }, []);
+  }, [fetchUserFromServer]);
 
   useEffect(() => {
-    setCartOpen(false);
-  }, [pathname]);
+    if (isAuthenticated) {
+      setCartOpen(false);
+    }
+  }, [isAuthenticated, setCartOpen]);
 
   const handleLogout = async () => {
     await logout();
@@ -78,62 +58,61 @@ const Navbar = ({ allProducts }: NavbarProps) => {
   };
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (accountOpen && !document.getElementById("profileBtn")?.contains(e.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (accountOpen && !(document.getElementById("profileBtn")?.contains(event.target as Node))) {
         setAccountOpen(false);
       }
       if (
         cartOpen &&
-        !document.getElementById("cartBtn")?.contains(e.target as Node) &&
-        !(e.target as Element).classList.contains("addToCartBtn")
+        !(document.getElementById("cartBtn")?.contains(event.target as Node)) &&
+        !(event.target as HTMLElement).classList.contains("addToCartBtn")
       ) {
         setCartOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [accountOpen, cartOpen]);
+  }, [accountOpen, cartOpen, setCartOpen]);
 
   const navItems: string[] = ["About Us"];
-  const navItemsWithDropdown: NavItemWithDropdown[] = [
+  const navItemsWithDropdown = [
     {
       label: "Collections",
       items: collectionCategories,
-      basePath: "collections"
+      basePath: "collections",
     },
     {
       label: "Categories",
       items: productCategories,
-      basePath: "categories"
-    }
+      basePath: "categories",
+    },
   ];
 
-  const mobileMenuLinks: MobileMenuLink[] = [
+  const mobileMenuLinks = [
     {
       label: "About Us",
       unique: "/about-us",
-      show: true
+      show: true,
     },
     {
       label: "Collections",
       unique: "/collections",
-      show: true
+      show: true,
     },
     {
       label: "Categories",
       unique: "/categories",
-      show: true
+      show: true,
     },
     {
       label: "Sign In",
       unique: "/login",
-      show: !isAuthenticated
+      show: !isAuthenticated,
     },
     {
       label: "Create Account",
       unique: "/register",
-      show: !isAuthenticated
+      show: !isAuthenticated,
     },
     {
       label: "Order History",
@@ -142,31 +121,27 @@ const Navbar = ({ allProducts }: NavbarProps) => {
           replace("/order-history");
           setMenuOpen(false);
         },
-        classes: "block w-full text-left text-blue-600"
+        classes: "block w-full text-left text-lg",
       },
-      show: isAuthenticated
+      show: isAuthenticated,
     },
     {
       label: "Logout",
       unique: {
         function: handleLogout,
-        classes: "block w-full text-left text-red-600"
+        classes: "block w-full text-left text-lg",
       },
-      show: isAuthenticated
+      show: isAuthenticated,
     },
     {
       label: "View Cart",
       unique: "/checkout",
-      show: true
-    }
+      show: true,
+    },
   ];
 
-  const isFunctionLink = (unique: MobileMenuLink['unique']): unique is { function: () => void; classes: string } => {
-    return typeof unique === 'object' && unique !== null && 'function' in unique;
-  };
-
   return (
-    <nav className="bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
+    <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 z-50 py-2">
       <div className="max-w-screen-xl px-4 mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo and Desktop Menu */}
@@ -183,14 +158,14 @@ const Navbar = ({ allProducts }: NavbarProps) => {
             </Link>
 
             <ul className="hidden lg:flex items-center gap-8 py-3 relative">
-              {navItems.map(item => (
+              {navItems.map((item) => (
                 <TopNavLink
                   key={item}
                   href={`/${item.toLowerCase().replace(/ /g, "-")}`}
                   label={item}
                 />
               ))}
-              {navItemsWithDropdown.map(item => (
+              {navItemsWithDropdown.map((item) => (
                 <TopNavLink
                   key={item.label}
                   href={item.basePath}
@@ -285,72 +260,57 @@ const Navbar = ({ allProducts }: NavbarProps) => {
                           );
                         })}
                       </ul>
-                      <div className="mt-4">
-                        <Link
-                          href="/checkout"
-                          className="block w-full py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors text-center"
+                      <div className="mt-4 flex justify-end">
+                        <button
+                          className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+                          onClick={() => replace("/checkout")}
                         >
-                          View Cart
-                        </Link>
+                          Checkout
+                        </button>
                       </div>
                     </>
                   ) : (
-                    <p className="text-center text-gray-500">Your cart is empty</p>
+                    <p className="text-sm text-gray-900">Your cart is empty.</p>
                   )}
                 </div>
               )}
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Hamburger - Mobile Only */}
             <div className="lg:hidden">
               <Hamburger toggled={menuOpen} toggle={setMenuOpen} />
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 shadow-xl z-[9999]">
-          <div>
-            {isAuthenticated && (
-              <div className="px-3 py-2 mb-2 bg-gray-50 border border-gray-200 rounded-lg">
-                <p className="text-sm text-gray-500">Signed in as</p>
-                <p className="font-medium text-gray-900">{user?.first_name} {user?.last_name}</p>
-              </div>
-            )}
-            {mobileMenuLinks
-              .filter((link) => link.show)
-              .map((link) => (
-                <Fragment key={link.label}>
-                  {typeof link.unique === "string" ? (
-                    <Link
-                      href={link.unique}
-                      onClick={() => setMenuOpen(false)}
-                      className="block text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-900 transition duration-300"
-                    >
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        if (isFunctionLink(link.unique)) {
-                          link.unique.function();
-                          setMenuOpen(false);
-                        }
-                      }}
-                      className={`text-lg font-medium px-3 py-2 rounded-lg hover:bg-gray-100 transition duration-300 ${link.unique.classes}`}
-                    >
-                      {link.label}
-                    </button>
-                  )}
-                </Fragment>
-              ))}
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <div className="lg:hidden absolute top-full right-4 mt-2 w-42 bg-white rounded-lg p-4 space-y-1 shadow-xl z-[9999]">
+            {mobileMenuLinks.map((link) => (
+              <Fragment key={link.label}>
+                {link.show && (
+                  <>
+                    {typeof link.unique === "string" ? (
+                      <NavLink
+                        href={link.unique}
+                        onClick={() => setMenuOpen(false)}
+                        classes="block text-lg"
+                        label={link.label}
+                      />
+                    ) : (
+                      <button onClick={link.unique.function} className={link.unique.classes}>
+                        {link.label}
+                      </button>
+                    )}
+                  </>
+                )}
+              </Fragment>
+            ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
   );
 };
 
-export default Navbar; 
+export default Navbar;
