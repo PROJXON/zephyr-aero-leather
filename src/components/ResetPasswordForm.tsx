@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useState, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { ResetPasswordFormState, ApiResponse } from "../../types/types";
+import type { JSX } from "react";
 
-export default function ResetPasswordForm() {
+export default function ResetPasswordForm(): JSX.Element {
   const [formState, setFormState] = useState<ResetPasswordFormState>({
     password: "",
     confirmPassword: "",
@@ -54,14 +55,6 @@ export default function ResetPasswordForm() {
     }
   };
 
-  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setFormState((prev) => ({ ...prev, password: event.target.value }));
-  };
-
-  const handleConfirmPasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setFormState((prev) => ({ ...prev, confirmPassword: event.target.value }));
-  };
-
   return (
     <div className="w-full max-w-md mx-auto p-4 md:p-6">
       {formState.error && <p className="text-red-500 text-sm mb-4">{formState.error}</p>}
@@ -73,7 +66,7 @@ export default function ResetPasswordForm() {
             type={showPassword ? "text" : "password"}
             required
             value={formState.password}
-            onChange={handlePasswordChange}
+            onChange={(e) => setFormState((prev) => ({ ...prev, password: e.target.value }))}
             className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all"
             placeholder="New Password"
             disabled={formState.loading}
@@ -102,7 +95,7 @@ export default function ResetPasswordForm() {
             type={showPassword ? "text" : "password"}
             required
             value={formState.confirmPassword}
-            onChange={handleConfirmPasswordChange}
+            onChange={(e) => setFormState((prev) => ({ ...prev, confirmPassword: e.target.value }))}
             className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all"
             placeholder="Confirm New Password"
             disabled={formState.loading}
