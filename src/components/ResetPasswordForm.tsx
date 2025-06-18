@@ -2,7 +2,8 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import type { ResetPasswordFormState, ApiResponse } from "../../types/types";
+import { useAuth } from "@/app/context/AuthContext";
+import type { ResetPasswordFormState, ResetPasswordResponse } from "../../types/types";
 import type { JSX } from "react";
 
 export default function ResetPasswordForm(): JSX.Element {
@@ -17,6 +18,7 @@ export default function ResetPasswordForm(): JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const { login } = useAuth();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -41,10 +43,39 @@ export default function ResetPasswordForm(): JSX.Element {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password: formState.password }),
       });
-      const data: ApiResponse<void> = await response.json();
+      const data: ResetPasswordResponse = await response.json();
       if (response.ok) {
-        setFormState((prev) => ({ ...prev, message: "Password has been reset successfully" }));
-        setTimeout(() => router.push("/login"), 2000);
+        setFormState((prev) => ({ ...prev, message: "Password has been reset successfully. Logging you in..." }));
+        
+        // Automatically log in the user with the new password
+        try {
+          const loginResponse = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              email: data.user?.email, 
+              password: formState.password 
+            }),
+          });
+          
+          if (loginResponse.ok) {
+            const loginData = await loginResponse.json();
+            if (loginData.user) {
+              login(loginData.user);
+              setTimeout(() => router.push("/"), 1500);
+            } else {
+              // Fallback: redirect to login page
+              setTimeout(() => router.push("/login"), 2000);
+            }
+          } else {
+            // Fallback: redirect to login page
+            setTimeout(() => router.push("/login"), 2000);
+          }
+        } catch (loginError) {
+          console.error("Auto-login failed:", loginError);
+          // Fallback: redirect to login page
+          setTimeout(() => router.push("/login"), 2000);
+        }
       } else {
         setFormState((prev) => ({ ...prev, error: data.error || "Failed to reset password" }));
       }

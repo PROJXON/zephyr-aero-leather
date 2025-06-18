@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import type { ResetPasswordRequest } from "../../../../types/types";
 import type { WooCustomer, WooCustomerMeta } from "../../../../types/woocommerce";
 import getWooCommerceApi from "../../../../lib/woocommerceApi";
+import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 
 const api = getWooCommerceApi();
 
@@ -55,9 +56,13 @@ export async function POST(request: NextRequest): Promise<Response> {
       meta_data: updatedMetaData,
     });
 
+    // Get the updated user data after password reset
+    const updatedUser = await fetchWooCommerce(`wc/v3/customers/${user.id}`, "Failed to fetch updated user data");
+
     return NextResponse.json({
       success: true,
       message: "Password has been reset successfully",
+      user: updatedUser,
     });
   } catch (error: unknown) {
     console.error("Reset password error:", error);

@@ -594,6 +594,7 @@ export interface ResetPasswordResponse {
   success: boolean;
   message?: string;
   error?: string;
+  user?: any; // User data returned after successful password reset
 }
 
 export interface PaymentIntentResponse {
