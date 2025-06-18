@@ -152,9 +152,12 @@ export interface AuthState {
 }
 
 // API Response Types
-export interface ApiResponse<T> {
-  data: T;
+export interface ApiResponse<T = void> {
+  user?: User;
   error?: string;
+  data?: T;
+  message?: string;
+  success?: boolean;
 }
 
 // Utility Types

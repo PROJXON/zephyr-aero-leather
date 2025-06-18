@@ -4,20 +4,10 @@ import { useState, FormEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/context/AuthContext";
-import type { User } from "../../types/types";
+import type { LoginFormData, ApiResponse, User } from "../../types/types";
 
-const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
+const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
-
-interface LoginFormData {
-  email: string;
-  password: string;
-}
-
-interface ApiResponse {
-  user?: User;
-  error?: string;
-}
 
 const Login = () => {
   const [formData, setFormData] = useState<LoginFormData>({
@@ -70,7 +60,7 @@ const Login = () => {
         return;
       }
 
-      const data: ApiResponse = await response.json();
+      const data: ApiResponse<User> = await response.json();
 
       const userResponse = await fetch("/api/auth/user", {
         credentials: "include",

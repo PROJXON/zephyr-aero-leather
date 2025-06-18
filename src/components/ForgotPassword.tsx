@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react"
 import { useRouter } from "next/navigation"
+import type { ApiResponse } from "../../types/types"
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL;
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
@@ -11,11 +12,6 @@ interface ForgotPasswordFormState {
   message: string;
   error: string;
   loading: boolean;
-}
-
-interface ApiResponse {
-  success: boolean;
-  error?: string;
 }
 
 export default function ForgotPassword() {
