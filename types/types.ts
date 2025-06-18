@@ -677,3 +677,10 @@ export interface WordPressUser {
   roles: string[];
   [key: string]: unknown;
 }
+
+export interface ForgotPasswordFormState {
+  email: string;
+  message: string;
+  error: string;
+  loading: boolean;
+}

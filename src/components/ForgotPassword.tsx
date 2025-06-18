@@ -2,32 +2,27 @@
 
 import { useState, FormEvent } from "react"
 import { useRouter } from "next/navigation"
-import type { ApiResponse } from "../../types/types"
+import type { ApiResponse, ForgotPasswordFormState } from "../../types/types"
+import type { JSX } from "react"
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
 
-interface ForgotPasswordFormState {
-  email: string;
-  message: string;
-  error: string;
-  loading: boolean;
-}
-
-export default function ForgotPassword() {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function ForgotPassword(): JSX.Element {
+  const [formState, setFormState] = useState<ForgotPasswordFormState>({
+    email: "",
+    message: "",
+    error: "",
+    loading: false
+  });
 
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMessage("");
-    setError("");
+    setFormState((prev: ForgotPasswordFormState) => ({ ...prev, message: "", error: "" }));
 
-    setLoading(true);
+    setFormState((prev: ForgotPasswordFormState) => ({ ...prev, loading: true }));
 
     try {
       const response = await fetch("/api/forgot-password", {
@@ -35,20 +30,20 @@ export default function ForgotPassword() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: formState.email }),
       });
 
       const data: ApiResponse = await response.json();
 
       if (data.success) {
-        setMessage("Check your email for a password reset link.");
+        setFormState((prev: ForgotPasswordFormState) => ({ ...prev, message: "Check your email for a password reset link." }));
       } else {
-        setError(data.error || "An error occurred. Please try again.");
+        setFormState((prev: ForgotPasswordFormState) => ({ ...prev, error: data.error || "An error occurred. Please try again." }));
       }
     } catch {
-      setError("An error occurred. Please try again.");
+      setFormState((prev: ForgotPasswordFormState) => ({ ...prev, error: "An error occurred. Please try again." }));
     } finally {
-      setLoading(false);
+      setFormState((prev: ForgotPasswordFormState) => ({ ...prev, loading: false }));
     }
   };
 
@@ -79,8 +74,8 @@ export default function ForgotPassword() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 mt-2">
               Forgot Password
             </h1>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            {message && <p className="text-green-500 text-sm">{message}</p>}
+            {formState.error && <p className="text-red-500 text-sm">{formState.error}</p>}
+            {formState.message && <p className="text-green-500 text-sm">{formState.message}</p>}
 
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit} noValidate>
               <div>
@@ -92,21 +87,22 @@ export default function ForgotPassword() {
                   name="email"
                   id="email"
                   autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formState.email}
+                  onChange={(e) => setFormState((prev: ForgotPasswordFormState) => ({ ...prev, email: e.target.value }))}
                   className="w-full px-4 py-3 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all"
                   placeholder="maverick@topgun.com"
                   required
+                  disabled={formState.loading}
                 />
               </div>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={formState.loading}
                 className={`w-full py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium hover:text-white transition-colors ${
-                  loading ? "opacity-50 cursor-not-allowed" : ""
+                  formState.loading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {loading ? "Resetting..." : "Reset Password"}
+                {formState.loading ? "Resetting..." : "Reset Password"}
               </button>
             </form>
           </div>
