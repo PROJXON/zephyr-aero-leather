@@ -38,6 +38,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     const orders = await fetchWooCommerce<WooOrder[]>(`wc/v3/orders?customer=${userId}`, "Failed to fetch orders");
     const hasPurchased = orders.some((order) =>
+      (order.status === "completed" || order.status === "processing") &&
       order.line_items.some((item) => item.product_id === productId)
     );
 
