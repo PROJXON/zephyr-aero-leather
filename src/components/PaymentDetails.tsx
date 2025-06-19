@@ -50,68 +50,71 @@ export default function PaymentDetails() {
   }, [clearCart, queryIntent, router]);
 
   useEffect(() => {
-    const getProducts = async () => {
-      const res = await fetch("/api/products");
-      const data = await res.json();
-      setProducts(data);
-    };
-    getProducts();
-  }, []);
+    const loadAllData = async () => {
+      if (!paymentIntentId) return;
+      
+      try {
+        // First get payment details to get the wooOrderId
+        const paymentRes = await fetch(`/api/payment?payment_intent=${paymentIntentId}`);
+        const paymentData = await paymentRes.json();
+        
+        // Load products and order data in parallel
+        const [productsRes, orderRes] = await Promise.all([
+          fetch("/api/products"),
+          fetch("/api/order")
+        ]);
 
-  useEffect(() => {
-    if (paymentIntentId && products.length > 0) {
-      const run = async () => {
-        try {
-          await fetch(`/api/payment-intent-status?payment_intent_id=${paymentIntentId}`);
-          const res = await fetch(`/api/payment?payment_intent=${paymentIntentId}`);
-          const data = await res.json();
-          setPaymentDetails(data);
+        const [productsData, orderData] = await Promise.all([
+          productsRes.json(),
+          orderRes.json()
+        ]);
+
+        // Find the specific order for this payment
+        const orders = orderData.orders || [];
+        const order = orders.find((o: WooOrder) => o.id.toString() === paymentData.wooOrderId);
+
+        // Prepare all the data
+        let orderTotals = {
+          subtotal: undefined as number | undefined,
+          shipping: undefined as number | undefined,
+          tax: undefined as number | undefined,
+          total: 0 as number,
+          shippingDetails: undefined as WooCommerceAddress | undefined
+        };
+
+        if (order) {
+          orderTotals.shippingDetails = order.shipping;
+          // Extract values from WooCommerce order
+          const subtotal = order.line_items?.reduce((sum: number, item: any) => sum + parseFloat(item.subtotal || '0'), 0) || 0;
+          const shipping = order.shipping_lines?.reduce((sum: number, line: any) => sum + parseFloat(line.total || '0'), 0) || 0;
+          const tax = order.total_tax ? parseFloat(order.total_tax) : 0;
+          const total = order.total ? parseFloat(order.total) : 0;
           
-          // Get the actual order amounts from WooCommerce
-          if (data.wooOrderId) {
-            try {
-              const orderRes = await fetch("/api/order");
-              const orderData = await orderRes.json();
-              const orders = orderData.orders || [];
-              const order = orders.find((o: WooOrder) => o.id.toString() === data.wooOrderId);
-              if (order) {
-                setShippingDetails(order.shipping);
-                // --- Extract correct values from WooCommerce order ---
-                // Subtotal: sum of line_items[].subtotal
-                const subtotal = order.line_items?.reduce((sum: number, item: any) => sum + parseFloat(item.subtotal || '0'), 0) || 0;
-                // Shipping: sum of shipping_lines[].total
-                const shipping = order.shipping_lines?.reduce((sum: number, line: any) => sum + parseFloat(line.total || '0'), 0) || 0;
-                // Tax: use total_tax
-                const tax = order.total_tax ? parseFloat(order.total_tax) : 0;
-                // Total: use order.total
-                const total = order.total ? parseFloat(order.total) : 0;
-                setSubtotal(Math.round(subtotal * 100));
-                setShipping(Math.round(shipping * 100));
-                setTax(Math.round(tax * 100));
-                setTotal(Math.round(total * 100));
-              } else {
-                // Fallback to calculated amounts if order not found
-                const calculatedTotal = calculateTotal(data.items, products);
-                setTotal(calculatedTotal);
-              }
-            } catch (err) {
-              console.error("Error fetching order for amounts:", err);
-              // Fallback to calculated amounts
-              const calculatedTotal = calculateTotal(data.items, products);
-              setTotal(calculatedTotal);
-            }
-          } else {
-            // Fallback to calculated amounts if no order ID
-            const calculatedTotal = calculateTotal(data.items, products);
-            setTotal(calculatedTotal);
-          }
-        } catch (err) {
-          console.error("Error syncing payment intent and Woo order:", err);
+          orderTotals.subtotal = Math.round(subtotal * 100);
+          orderTotals.shipping = Math.round(shipping * 100);
+          orderTotals.tax = Math.round(tax * 100);
+          orderTotals.total = Math.round(total * 100);
+        } else {
+          // Fallback to calculated amounts if order not found
+          const calculatedTotal = calculateTotal(paymentData.items, productsData);
+          orderTotals.total = calculatedTotal;
         }
-      };
-      run();
-    }
-  }, [paymentIntentId, products]);
+
+        // Set all state together so everything appears at once
+        setProducts(productsData);
+        setPaymentDetails(paymentData);
+        setSubtotal(orderTotals.subtotal);
+        setShipping(orderTotals.shipping);
+        setTax(orderTotals.tax);
+        setTotal(orderTotals.total);
+        setShippingDetails(orderTotals.shippingDetails);
+      } catch (err) {
+        console.error("Error loading payment details:", err);
+      }
+    };
+
+    loadAllData();
+  }, [paymentIntentId]);
 
   return allowed ? (
     <div className="container mx-auto p-6 mt-6">
