@@ -31,9 +31,9 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   const pendingRemovals = useRef<Record<number, boolean>>({});
   const removeTimers = useRef<Record<number, NodeJS.Timeout>>({});
 
-  const fetchUserCart = useCallback(async () => {
+  const fetchUserCart = useCallback(async (showLoading = true) => {
     if (!isAuthenticated) return;
-    setIsLoading(true);
+    if (showLoading) setIsLoading(true);
     try {
       const response = await fetch("/api/cart");
       if (!response.ok) throw new Error("Failed to fetch cart");
@@ -52,7 +52,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       setCartItems([]);
       setOrderId(null);
     } finally {
-      setIsLoading(false);
+      if (showLoading) setIsLoading(false);
     }
   }, [isAuthenticated]);
 
@@ -109,7 +109,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             return res.json();
           })
           .then(() => {
-            fetchUserCart();
+            fetchUserCart(false);
           })
           .catch((err) => {
             console.error("Error syncing cart with Woo:", err.message);
@@ -153,7 +153,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             return res.json();
           })
           .then(() => {
-            fetchUserCart();
+            fetchUserCart(false);
           })
           .catch((err) => {
             console.error("Error syncing cart removal with Woo:", err.message);
@@ -223,7 +223,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
             if (res && !res.ok) throw new Error("Failed to update cart");
             return res?.json?.();
           })
-          .then(() => fetchUserCart())
+          .then(() => fetchUserCart(false))
           .catch((err) => {
             console.error("Error syncing cart:", err.message);
           });

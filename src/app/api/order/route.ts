@@ -9,7 +9,8 @@ export async function GET(): Promise<Response> {
   const ordersError = "Error fetching orders";
 
   try {
-    const orders = await fetchWooCommerce("customcarteditor/v1/get-orders", ordersError, token);
+    // Fetch all orders without status filter to get completed and other statuses
+    const orders = await fetchWooCommerce("wc/v3/orders?per_page=100", ordersError, token);
     return NextResponse.json({ orders });
   } catch {
     return NextResponse.json({ error: ordersError }, { status: 500 });
