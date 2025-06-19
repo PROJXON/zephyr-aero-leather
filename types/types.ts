@@ -406,6 +406,9 @@ export interface OrderSummaryProps {
   showReviewLinks?: boolean;
   reviewedProductIds?: number[];
   shippingDetails?: WooCommerceAddress;
+  subtotal?: number;
+  shipping?: number;
+  tax?: number;
 }
 
 export interface QuantityControls {

@@ -19,6 +19,8 @@ import type {
 import { useAddressValidation } from "../hooks/useAddressValidation";
 import LoadingSpinner from "./LoadingSpinner";
 import type { Appearance, StripeElementsOptions } from "@stripe/stripe-js";
+import ShippingRateSelector from "./ShippingRateSelector";
+import { calculateTotalWithTaxAndShipping } from "../../lib/calculateTotalWithTaxAndShipping";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -77,6 +79,7 @@ export default function Checkout({ products }: CheckoutProps) {
   const [shippingDetails, shippingDispatch] = useReducer(reducer, defaultAddressDetails)
   const [billingErrors, setBillingErrors] = useState<AddressErrors>({});
   const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
+  const [selectedShippingRateId, setSelectedShippingRateId] = useState<string | undefined>(undefined);
 
   const states: readonly string[] = useMemo(() => [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
@@ -240,6 +243,15 @@ export default function Checkout({ products }: CheckoutProps) {
 
   const toggleBillToShipping = () => setBillToShipping(!billToShipping);
 
+  // Calculate totals with shipping and tax
+  const calculation = calculateTotalWithTaxAndShipping(
+    cartItems,
+    products,
+    shippingDetails.state,
+    shippingDetails.zipCode,
+    selectedShippingRateId
+  );
+
   return (
     <>
       {isLoading ? (
@@ -249,14 +261,17 @@ export default function Checkout({ products }: CheckoutProps) {
           <OrderSummary
             cartItems={cartItems}
             products={products}
-            total={total}
+            subtotal={calculation.subtotal}
+            shipping={calculation.shipping}
+            tax={calculation.tax}
+            total={calculation.total}
             quantityControls={{
               updateQuantity,
               editID,
               setEditID,
               newQty,
               setNewQty,
-              changeQuantity, // this is an array from getChangeQuantity
+              changeQuantity,
             }}
           />
           {clientSecret && (
@@ -284,6 +299,17 @@ export default function Checkout({ products }: CheckoutProps) {
                       Invalid addresses will still work for test payments in development mode
                     </div>
                   </ChangeContext.Provider>
+                  {/* Shipping Rate Selector Integration */}
+                  <div className="mt-4">
+                    <ShippingRateSelector
+                      state={shippingDetails.state}
+                      zipCode={shippingDetails.zipCode}
+                      cartItems={cartItems}
+                      products={products}
+                      selectedRateId={selectedShippingRateId}
+                      onRateSelect={setSelectedShippingRateId}
+                    />
+                  </div>
                   <div className="mt-4">
                     <input
                       type="checkbox"
@@ -338,6 +364,17 @@ export default function Checkout({ products }: CheckoutProps) {
                       </div>
                     )}
                   </ChangeContext.Provider>
+                  {/* Shipping Rate Selector Integration */}
+                  <div className="mt-4">
+                    <ShippingRateSelector
+                      state={shippingDetails.state}
+                      zipCode={shippingDetails.zipCode}
+                      cartItems={cartItems}
+                      products={products}
+                      selectedRateId={selectedShippingRateId}
+                      onRateSelect={setSelectedShippingRateId}
+                    />
+                  </div>
                   <div className="mt-4">
                     <input
                       type="checkbox"

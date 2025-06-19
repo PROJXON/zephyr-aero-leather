@@ -11,7 +11,10 @@ export default function OrderSummary({
   quantityControls = {},
   showReviewLinks = false,
   reviewedProductIds = [],
-  shippingDetails
+  shippingDetails,
+  subtotal,
+  shipping,
+  tax
 }: OrderSummaryProps) {
   const {
     updateQuantity,
@@ -127,11 +130,15 @@ export default function OrderSummary({
       <div className="space-y-2 text-sm pt-4 border-t p-6">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span>{formatPrice(total)}</span>
+          <span>{typeof subtotal === 'number' ? formatPrice(subtotal) : formatPrice(total)}</span>
         </div>
         <div className="flex justify-between">
           <span>Shipping</span>
-          <span>Calculated at checkout</span>
+          <span>{typeof shipping === 'number' ? formatPrice(shipping) : 'Calculated at checkout'}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Tax</span>
+          <span>{typeof tax === 'number' ? formatPrice(tax) : '-'}</span>
         </div>
         <div className="flex justify-between font-bold pt-2">
           <span>Total</span>
