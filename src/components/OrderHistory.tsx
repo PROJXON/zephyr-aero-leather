@@ -34,9 +34,21 @@ export default function OrderHistory({ products }: { products: Product[] }) {
           const orderRes = await fetch("/api/order")
           const orderData = await orderRes.json()
           const ordersArray = (orderData.orders || []) as WooOrder[]
-          setOrders(ordersArray.reverse())
+          
+          // Sort orders by date from newest to oldest
+          const sortedOrders = ordersArray.sort((a, b) => {
+            const timeA = a.meta_data?.find(meta => meta.key === "user_local_time")?.value
+            const timeB = b.meta_data?.find(meta => meta.key === "user_local_time")?.value
+            
+            const dateA = timeA ? new Date(timeA as string) : new Date(0)
+            const dateB = timeB ? new Date(timeB as string) : new Date(0)
+            
+            return dateB.getTime() - dateA.getTime() // Newest first
+          })
+          
+          setOrders(sortedOrders)
 
-          const times = ordersArray.map((order: WooOrder) => {
+          const times = sortedOrders.map((order: WooOrder) => {
             const timeString = order.meta_data?.find(meta => meta.key === "user_local_time")?.value
             return timeString ? new Date(timeString as string) : new Date()
           })
@@ -115,6 +127,7 @@ export default function OrderHistory({ products }: { products: Product[] }) {
                   total={total}
                   showReviewLinks={true}
                   reviewedProductIds={reviewedProductIds}
+                  shippingDetails={order.shipping}
                 />
               </li>
             )

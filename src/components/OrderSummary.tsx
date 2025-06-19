@@ -11,6 +11,7 @@ export default function OrderSummary({
   quantityControls = {},
   showReviewLinks = false,
   reviewedProductIds = [],
+  shippingDetails
 }: OrderSummaryProps) {
   const {
     updateQuantity,
@@ -42,7 +43,7 @@ export default function OrderSummary({
           const alreadyReviewed = item.productId ? reviewedProductIds.includes(item.productId) : false;
 
           return (
-            <div key={item.id} className="flex gap-4 border rounded-lg p-4">
+            <div key={item.id} className="flex gap-4 border rounded-lg p-4 bg-amber-50/30">
               <Link href={productLink} className="relative w-24 h-24 block">
                 <Image
                   src={imageInfo?.src || "/images/placeholder.svg"}
@@ -85,7 +86,7 @@ export default function OrderSummary({
                     {editable && changeQuantity.length > 0 && <ChangeQuantitySpans cqs={changeQuantity} item={item} />}
                   </div>
 
-                  <p className="text-green-600 font-semibold text-sm">
+                  <p className="text-green-600 font-semibold text-sm pr-6">
                     {formatPrice(priceInCents)}
                   </p>
                 </div>
@@ -107,8 +108,23 @@ export default function OrderSummary({
           );
         })}
       </div>
+        {shippingDetails && (
+          <div className="text-sm bg-amber-50/50 border rounded p-4 pr-8">
+            <h3 className="font-semibold mb-2">Shipped to:</h3>
+            <p>
+              {shippingDetails.first_name} {shippingDetails.last_name}
+            </p>
+            <p>
+              {shippingDetails.address_1}
+              {shippingDetails.address_2 ? `, ${shippingDetails.address_2}` : ""}
+            </p>
+            <p>
+              {shippingDetails.city}, {shippingDetails.state} {shippingDetails.postcode}
+            </p>
+          </div>
+        )}
 
-      <div className="space-y-2 text-sm pt-4 border-t">
+      <div className="space-y-2 text-sm pt-4 border-t p-6">
         <div className="flex justify-between">
           <span>Subtotal</span>
           <span>{formatPrice(total)}</span>
