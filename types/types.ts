@@ -429,6 +429,14 @@ export interface PaymentDetailsData {
   items: CartItem[];
 }
 
+export interface OrderTotals {
+  subtotal: number | undefined;
+  shipping: number | undefined;
+  tax: number | undefined;
+  total: number;
+  shippingDetails: WooCommerceAddress | undefined;
+}
+
 export interface ProductCarouselProps {
   products: Product[];
   viewAllLink: string;
@@ -749,6 +757,6 @@ export interface ShippingCalculation {
   shipping: number;
   tax: number;
   total: number;
-  shippingRate?: any;
+  shippingRate?: ShippingRate;
   taxRate?: number;
 }

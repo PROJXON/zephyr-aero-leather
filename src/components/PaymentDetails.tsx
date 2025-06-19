@@ -6,8 +6,8 @@ import OrderSummary from "./OrderSummary";
 import LoadingSpinner from "./LoadingSpinner";
 import calculateTotal from "../../lib/calculateTotal";
 import { useCart } from "@/app/context/CartContext";
-import type { Product, PaymentDetailsData } from "../../types/types";
-import type { WooCommerceAddress, WooOrder } from "../../types/woocommerce";
+import type { Product, PaymentDetailsData, OrderTotals } from "../../types/types";
+import type { WooCommerceAddress, WooOrder, WooOrderLineItem, WooOrderShippingLine } from "../../types/woocommerce";
 
 export default function PaymentDetails() {
   const router = useRouter();
@@ -74,19 +74,19 @@ export default function PaymentDetails() {
         const order = orders.find((o: WooOrder) => o.id.toString() === paymentData.wooOrderId);
 
         // Prepare all the data
-        let orderTotals = {
-          subtotal: undefined as number | undefined,
-          shipping: undefined as number | undefined,
-          tax: undefined as number | undefined,
-          total: 0 as number,
-          shippingDetails: undefined as WooCommerceAddress | undefined
+        const orderTotals: OrderTotals = {
+          subtotal: undefined,
+          shipping: undefined,
+          tax: undefined,
+          total: 0,
+          shippingDetails: undefined
         };
 
         if (order) {
           orderTotals.shippingDetails = order.shipping;
           // Extract values from WooCommerce order
-          const subtotal = order.line_items?.reduce((sum: number, item: any) => sum + parseFloat(item.subtotal || '0'), 0) || 0;
-          const shipping = order.shipping_lines?.reduce((sum: number, line: any) => sum + parseFloat(line.total || '0'), 0) || 0;
+          const subtotal = order.line_items?.reduce((sum: number, item: WooOrderLineItem) => sum + parseFloat(item.subtotal || '0'), 0) || 0;
+          const shipping = order.shipping_lines?.reduce((sum: number, line: WooOrderShippingLine) => sum + parseFloat(line.total || '0'), 0) || 0;
           const tax = order.total_tax ? parseFloat(order.total_tax) : 0;
           const total = order.total ? parseFloat(order.total) : 0;
           
@@ -108,8 +108,9 @@ export default function PaymentDetails() {
         setTax(orderTotals.tax);
         setTotal(orderTotals.total);
         setShippingDetails(orderTotals.shippingDetails);
-      } catch (err) {
-        console.error("Error loading payment details:", err);
+      } catch {
+        // Handle error silently or show user-friendly message
+        // Could add error state here if needed
       }
     };
 

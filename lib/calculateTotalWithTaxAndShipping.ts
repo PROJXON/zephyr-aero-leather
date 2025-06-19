@@ -75,7 +75,7 @@ export function getCalculationBreakdown(
 export function reconstructCalculationFromOrder(
   cartItems: CartItem[],
   products: Product[],
-  orderData: any
+  orderData: { shipping_total?: string; cart_tax?: string; total?: string }
 ): ShippingCalculation {
   // Calculate the actual subtotal using our precision-safe function
   const actualSubtotal = calculateTotal(cartItems, products);
