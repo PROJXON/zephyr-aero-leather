@@ -607,6 +607,7 @@ export interface PaymentIntentResponse {
   amount: number;
   status: string;
   items: CartItem[];
+  wooOrderId?: string;
 }
 
 // Stripe Types

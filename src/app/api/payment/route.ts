@@ -24,6 +24,7 @@ export async function GET(req: NextRequest): Promise<Response> {
       amount: paymentIntent.amount,
       status: paymentIntent.status,
       items: paymentIntent.metadata?.items ? JSON.parse(paymentIntent.metadata.items) : [],
+      wooOrderId: paymentIntent.metadata?.woo_order_id,
     };
 
     return new Response(JSON.stringify(response), {

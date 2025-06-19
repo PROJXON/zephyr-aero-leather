@@ -16,6 +16,7 @@ export default function PaymentDetails() {
   const [total, setTotal] = useState<number>(0);
   const [allowed, setAllowed] = useState<boolean>(false);
   const cartClearedRef = useRef(false);
+  const [shippingDetails, setShippingDetails] = useState<any>(null);
 
   const { clearCart } = useCart();
   const queryIntent = searchParams.get("payment_intent");
@@ -61,6 +62,21 @@ export default function PaymentDetails() {
           const data = await res.json();
           setPaymentDetails(data);
           setTotal(calculateTotal(data.items, products));
+
+          // Get shipping details from the order if we have the order ID
+          if (data.wooOrderId) {
+            try {
+              const orderRes = await fetch("/api/order");
+              const orderData = await orderRes.json();
+              const orders = orderData.orders || [];
+              const order = orders.find((o: any) => o.id.toString() === data.wooOrderId);
+              if (order) {
+                setShippingDetails(order.shipping);
+              }
+            } catch (err) {
+              console.error("Error fetching order for shipping details:", err);
+            }
+          }
         } catch (err) {
           console.error("Error syncing payment intent and Woo order:", err);
         }
@@ -79,6 +95,7 @@ export default function PaymentDetails() {
           products={products}
           total={total}
           showReviewLinks={true}
+          shippingDetails={shippingDetails}
         />
       ) : (
         <p>Loading your payment details...</p>
