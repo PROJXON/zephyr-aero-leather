@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import ResetPasswordForm from "../../components/ResetPasswordForm";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const CDN_URL = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
 const backgroundImageUrl = `${CDN_URL}/ifr.jpg`;
@@ -18,7 +19,7 @@ export default function ResetPasswordPage() {
             <p className="mt-2 text-gray-600">Enter your new password below</p>
           </div>
 
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<LoadingSpinner message="Loading..." />}>
             <ResetPasswordForm />
           </Suspense>
         </div>

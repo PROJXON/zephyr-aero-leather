@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import OrderSummary from "./OrderSummary";
+import LoadingSpinner from "./LoadingSpinner";
 import calculateTotal from "../../lib/calculateTotal";
 import { useCart } from "@/app/context/CartContext";
 import type { Product, PaymentDetailsData } from "../../types/types";
@@ -99,7 +100,7 @@ export default function PaymentDetails() {
           shippingDetails={shippingDetails}
         />
       ) : (
-        <p>Loading your payment details...</p>
+        <LoadingSpinner message="Loading your payment details..." />
       )}
     </div>
   ) : null;

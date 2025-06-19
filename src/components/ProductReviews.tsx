@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { FaStar } from "react-icons/fa";
 import { useAuth } from "@/app/context/AuthContext";
+import LoadingSpinner from "./LoadingSpinner";
 import type { ProductReviewsProps } from "../../types/types";
 import type { WooOrder, CartItemResponse, WooCommerceReview } from "../../types/woocommerce";
 
@@ -113,7 +114,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     }
   };
 
-  if (loading) return <div>Loading reviews...</div>;
+  if (loading) return <LoadingSpinner message="Loading reviews..." />;
 
   return (
     <div className="mt-8">

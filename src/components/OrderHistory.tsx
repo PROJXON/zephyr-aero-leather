@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/AuthContext"
 import OrderSummary from "./OrderSummary"
+import LoadingSpinner from "./LoadingSpinner"
 import calculateTotal from "../../lib/calculateTotal"
 import type { Product, CartItem } from "../../types/types"
 import type { WooOrder, CartItemResponse, WooCommerceReview } from "../../types/woocommerce"
@@ -96,7 +97,7 @@ export default function OrderHistory({ products }: { products: Product[] }) {
   }
 
   if (loading) {
-    return <div className="text-center py-8">Loading Orders...</div>
+    return <LoadingSpinner message="Loading orders..." />
   }
 
   return (
