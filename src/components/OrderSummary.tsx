@@ -110,7 +110,7 @@ export default function OrderSummary({
       </div>
         {shippingDetails && (
           <div className="text-sm bg-gray-50 border border-gray-200 rounded p-4">
-            <h3 className="font-semibold mb-2">Shipping To</h3>
+            <h3 className="font-semibold mb-2">Shipped to:</h3>
             <p>
               {shippingDetails.first_name} {shippingDetails.last_name}
             </p>
