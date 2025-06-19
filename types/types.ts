@@ -3,11 +3,11 @@ import { WooCommerceAddress } from "./woocommerce";
 // Next.js Page Props Types
 export interface CategoryPageProps {
   params: Promise<{ slug: string }>;
-}
+};
 
 export interface CollectionPageProps {
   params: Promise<{ slug: string }>;
-}
+};
 
 export interface ProductPageProps {
   params: Promise<{ id: string }>;
@@ -28,7 +28,7 @@ export interface CartItem {
     attribute: string;
     value: string;
   };
-}
+};
 
 export interface Cart {
   items: CartItem[];
@@ -83,7 +83,7 @@ export interface Category {
   image: string;
   products?: Product[];
   slugs: string[];
-}
+};
 
 export type CategoryMap = Record<string, readonly string[]>;
 
@@ -91,7 +91,7 @@ export interface CategoryTitle {
   title: string;
   subtitle: string;
   images?: string[];
-}
+};
 
 export type CategoryTitlesMap = Record<string, CategoryTitle>;
 
@@ -105,7 +105,7 @@ export interface Collection {
   carouselImages: string[];
   productIds: number[];
   products?: Product[];
-}
+};
 
 export type CollectionMap = Record<string, Collection>;
 
@@ -133,7 +133,7 @@ export interface ApiResponse<T = void> {
   error?: string;
   message?: string;
   success?: boolean;
-}
+};
 
 export interface AuthApiResponse extends ApiResponse<User> {
   user?: User;
@@ -160,7 +160,7 @@ export interface StripePaymentRequestBody {
   user_local_time?: string;
   shipping?: AddressDetailsState;
   billing?: AddressDetailsState;
-}
+};
 
 export type UpdateQuantityFn = (id: number, quantity: number) => void;
 
@@ -185,14 +185,14 @@ export interface StripePaymentIntent {
     };
   };
   payment_method_types: string[];
-}
+};
 
 export interface StripeError {
   message: string;
   type?: string;
   code?: string;
   raw?: unknown;
-}
+};
 
 export interface StripePaymentResponse {
   clientSecret: string;
@@ -201,14 +201,14 @@ export interface StripePaymentResponse {
   type?: string;
   code?: string;
   details?: Record<string, unknown> | string;
-}
+};
 
 export type CategoryKey = keyof CategoryMap;
 
 export interface FetchProductsOptions {
   category?: CategoryKey;
   per_page?: number;
-}
+};
 
 export interface AuthContextType {
   user: User | null;
@@ -219,7 +219,7 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
-}
+};
 
 export interface CartContextType {
   cartItems: CartItem[];
@@ -241,29 +241,29 @@ export interface SectionProps {
   title: string;
   products: Product[]; // Now strictly typed
   link: string;
-}
+};
 
 export interface HeroProps {
   title: string;
   subtitle?: string | React.ReactNode; // Broader compatibility
   description?: string;
   images: string[];
-}
+};
 
 export interface HeroCarouselProps {
   images: string[];
   altBase?: string;
   autoPlay?: boolean;
   interval?: number;
-}
+};
 
 export interface CartProviderProps {
   children: React.ReactNode;
-}
+};
 
 export interface AuthProviderProps {
   children: React.ReactNode;
-}
+};
 
 export interface RegisterFormData {
   name: string;
@@ -271,57 +271,57 @@ export interface RegisterFormData {
   password: string;
   confirmPassword: string;
   termsAccepted: boolean;
-}
+};
 
 export interface WhyShopItem {
   title: string;
   text: string;
   image: string;
-}
+};
 
 export interface AddToCartButtonProps {
   productId: number;
   className?: string;
-}
+};
 
 export interface DebugInfo {
   localStorage: Record<string, unknown> | null;
   cookies: string | null;
   apiResponse: Record<string, unknown> | string | null;
   timestamp: string | null;
-}
+};
 
 export interface ChangeQuantitySpan {
   onClick: (item: CartItem) => void;
   icon: React.ElementType;
-}
+};
 
 export interface ChangeQuantitySpansProps {
   cqs: ChangeQuantitySpan[];
   item: CartItem;
-}
+};
 
 export interface CheckoutProps {
   products: Product[];
-}
+};
 
 export interface AddressFormName {
   first: string;
   last: string;
-}
+};
 
 export interface AddressFormAddress {
   line1: string;
   line2?: string;
-}
+};
 
 export interface AddressDetailsState {
   name: AddressFormName;
   address: AddressFormAddress;
   city: string;
   zipCode: string;
-  state: string;
-}
+  state: State;
+};
 
 export type AddressDetailsAction =
   | { type: "FIRSTNAME"; value: string; }
@@ -342,28 +342,28 @@ export interface AddressErrors {
   city?: string;
   zipCode?: string;
   state?: string;
-}
+};
 
 export interface ContactFormData {
   name: string;
   email: string;
   message: string;
-}
+};
 
 export interface EmailTemplateProps {
   name: string;
   email: string;
   message: string;
-}
+};
 
 export interface LoginFormData {
   email: string;
   password: string;
-}
+};
 
 export interface NavbarProps {
   allProducts: Product[];
-}
+};
 
 export interface NavButtonProps {
   onClick: () => void;
@@ -373,30 +373,30 @@ export interface NavButtonProps {
   text?: string;
   fill?: string;
   badgeCount?: number;
-}
+};
 
 export interface NavLinkProps {
   href: string;
   classes?: string;
   label: string;
   onClick?: () => void;
-}
+};
 
 export interface TopNavLinkDropdownItem {
   name: string;
   slug: string;
-}
+};
 
 export interface TopNavLinkProps {
   href: string;
   label: string;
   dropdownItems?: TopNavLinkDropdownItem[];
-}
+};
 
 export interface NavLoggedOutBtnProps {
   href: string;
   text: string;
-}
+};
 
 export interface OrderSummaryProps {
   cartItems: CartItem[];
@@ -406,7 +406,7 @@ export interface OrderSummaryProps {
   showReviewLinks?: boolean;
   reviewedProductIds?: number[];
   shippingDetails?: WooCommerceAddress;
-}
+};
 
 export interface QuantityControls {
   updateQuantity: (id: number, qty: number) => void;
@@ -415,20 +415,20 @@ export interface QuantityControls {
   newQty: string;
   setNewQty: (qty: string) => void;
   changeQuantity: ChangeQuantitySpan[];
-}
+};
 
 export interface PaymentDetailsData {
   items: CartItem[];
-}
+};
 
 export interface ProductCarouselProps {
   products: Product[];
   viewAllLink: string;
-}
+};
 
 export interface ProductListProps {
   products: Product[];
-}
+};
 
 export interface ProductReview {
   id: number;
@@ -439,11 +439,11 @@ export interface ProductReview {
   review: string;
   date_created: string;
   error?: string;
-}
+};
 
 export interface ProductReviewsProps {
   productId: number;
-}
+};
 
 export interface ResetPasswordFormState {
   password: string;
@@ -451,13 +451,13 @@ export interface ResetPasswordFormState {
   error: string;
   message: string;
   loading: boolean;
-}
+};
 
 export interface AddressDetailsProps {
   details: AddressDetailsState;
   errors: { [key: string]: string };
   states: string[];
-}
+};
 
 export interface ShippingFormInputProps {
   name: string;
@@ -467,7 +467,7 @@ export interface ShippingFormInputProps {
   error?: string;
   type?: string;
   options?: string[];
-}
+};
 
 export type ValidateAddressFunc = (errors: AddressErrors) => void;
 
@@ -479,18 +479,18 @@ export interface StripeFormProps {
   setShippingErrors: ValidateAddressFunc;
   validateBilling: () => AddressErrors;
   setBillingErrors: ValidateAddressFunc;
-}
+};
 
 export interface SendEmailParams {
   to: string | string[];
   subject: string;
   html: string;
-}
+};
 
 export interface FetchProductsParams {
   category?: string;
   per_page?: number;
-}
+};
 
 export type ViewAllProduct = {
   id: "view-all";
@@ -499,11 +499,7 @@ export type ViewAllProduct = {
 export type CarouselProduct = Product | ViewAllProduct;
 
 export type State =
-  | "AL" | "AK" | "AZ" | "AR" | "CA" | "CO" | "CT" | "DE" | "FL" | "GA"
-  | "HI" | "ID" | "IL" | "IN" | "IA" | "KS" | "KY" | "LA" | "ME" | "MD"
-  | "MA" | "MI" | "MN" | "MS" | "MO" | "MT" | "NE" | "NV" | "NH" | "NJ"
-  | "NM" | "NY" | "NC" | "ND" | "OH" | "OK" | "OR" | "PA" | "RI" | "SC"
-  | "SD" | "TN" | "TX" | "UT" | "VT" | "VA" | "WA" | "WV" | "WI" | "WY";
+  | "AA" | "AE" | "AL" | "AK" | "AP" | "AS" | "AZ" | "AR" | "CA" | "CO" | "CT" | "DE" | "DC" | "FM" | "FL" | "GA" | "GU" | "HI" | "ID" | "IL" | "IN" | "IA" | "KS" | "KY" | "LA" | "ME" | "MH" | "MD" | "MA" | "MI" | "MN" | "MS" | "MO" | "MP" | "MT" | "NE" | "NV" | "NH" | "NJ" | "NM" | "NY" | "NC" | "ND" | "OH" | "OK" | "OR" | "PW" | "PA" | "PR" | "RI" | "SC" | "SD" | "TN" | "TX" | "UT" | "VT" | "VI" | "VA" | "WA" | "WV" | "WI" | "WY";
 
 export interface AddressFormInputProps {
   name: string;
@@ -533,17 +529,17 @@ export interface AddressFormInputProps {
   "text" |
   "time" |
   "url" |
-  "week"
-}
+  "week";
+};
 
-export type AddressFormChange = React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+export type AddressFormChange = React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
 
 // Authentication Types
 export interface RegisterRequest {
   email: string;
   password: string;
   name: string;
-}
+};
 
 export interface RegisterResponse {
   success: boolean;
@@ -555,12 +551,12 @@ export interface RegisterResponse {
     lastName: string;
   };
   error?: string;
-}
+};
 
 export interface LoginRequest {
   email: string;
   password: string;
-}
+};
 
 export interface LoginResponse {
   id: number;
@@ -568,7 +564,7 @@ export interface LoginResponse {
   first_name: string;
   last_name: string;
   error?: string;
-}
+};
 
 export interface JWTResponse {
   token: string;
@@ -578,17 +574,17 @@ export interface JWTResponse {
     first_name: string;
     last_name: string;
   };
-}
+};
 
 export interface ForgotPasswordRequest {
   email: string;
-}
+};
 
 export interface ForgotPasswordResponse {
   success: boolean;
   message?: string;
   error?: string;
-}
+};
 
 export interface ResetPasswordRequest {
   token: string;
@@ -602,7 +598,7 @@ export interface ResetPasswordResponse {
   message?: string;
   error?: string;
   user?: WooCustomer;
-}
+};
 
 export interface PaymentIntentResponse {
   amount: number;
@@ -628,7 +624,7 @@ export interface StripePaymentIntentParams {
       country: string;
     };
   };
-}
+};
 
 export interface StripeEvent {
   type: string;
@@ -639,19 +635,19 @@ export interface StripeEvent {
       metadata?: Record<string, string>;
     };
   };
-}
+};
 
 export interface ResendError {
   message: string;
   name?: string;
   statusCode?: number;
-}
+};
 
 export interface WebhookResponse {
   received?: boolean;
   success?: boolean;
   error?: boolean;
-}
+};
 
 export interface WordPressUser {
   id: number;
@@ -659,26 +655,26 @@ export interface WordPressUser {
   email: string;
   roles: string[];
   [key: string]: unknown;
-}
+};
 
 export interface ForgotPasswordFormState {
   email: string;
   message: string;
   error: string;
   loading: boolean;
-}
+};
 
 export interface ProductImageCardProps {
   src: string;
   alt: string;
   className?: string;
-}
+};
 
 export interface LoadingSpinnerProps {
   message?: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
-}
+};
 
 export interface AddressValidationResponse {
   valid: boolean;
@@ -688,7 +684,7 @@ export interface AddressValidationResponse {
   dpvConfirmation?: string;
   carrierRoute?: string;
   deliveryPoint?: string;
-}
+};
 
 export interface USPSAddress {
   Address1: string;
@@ -706,7 +702,7 @@ export interface USPSAddress {
   Business?: string;
   CentralDeliveryPoint?: string;
   Vacant?: string;
-}
+};
 
 export interface USPSAddressValidationRequest {
   AddressValidateRequest: {
