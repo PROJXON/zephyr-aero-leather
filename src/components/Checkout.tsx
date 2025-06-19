@@ -59,7 +59,7 @@ function reducer(details: AddressDetailsState, action: AddressDetailsAction): Ad
 }
 
 export const ChangeContext = createContext<((event: AddressFormChange) => void)>(() => { });
-export const StatesContext = createContext<(string[])>([]);
+export const StatesContext = createContext<readonly string[]>([]);
 
 export default function Checkout({ products }: CheckoutProps) {
   const { cartItems, updateQuantity, orderId, isLoading } = useCart();
@@ -78,9 +78,9 @@ export default function Checkout({ products }: CheckoutProps) {
   const [billingErrors, setBillingErrors] = useState<AddressErrors>({});
   const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
 
-  const states = useMemo(() => [
+  const states: readonly string[] = useMemo(() => [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
-  ], []);
+  ] as const, []);
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
   changeQuantity.push({
