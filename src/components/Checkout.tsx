@@ -1,6 +1,6 @@
 "use client";
 import { useCart } from "@/app/context/CartContext";
-import { useState, useEffect, useReducer, useCallback, createContext, Dispatch, SetStateAction, useRef } from "react";
+import { useState, useEffect, useReducer, useCallback, createContext, Dispatch, SetStateAction, useRef, useMemo } from "react";
 import { FaEdit } from "react-icons/fa";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import calculateTotal from "../../lib/calculateTotal";
@@ -78,9 +78,9 @@ export default function Checkout({ products }: CheckoutProps) {
   const [billingErrors, setBillingErrors] = useState<AddressErrors>({});
   const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
 
-  const states = [
+  const states = useMemo(() => [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
-  ];
+  ], []);
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
   changeQuantity.push({
