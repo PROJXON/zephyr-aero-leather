@@ -673,3 +673,9 @@ export interface ProductImageCardProps {
   alt: string;
   className?: string;
 }
+
+export interface LoadingSpinnerProps {
+  message?: string;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
