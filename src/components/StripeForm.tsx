@@ -81,8 +81,7 @@ export default function StripeForm({
   return (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="max-w-md mx-auto">
-        <h2 className="text-xl font-semibold mb-2">Payment Information</h2>
-        <div className="text-sm text-gray-500 mb-4 italic">Use Card Number: 4242 4242 4242 4242 to test payment</div>
+        <h2 className="text-xl font-semibold mb-4">Payment Information</h2>
         <div className="border border-gray-300 rounded-md p-4 bg-white shadow-sm mb-4">
           <CardElement
             options={{
@@ -118,6 +117,9 @@ export default function StripeForm({
         >
           {isProcessing ? 'Processing...' : 'Pay Now'}
         </button>
+        <div className="text-sm text-gray-500 mt-4 italic">
+          Use Card Number: 4242 4242 4242 4242 to test payment
+        </div>
       </div>
     </form>
   );

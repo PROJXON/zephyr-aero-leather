@@ -1,6 +1,6 @@
 "use client";
 import { useCart } from "@/app/context/CartContext";
-import { useState, useEffect, useReducer, useCallback, createContext } from "react";
+import { useState, useEffect, useReducer, useCallback, createContext, Dispatch, SetStateAction } from "react";
 import { FaEdit } from "react-icons/fa";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import calculateTotal from "../../lib/calculateTotal";
@@ -16,9 +16,9 @@ import type {
   AddressErrors,
   AddressFormChange
 } from "../../types/types";
-import type { StripeElementsOptions, Appearance } from "@stripe/stripe-js";
-import type { Dispatch, SetStateAction } from "react";
+import { useAddressValidation } from "../hooks/useAddressValidation";
 import LoadingSpinner from "./LoadingSpinner";
+import type { Appearance, StripeElementsOptions } from "@stripe/stripe-js";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -63,6 +63,7 @@ export const StatesContext = createContext<(string[])>([]);
 
 export default function Checkout({ products }: CheckoutProps) {
   const { cartItems, updateQuantity, orderId, isLoading } = useCart();
+  const { validateAddress, isValidating, validationResult } = useAddressValidation();
   const [total, setTotal] = useState<number>(calculateTotal(cartItems, products));
   const [editID, setEditID] = useState<number | null>(null);
   const [newQty, setNewQty] = useState<string>("");
@@ -155,7 +156,7 @@ export default function Checkout({ products }: CheckoutProps) {
     appearance
   };
 
-  const validateAddress = (details: AddressDetailsState): AddressErrors => {
+  const validateAddressForm = (details: AddressDetailsState): AddressErrors => {
     const errors: AddressErrors = {};
 
     // Required fields
@@ -177,6 +178,28 @@ export default function Checkout({ products }: CheckoutProps) {
 
     return errors;
   };
+
+  // Auto-validate address when all required fields are filled
+  useEffect(() => {
+    const errors = validateAddressForm(shippingDetails);
+    const hasAllRequiredFields = !errors.firstName && !errors.lastName && !errors.address && !errors.city && !errors.zipCode && !errors.state;
+    
+    if (hasAllRequiredFields && shippingDetails.address.line1.trim()) {
+      // Debounce validation to avoid too many API calls
+      const timeout = setTimeout(() => {
+        validateAddress(shippingDetails);
+      }, 1000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [shippingDetails, validateAddress]);
+
+  // Update shipping details with validated address if available
+  useEffect(() => {
+    if (validationResult?.valid && validationResult.validatedAddress) {
+      shippingDispatch({ type: "ALL", value: validationResult.validatedAddress });
+    }
+  }, [validationResult]);
 
   const handleChange = (
     dispatch: Dispatch<AddressDetailsAction>,
@@ -231,6 +254,24 @@ export default function Checkout({ products }: CheckoutProps) {
                 <StatesContext.Provider value={states}>
                   <ChangeContext.Provider value={shippingChange}>
                     <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
+                    {isValidating && (
+                      <div className="mt-6 text-sm text-blue-600">
+                        <LoadingSpinner message="Validating address..." size="sm" className="h-8" />
+                      </div>
+                    )}
+                    {validationResult && !validationResult.valid && validationResult.error && (
+                      <div className="mt-6 text-sm text-red-600">
+                        ⚠️ {validationResult.error}
+                      </div>
+                    )}
+                    {validationResult?.valid && (
+                      <div className="mt-6 text-sm text-green-600">
+                        ✅ Address validated successfully
+                      </div>
+                    )}
+                    <div className="text-sm text-gray-500 mt-2 italic">
+                      Invalid addresses will still work for test payments in development mode
+                    </div>
                   </ChangeContext.Provider>
                   <div className="mt-4">
                     <input
@@ -255,9 +296,9 @@ export default function Checkout({ products }: CheckoutProps) {
                     clientSecret={clientSecret}
                     formError={formError}
                     setFormError={setFormError}
-                    validateShipping={() => validateAddress(shippingDetails)}
+                    validateShipping={() => validateAddressForm(shippingDetails)}
                     setShippingErrors={setShippingErrors}
-                    validateBilling={() => validateAddress(billingDetails)}
+                    validateBilling={() => validateAddressForm(billingDetails)}
                     setBillingErrors={setBillingErrors}
                   />
                 </Elements>
@@ -270,6 +311,24 @@ export default function Checkout({ products }: CheckoutProps) {
                 <StatesContext.Provider value={states}>
                   <ChangeContext.Provider value={shippingChange}>
                     <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
+                    {isValidating && (
+                      <div className="mt-6 text-sm text-blue-600">
+                        <LoadingSpinner message="Validating address..." size="sm" className="h-8" />
+                      </div>
+                    )}
+                    {validationResult && !validationResult.valid && validationResult.error && (
+                      <div className="mt-6 text-sm text-red-600">
+                        ⚠️ {validationResult.error}
+                      </div>
+                    )}
+                    {validationResult?.valid && (
+                      <div className="mt-6 text-sm text-green-600">
+                        ✅ Address validated successfully
+                      </div>
+                    )}
+                    <div className="text-sm text-gray-500 mt-2 italic">
+                      Note: Invalid addresses will still work for test payments in development mode
+                    </div>
                   </ChangeContext.Provider>
                   <div className="mt-4">
                     <input

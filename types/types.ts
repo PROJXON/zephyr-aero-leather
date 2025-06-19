@@ -679,3 +679,43 @@ export interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
+
+export interface AddressValidationResponse {
+  valid: boolean;
+  validatedAddress?: AddressDetailsState;
+  error?: string;
+  suggestions: AddressDetailsState[];
+  dpvConfirmation?: string;
+  carrierRoute?: string;
+  deliveryPoint?: string;
+}
+
+export interface USPSAddress {
+  Address1: string;
+  Address2?: string;
+  City: string;
+  State: string;
+  Zip5: string;
+  Zip4?: string;
+  DeliveryPoint?: string;
+  CarrierRoute?: string;
+  Footnotes?: string;
+  DPVConfirmation?: string;
+  DPVCMRA?: string;
+  DPVVacant?: string;
+  Business?: string;
+  CentralDeliveryPoint?: string;
+  Vacant?: string;
+}
+
+export interface USPSAddressValidationRequest {
+  AddressValidateRequest: {
+    Address: USPSAddress;
+  };
+}
+
+export interface USPSAddressValidationResponse {
+  AddressValidateResponse: {
+    Address: USPSAddress;
+  };
+}
