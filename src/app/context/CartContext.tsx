@@ -23,6 +23,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [orderId, setOrderId] = useState<number | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   const pendingUpdates = useRef<Record<number, number>>({});
   const updateTimers = useRef<Record<number, NodeJS.Timeout>>({});
@@ -52,12 +53,17 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    // Don't fetch cart if we're on payment-success page (cart should be cleared)
+    if (typeof window !== 'undefined' && window.location.pathname === '/payment-success') {
+      return;
+    }
+    
+    if (isAuthenticated && !isClearing) {
       fetchUserCart();
-    } else {
+    } else if (!isAuthenticated) {
       setCartItems(loadGuestCart());
     }
-  }, [isAuthenticated, fetchUserCart]);
+  }, [isAuthenticated, fetchUserCart, isClearing]);
 
   const addToCart = async (productId: number, quantity: number = 1) => {
     if (isAuthenticated) {
@@ -255,21 +261,19 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     if (isAuthenticated) {
       if (!isAuthenticated) return;
       try {
-        const response = await fetch("/api/cart", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            orderId,
-            line_items: [],
-          }),
-        });
-
-        if (!response.ok) throw new Error("Failed to clear cart");
-
+        setIsClearing(true);
+        // For authenticated users, just clear the local state
+        // The server-side cart should already be empty after successful payment
         setCartItems([]);
         setOrderId(null);
+        
+        // Keep the clearing flag active for a short time to prevent refetching
+        setTimeout(() => {
+          setIsClearing(false);
+        }, 2000);
       } catch (error: unknown) {
         console.error("Error clearing cart:", error instanceof Error ? error.message : 'Unknown error');
+        setIsClearing(false);
       }
     } else {
       localStorage.removeItem("guestCart");
