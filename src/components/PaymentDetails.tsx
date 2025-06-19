@@ -6,6 +6,7 @@ import OrderSummary from "./OrderSummary";
 import calculateTotal from "../../lib/calculateTotal";
 import { useCart } from "@/app/context/CartContext";
 import type { Product, PaymentDetailsData } from "../../types/types";
+import type { WooCommerceAddress, WooOrder } from "../../types/woocommerce";
 
 export default function PaymentDetails() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function PaymentDetails() {
   const [total, setTotal] = useState<number>(0);
   const [allowed, setAllowed] = useState<boolean>(false);
   const cartClearedRef = useRef(false);
-  const [shippingDetails, setShippingDetails] = useState<any>(null);
+  const [shippingDetails, setShippingDetails] = useState<WooCommerceAddress | undefined>(undefined);
 
   const { clearCart } = useCart();
   const queryIntent = searchParams.get("payment_intent");
@@ -69,7 +70,7 @@ export default function PaymentDetails() {
               const orderRes = await fetch("/api/order");
               const orderData = await orderRes.json();
               const orders = orderData.orders || [];
-              const order = orders.find((o: any) => o.id.toString() === data.wooOrderId);
+              const order = orders.find((o: WooOrder) => o.id.toString() === data.wooOrderId);
               if (order) {
                 setShippingDetails(order.shipping);
               }
