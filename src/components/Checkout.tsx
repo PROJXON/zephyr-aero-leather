@@ -1,6 +1,6 @@
 "use client";
 import { useCart } from "@/app/context/CartContext";
-import { useState, useEffect, useReducer, useCallback, createContext, Dispatch, SetStateAction } from "react";
+import { useState, useEffect, useReducer, useCallback, createContext, Dispatch, SetStateAction, useRef } from "react";
 import { FaEdit } from "react-icons/fa";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import calculateTotal from "../../lib/calculateTotal";
@@ -64,6 +64,7 @@ export const StatesContext = createContext<(string[])>([]);
 export default function Checkout({ products }: CheckoutProps) {
   const { cartItems, updateQuantity, orderId, isLoading } = useCart();
   const { validateAddress, isValidating, validationResult } = useAddressValidation();
+  const lastValidatedAddress = useRef<string>('');
   const [total, setTotal] = useState<number>(calculateTotal(cartItems, products));
   const [editID, setEditID] = useState<number | null>(null);
   const [newQty, setNewQty] = useState<string>("");
@@ -184,11 +185,21 @@ export default function Checkout({ products }: CheckoutProps) {
     const errors = validateAddressForm(shippingDetails);
     const hasAllRequiredFields = !errors.firstName && !errors.lastName && !errors.address && !errors.city && !errors.zipCode && !errors.state;
     
-    if (hasAllRequiredFields && shippingDetails.address.line1.trim()) {
+    // Only validate if all required fields are complete AND we have a meaningful address
+    if (hasAllRequiredFields && 
+        shippingDetails.address.line1.trim().length > 5 && 
+        shippingDetails.city.trim().length > 2 &&
+        shippingDetails.zipCode.trim().length >= 5) {
+      
       // Debounce validation to avoid too many API calls
       const timeout = setTimeout(() => {
-        validateAddress(shippingDetails);
-      }, 1000);
+        // Double-check that we haven't already validated this exact address
+        const currentAddress = JSON.stringify(shippingDetails);
+        if (currentAddress !== lastValidatedAddress.current) {
+          lastValidatedAddress.current = currentAddress;
+          validateAddress(shippingDetails);
+        }
+      }, 2000);
 
       return () => clearTimeout(timeout);
     }
@@ -326,9 +337,6 @@ export default function Checkout({ products }: CheckoutProps) {
                         ✅ Address validated successfully
                       </div>
                     )}
-                    <div className="text-sm text-gray-500 mt-2 italic">
-                      Note: Invalid addresses will still work for test payments in development mode
-                    </div>
                   </ChangeContext.Provider>
                   <div className="mt-4">
                     <input
