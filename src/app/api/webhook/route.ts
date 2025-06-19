@@ -41,6 +41,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         
         console.log('Current order before completion:', {
           total: currentOrder.total,
+          subtotal: currentOrder.subtotal,
           shipping_total: currentOrder.shipping_total,
           total_tax: currentOrder.total_tax,
           shipping_lines: currentOrder.shipping_lines,
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest): Promise<Response> {
             value: paymentIntent.metadata?.user_local_time,
           }],
           total: currentOrder.total,
+          subtotal: currentOrder.subtotal,
           shipping_total: currentOrder.shipping_total,
           total_tax: currentOrder.total_tax,
           shipping_lines: currentOrder.shipping_lines,
@@ -63,6 +65,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
         console.log('Order after completion:', {
           total: updatedOrder.total,
+          subtotal: updatedOrder.subtotal,
           shipping_total: updatedOrder.shipping_total,
           total_tax: updatedOrder.total_tax,
           shipping_lines: updatedOrder.shipping_lines,

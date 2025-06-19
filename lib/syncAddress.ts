@@ -97,8 +97,17 @@ export default async function syncAddress(
         tax: frontendTaxAmount
       });
       
+      // Calculate subtotal from cart items
+      const subtotal = cartItems?.reduce((sum, item) => {
+        const product = productsToUse?.find(p => p.id === item.productId || p.id === item.id);
+        const price = product?.price || item.price || 0;
+        return sum + (price * item.quantity);
+      }, 0) || 0;
+      
       // Convert cents to dollars for WooCommerce
-      wooDetails.total = ((frontendShippingAmount + frontendTaxAmount) / 100).toFixed(2);
+      const totalInCents = subtotal + frontendShippingAmount + frontendTaxAmount;
+      wooDetails.total = (totalInCents / 100).toFixed(2);
+      wooDetails.subtotal = (subtotal / 100).toFixed(2);
       wooDetails.shipping_total = (frontendShippingAmount / 100).toFixed(2);
       wooDetails.total_tax = (frontendTaxAmount / 100).toFixed(2);
       
@@ -148,6 +157,7 @@ export default async function syncAddress(
         
         // Convert cents to dollars for WooCommerce
         wooDetails.total = (totals.total / 100).toFixed(2);
+        wooDetails.subtotal = (totals.subtotal / 100).toFixed(2);
         wooDetails.shipping_total = (totals.shipping / 100).toFixed(2);
         wooDetails.total_tax = (totals.tax / 100).toFixed(2);
         

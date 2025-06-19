@@ -70,6 +70,9 @@ export interface WooOrder {
   id: number;
   status: string;
   total: string;
+  subtotal?: string;
+  shipping_total?: string;
+  total_tax?: string;
   currency: string;
   line_items: WooOrderLineItem[];
   shipping_lines: WooOrderShippingLine[];
@@ -92,6 +95,7 @@ export type WooOrderUpdate = Partial<Pick<WooOrder,
   'payment_method_title' | 
   'set_paid' |
   'total' |
+  'subtotal' |
   'total_tax' |
   'shipping_total' |
   'shipping_lines' |

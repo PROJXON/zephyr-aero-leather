@@ -32,9 +32,13 @@ export default function OrderHistory({ products }: { products: Product[] }) {
     (async () => {
       if (isAuthenticated) {
         try {
+          console.log("Fetching orders...");
           const orderRes = await fetch("/api/order")
+          console.log("Order response status:", orderRes.status);
           const orderData = await orderRes.json()
+          console.log("Order data:", orderData);
           const ordersArray = (orderData.orders || []) as WooOrder[]
+          console.log("Orders array length:", ordersArray.length);
           
           // Sort orders by date from newest to oldest
           const sortedOrders = ordersArray.sort((a, b) => {
@@ -91,6 +95,19 @@ export default function OrderHistory({ products }: { products: Product[] }) {
     productId: item.id
   })
 
+  // Helper function to get order amounts in cents
+  const getOrderAmounts = (order: WooOrder) => {
+    // Get the order total (always available)
+    const total = order.total ? Math.round(parseFloat(order.total) * 100) : 0;
+    
+    // Only use breakdown fields if they exist and are valid
+    const subtotal = order.subtotal ? Math.round(parseFloat(order.subtotal) * 100) : undefined;
+    const shipping = order.shipping_total ? Math.round(parseFloat(order.shipping_total) * 100) : undefined;
+    const tax = order.total_tax ? Math.round(parseFloat(order.total_tax) * 100) : undefined;
+    
+    return { subtotal, shipping, tax, total };
+  };
+
   // Don't render anything if not authenticated (will redirect)
   if (!isAuthenticated) {
     return null
@@ -109,7 +126,7 @@ export default function OrderHistory({ products }: { products: Product[] }) {
           {orders.map((order: WooOrder, i: number) => {
             const datePaid = localTimes[i]
             const items = order.items.map(convertToCartItem)
-            const total = calculateTotal(items, products)
+            const { subtotal, shipping, tax, total } = getOrderAmounts(order)
 
             return (
               <li key={order.id}>
@@ -126,6 +143,9 @@ export default function OrderHistory({ products }: { products: Product[] }) {
                   cartItems={items}
                   products={products}
                   total={total}
+                  subtotal={subtotal}
+                  shipping={shipping}
+                  tax={tax}
                   showReviewLinks={true}
                   reviewedProductIds={reviewedProductIds}
                   shippingDetails={order.shipping}
