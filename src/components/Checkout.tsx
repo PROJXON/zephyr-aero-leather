@@ -1,6 +1,6 @@
 "use client";
 import { useCart } from "@/app/context/CartContext";
-import { useState, useEffect, useReducer, useCallback, createContext, Dispatch, SetStateAction, useRef, useMemo } from "react";
+import { useState, useEffect, useReducer, useCallback, createContext, useRef, useMemo } from "react";
 import { FaEdit } from "react-icons/fa";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import calculateTotal from "../../lib/calculateTotal";
