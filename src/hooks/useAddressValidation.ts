@@ -21,7 +21,7 @@ export function useAddressValidation() {
       const result: AddressValidationResponse = await response.json();
       setValidationResult(result);
       return result;
-    } catch (error) {
+    } catch {
       const errorResult: AddressValidationResponse = {
         valid: false,
         error: 'Address validation service unavailable',

@@ -156,7 +156,7 @@ export default function Checkout({ products }: CheckoutProps) {
     appearance
   };
 
-  const validateAddressForm = (details: AddressDetailsState): AddressErrors => {
+  const validateAddressForm = useCallback((details: AddressDetailsState): AddressErrors => {
     const errors: AddressErrors = {};
 
     // Required fields
@@ -177,7 +177,7 @@ export default function Checkout({ products }: CheckoutProps) {
     // Address line 2 is optional, no validation needed
 
     return errors;
-  };
+  }, [states]);
 
   // Auto-validate address when all required fields are filled
   useEffect(() => {
@@ -192,7 +192,7 @@ export default function Checkout({ products }: CheckoutProps) {
 
       return () => clearTimeout(timeout);
     }
-  }, [shippingDetails, validateAddress]);
+  }, [shippingDetails, validateAddress, validateAddressForm]);
 
   // Update shipping details with validated address if available
   useEffect(() => {

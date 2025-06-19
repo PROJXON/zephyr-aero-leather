@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import type { AddressDetailsState, USPSAddressValidationRequest, USPSAddressValidationResponse } from "../../../../types/types";
+import type { AddressDetailsState, USPSAddressValidationRequest } from "../../../../types/types";
 
 // Simple XML parser helper functions
 function getXmlValue(xml: string, tag: string): string {

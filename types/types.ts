@@ -713,9 +713,3 @@ export interface USPSAddressValidationRequest {
     Address: USPSAddress;
   };
 }
-
-export interface USPSAddressValidationResponse {
-  AddressValidateResponse: {
-    Address: USPSAddress;
-  };
-}
