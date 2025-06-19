@@ -233,6 +233,7 @@ export interface CartContextType {
   fetchUserCart: () => Promise<void> | void;
   setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
   refreshCart: () => Promise<void> | void;
+  isLoading: boolean;
 }
 
 // --- UI & Page Props ---

@@ -61,12 +61,13 @@ export const ChangeContext = createContext<((event: AddressFormChange) => void)>
 export const StatesContext = createContext<(string[])>([]);
 
 export default function Checkout({ products }: CheckoutProps) {
-  const { cartItems, updateQuantity, orderId } = useCart();
+  const { cartItems, updateQuantity, orderId, isLoading } = useCart();
   const [total, setTotal] = useState<number>(calculateTotal(cartItems, products));
   const [editID, setEditID] = useState<number | null>(null);
   const [newQty, setNewQty] = useState<string>("");
   const [clientSecret, setClientSecret] = useState<string>("");
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+  const [isLoadingPaymentForm, setIsLoadingPaymentForm] = useState<boolean>(false);
   const [billToShipping, setBillToShipping] = useState<boolean>(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [shippingErrors, setShippingErrors] = useState<AddressErrors>({});
@@ -92,6 +93,7 @@ export default function Checkout({ products }: CheckoutProps) {
     setTotal(newTotal);
 
     if (newTotal > 50) {
+      setIsLoadingPaymentForm(true);
       const timeout = setTimeout(() => {
         fetch("/api/payment", {
           method: paymentIntentId ? "PUT" : "POST",
@@ -118,14 +120,18 @@ export default function Checkout({ products }: CheckoutProps) {
             if (data.payment_intent_id) {
               setPaymentIntentId(data.payment_intent_id);
             }
+            setIsLoadingPaymentForm(false);
           })
           .catch((error) => {
             console.error('Payment error:', error);
             setFormError(error.message);
+            setIsLoadingPaymentForm(false);
           });
       }, 500);
 
       return () => clearTimeout(timeout);
+    } else {
+      setIsLoadingPaymentForm(false);
     }
   }, [cartItems, shippingDetails, billingDetails, orderId, paymentIntentId, products]);
 
@@ -201,7 +207,14 @@ export default function Checkout({ products }: CheckoutProps) {
 
   return (
     <>
-      {cartItems?.length > 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-dark mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading cart...</p>
+          </div>
+        </div>
+      ) : cartItems?.length > 0 ? (
         <div className="flex flex-col gap-8">
           <OrderSummary
             cartItems={cartItems}
@@ -252,6 +265,40 @@ export default function Checkout({ products }: CheckoutProps) {
                     setBillingErrors={setBillingErrors}
                   />
                 </Elements>
+              </div>
+            </div>
+          )}
+          {isLoadingPaymentForm && !clientSecret && (
+            <div className="flex flex-wrap lg:flex-nowrap gap-8 max-w-7xl w-full mx-auto">
+              <div className="w-full lg:w-1/2">
+                <StatesContext.Provider value={states}>
+                  <ChangeContext.Provider value={shippingChange}>
+                    <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
+                  </ChangeContext.Provider>
+                  <div className="mt-4">
+                    <input
+                      type="checkbox"
+                      name="billToShipping"
+                      onChange={toggleBillToShipping}
+                      checked={billToShipping}
+                      className="w-5 h-5 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-neutral-dark transition accent-neutral-dark"
+                    />
+                    <label htmlFor="billToShipping" onClick={toggleBillToShipping} className="ml-2 text-neutral-dark">
+                      Bill to shipping address
+                    </label>
+                  </div>
+                  {!billToShipping && (<ChangeContext.Provider value={billingChange}>
+                    <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
+                  </ChangeContext.Provider>)}
+                </StatesContext.Provider>
+              </div>
+              <div className="w-full lg:w-1/2">
+                <div className="flex items-center justify-center h-64 border border-gray-300 rounded-md bg-gray-50">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-dark mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading payment form...</p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

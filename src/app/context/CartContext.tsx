@@ -24,6 +24,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   const [orderId, setOrderId] = useState<number | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const pendingUpdates = useRef<Record<number, number>>({});
   const updateTimers = useRef<Record<number, NodeJS.Timeout>>({});
@@ -32,6 +33,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
   const fetchUserCart = useCallback(async () => {
     if (!isAuthenticated) return;
+    setIsLoading(true);
     try {
       const response = await fetch("/api/cart");
       if (!response.ok) throw new Error("Failed to fetch cart");
@@ -49,12 +51,15 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       console.error("Error fetching cart:", error instanceof Error ? error.message : 'Unknown error');
       setCartItems([]);
       setOrderId(null);
+    } finally {
+      setIsLoading(false);
     }
   }, [isAuthenticated]);
 
   useEffect(() => {
     // Don't fetch cart if we're on payment-success page (cart should be cleared)
     if (typeof window !== 'undefined' && window.location.pathname === '/payment-success') {
+      setIsLoading(false);
       return;
     }
     
@@ -62,6 +67,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       fetchUserCart();
     } else if (!isAuthenticated) {
       setCartItems(loadGuestCart());
+      setIsLoading(false);
     }
   }, [isAuthenticated, fetchUserCart, isClearing]);
 
@@ -295,6 +301,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         setCartItems,
         refreshCart,
         removeFromCart,
+        isLoading,
       }}
     >
       {children}
