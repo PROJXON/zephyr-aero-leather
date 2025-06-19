@@ -81,6 +81,9 @@ export default function Checkout({ products }: CheckoutProps) {
   const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
   const [selectedShippingRateId, setSelectedShippingRateId] = useState<string | undefined>(undefined);
 
+  // Track if we need to update payment
+  const [shouldUpdatePayment, setShouldUpdatePayment] = useState(false);
+
   const states: readonly string[] = useMemo(() => [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
   ] as const, []);
@@ -94,52 +97,113 @@ export default function Checkout({ products }: CheckoutProps) {
     },
   });
 
+  // Handle shipping details changes
+  const handleShippingChange = useCallback((event: AddressFormChange) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    let type: AddressDetailsAction["type"];
+    
+    switch (name) {
+      case "firstName": type = "FIRSTNAME"; break;
+      case "lastName": type = "LASTNAME"; break;
+      case "address1": type = "ADDRESS1"; break;
+      case "address2": type = "ADDRESS2"; break;
+      case "city": type = "CITY"; break;
+      case "zipCode": type = "ZIPCODE"; break;
+      case "state": type = "STATE"; break;
+      default: return;
+    }
+
+    shippingDispatch({ type, value });
+
+    // Always trigger payment update when any field changes
+    setShouldUpdatePayment(true);
+  }, []);
+
+  // Handle shipping rate selection
+  const handleShippingRateSelect = useCallback((rateId: string) => {
+    setSelectedShippingRateId(rateId);
+    setShouldUpdatePayment(true);
+  }, []);
+
+  // Update payment when necessary
   useEffect(() => {
     const newTotal = calculateTotal(cartItems, products);
     setTotal(newTotal);
 
-    if (newTotal > 50) {
+    // Check if all required fields are filled
+    const hasRequiredFields = 
+      shippingDetails.name.first.trim() &&
+      shippingDetails.name.last.trim() &&
+      shippingDetails.address.line1.trim() &&
+      shippingDetails.city.trim() &&
+      shippingDetails.state &&
+      shippingDetails.zipCode.trim().length >= 5;
+
+    // Only update payment if we have a valid total, all required fields, and a reason to update
+    if (newTotal > 50 && hasRequiredFields && shouldUpdatePayment) {
       setIsLoadingPaymentForm(true);
-      const timeout = setTimeout(() => {
-        fetch("/api/payment", {
-          method: paymentIntentId ? "PUT" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: newTotal,
-            currency: 'usd',
-            items: cartItems,
-            woo_order_id: orderId,
-            payment_intent_id: paymentIntentId,
-            shipping: shippingDetails,
-            billing: billingDetails
-          }),
-        })
-          .then(async (res) => {
-            const data = await res.json();
-            if (!res.ok) {
-              throw new Error(data.error || 'Payment request failed');
-            }
-            return data;
-          })
-          .then((data) => {
-            setClientSecret(data.clientSecret);
-            if (data.payment_intent_id) {
-              setPaymentIntentId(data.payment_intent_id);
-            }
-            setIsLoadingPaymentForm(false);
-          })
-          .catch((error) => {
-            console.error('Payment error:', error);
-            setFormError(error.message);
-            setIsLoadingPaymentForm(false);
+      
+      // Debounce the payment update to prevent rapid-fire API calls
+      const timeout = setTimeout(async () => {
+        try {
+          // Calculate shipping and tax amounts from the calculation object
+          const calculation = calculateTotalWithTaxAndShipping(
+            cartItems,
+            products,
+            shippingDetails.state,
+            shippingDetails.zipCode,
+            selectedShippingRateId
+          );
+
+          const response = await fetch("/api/payment", {
+            method: paymentIntentId ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              amount: newTotal,
+              currency: 'usd',
+              items: cartItems,
+              woo_order_id: orderId,
+              payment_intent_id: paymentIntentId,
+              shipping: shippingDetails,
+              billing: billingDetails,
+              selectedShippingRateId: selectedShippingRateId,
+              shippingAmount: calculation.shipping, // Pass frontend shipping amount
+              taxAmount: calculation.tax // Pass frontend tax amount
+            }),
           });
-      }, 500);
+
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Payment request failed');
+          }
+
+          const data = await response.json();
+          setClientSecret(data.clientSecret);
+          if (data.payment_intent_id) {
+            setPaymentIntentId(data.payment_intent_id);
+          }
+          setShouldUpdatePayment(false);
+          setIsLoadingPaymentForm(false);
+        } catch (error) {
+          console.error('Payment error:', error);
+          setFormError(error instanceof Error ? error.message : 'Payment request failed');
+          setIsLoadingPaymentForm(false);
+        }
+      }, 1500); // Increased debounce time to 1.5 seconds
 
       return () => clearTimeout(timeout);
     } else {
       setIsLoadingPaymentForm(false);
     }
-  }, [cartItems, shippingDetails, billingDetails, orderId, paymentIntentId, products]);
+  }, [
+    cartItems,
+    products,
+    shouldUpdatePayment,
+    orderId,
+    paymentIntentId,
+    shippingDetails // Added to dependencies since we check its fields
+  ]);
 
   useEffect(() => {
     if (billToShipping) {
@@ -274,60 +338,62 @@ export default function Checkout({ products }: CheckoutProps) {
               changeQuantity,
             }}
           />
-          {clientSecret && (
-            <div className="flex flex-wrap lg:flex-nowrap gap-8 max-w-7xl w-full mx-auto">
-              <div className="w-full lg:w-1/2">
-                <StatesContext.Provider value={states}>
-                  <ChangeContext.Provider value={shippingChange}>
-                    <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
-                    {isValidating && (
-                      <div className="mt-6 text-sm text-blue-600">
-                        <LoadingSpinner message="Validating address..." size="sm" className="h-8" />
-                      </div>
-                    )}
-                    {validationResult && !validationResult.valid && validationResult.error && (
-                      <div className="mt-6 text-sm text-red-600">
-                        ⚠️ {validationResult.error}
-                      </div>
-                    )}
-                    {validationResult?.valid && (
-                      <div className="mt-6 text-sm text-green-600">
-                        ✅ Address validated successfully
-                      </div>
-                    )}
-                    <div className="text-sm text-gray-500 mt-2 italic">
-                      Invalid addresses will still work for test payments in development mode
+          <div className="flex flex-wrap lg:flex-nowrap gap-8 max-w-7xl w-full mx-auto">
+            <div className="w-full lg:w-1/2">
+              <StatesContext.Provider value={states}>
+                <ChangeContext.Provider value={handleShippingChange}>
+                  <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
+                  {isValidating && (
+                    <div className="mt-6 text-sm text-blue-600">
+                      <LoadingSpinner message="Validating address..." size="sm" className="h-8" />
                     </div>
-                  </ChangeContext.Provider>
-                  {/* Shipping Rate Selector Integration */}
-                  <div className="mt-4">
-                    <ShippingRateSelector
-                      state={shippingDetails.state}
-                      zipCode={shippingDetails.zipCode}
-                      cartItems={cartItems}
-                      products={products}
-                      selectedRateId={selectedShippingRateId}
-                      onRateSelect={setSelectedShippingRateId}
-                    />
+                  )}
+                  {validationResult && !validationResult.valid && validationResult.error && (
+                    <div className="mt-6 text-sm text-red-600">
+                      ⚠️ {validationResult.error}
+                    </div>
+                  )}
+                  {validationResult?.valid && (
+                    <div className="mt-6 text-sm text-green-600">
+                      ✅ Address validated successfully
+                    </div>
+                  )}
+                  <div className="text-sm text-gray-500 mt-2 italic">
+                    Invalid addresses will still work for test payments in development mode
                   </div>
-                  <div className="mt-4">
-                    <input
-                      type="checkbox"
-                      name="billToShipping"
-                      onChange={toggleBillToShipping}
-                      checked={billToShipping}
-                      className="w-5 h-5 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-neutral-dark transition accent-neutral-dark"
-                    />
-                    <label htmlFor="billToShipping" onClick={toggleBillToShipping} className="ml-2 text-neutral-dark">
-                      Bill to shipping address
-                    </label>
-                  </div>
-                  {!billToShipping && (<ChangeContext.Provider value={billingChange}>
+                </ChangeContext.Provider>
+                {/* Shipping Rate Selector Integration */}
+                <div className="mt-4">
+                  <ShippingRateSelector
+                    state={shippingDetails.state}
+                    zipCode={shippingDetails.zipCode}
+                    cartItems={cartItems}
+                    products={products}
+                    selectedRateId={selectedShippingRateId}
+                    onRateSelect={handleShippingRateSelect}
+                  />
+                </div>
+                <div className="mt-4">
+                  <input
+                    type="checkbox"
+                    name="billToShipping"
+                    onChange={toggleBillToShipping}
+                    checked={billToShipping}
+                    className="w-5 h-5 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-neutral-dark transition accent-neutral-dark"
+                  />
+                  <label htmlFor="billToShipping" onClick={toggleBillToShipping} className="ml-2 text-neutral-dark">
+                    Bill to shipping address
+                  </label>
+                </div>
+                {!billToShipping && (
+                  <ChangeContext.Provider value={handleShippingChange}>
                     <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
-                  </ChangeContext.Provider>)}
-                </StatesContext.Provider>
-              </div>
-              <div className="w-full lg:w-1/2">
+                  </ChangeContext.Provider>
+                )}
+              </StatesContext.Provider>
+            </div>
+            <div className="w-full lg:w-1/2">
+              {clientSecret ? (
                 <Elements stripe={stripePromise} options={options}>
                   <StripeForm
                     clientSecret={clientSecret}
@@ -339,64 +405,17 @@ export default function Checkout({ products }: CheckoutProps) {
                     setBillingErrors={setBillingErrors}
                   />
                 </Elements>
-              </div>
-            </div>
-          )}
-          {isLoadingPaymentForm && !clientSecret && (
-            <div className="flex flex-wrap lg:flex-nowrap gap-8 max-w-7xl w-full mx-auto">
-              <div className="w-full lg:w-1/2">
-                <StatesContext.Provider value={states}>
-                  <ChangeContext.Provider value={shippingChange}>
-                    <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
-                    {isValidating && (
-                      <div className="mt-6 text-sm text-blue-600">
-                        <LoadingSpinner message="Validating address..." size="sm" className="h-8" />
-                      </div>
-                    )}
-                    {validationResult && !validationResult.valid && validationResult.error && (
-                      <div className="mt-6 text-sm text-red-600">
-                        ⚠️ {validationResult.error}
-                      </div>
-                    )}
-                    {validationResult?.valid && (
-                      <div className="mt-6 text-sm text-green-600">
-                        ✅ Address validated successfully
-                      </div>
-                    )}
-                  </ChangeContext.Provider>
-                  {/* Shipping Rate Selector Integration */}
-                  <div className="mt-4">
-                    <ShippingRateSelector
-                      state={shippingDetails.state}
-                      zipCode={shippingDetails.zipCode}
-                      cartItems={cartItems}
-                      products={products}
-                      selectedRateId={selectedShippingRateId}
-                      onRateSelect={setSelectedShippingRateId}
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <input
-                      type="checkbox"
-                      name="billToShipping"
-                      onChange={toggleBillToShipping}
-                      checked={billToShipping}
-                      className="w-5 h-5 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-neutral-dark transition accent-neutral-dark"
-                    />
-                    <label htmlFor="billToShipping" onClick={toggleBillToShipping} className="ml-2 text-neutral-dark">
-                      Bill to shipping address
-                    </label>
-                  </div>
-                  {!billToShipping && (<ChangeContext.Provider value={billingChange}>
-                    <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
-                  </ChangeContext.Provider>)}
-                </StatesContext.Provider>
-              </div>
-              <div className="w-full lg:w-1/2">
+              ) : isLoadingPaymentForm ? (
                 <LoadingSpinner message="Loading payment form..." />
-              </div>
+              ) : (
+                <div className="w-full border border-gray-300 rounded-md p-4 bg-white shadow-sm mt-11">
+                  <div className="text-center">
+                    <p className="text-gray-500">Please enter your shipping information to proceed with payment</p>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       ) : (
         <p>Your cart is empty</p>

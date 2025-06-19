@@ -65,8 +65,10 @@ export interface Product {
     price: number;
     salePrice?: number;
     stock: number;
+    weight?: number; // Weight in pounds
   }[];
   stock: number;
+  weight: number; // Weight in pounds
   rating?: number;
   reviewCount?: number;
   date_modified?: string;
@@ -160,6 +162,9 @@ export interface StripePaymentRequestBody {
   user_local_time?: string;
   shipping?: AddressDetailsState;
   billing?: AddressDetailsState;
+  selectedShippingRateId?: string;
+  shippingAmount?: number; // Shipping amount in cents
+  taxAmount?: number; // Tax amount in cents
 }
 
 export type UpdateQuantityFn = (id: number, quantity: number) => void;
@@ -715,4 +720,34 @@ export interface USPSAddressValidationRequest {
   AddressValidateRequest: {
     Address: USPSAddress;
   };
+}
+
+export interface ShippingRate {
+  id: string;
+  name: string;
+  price: number; // in cents
+  deliveryDays: number;
+  description?: string;
+}
+
+export interface TaxRate {
+  state: string;
+  rate: number;
+  name: string;
+}
+
+export interface TaxCalculation {
+  taxableAmount: number;
+  taxAmount: number;
+  rate: number;
+  state: string;
+}
+
+export interface ShippingCalculation {
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+  shippingRate?: any;
+  taxRate?: number;
 }

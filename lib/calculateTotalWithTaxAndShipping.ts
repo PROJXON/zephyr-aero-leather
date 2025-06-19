@@ -22,8 +22,8 @@ export function calculateTotalWithTaxAndShipping(
     selectedRateId
   );
   
-  // Calculate tax (tax is applied to subtotal, not including shipping)
-  const taxCalculation = calculateTax(subtotal, state);
+  // Calculate tax (tax is applied to subtotal + shipping)
+  const taxCalculation = calculateTax(subtotal, state, shipping);
   
   // Calculate total
   const total = subtotal + shipping + taxCalculation.taxAmount;

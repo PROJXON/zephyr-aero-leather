@@ -1,5 +1,7 @@
 import AddressFormInput from "./AddressFormInput";
 import type { AddressDetailsState, AddressErrors } from "../../types/types";
+import { useContext } from "react";
+import { ChangeContext } from "./Checkout";
 
 export default function AddressDetails({ title, details, errors }: {
   title: string;
@@ -7,6 +9,7 @@ export default function AddressDetails({ title, details, errors }: {
   errors: AddressErrors;
 }) {
   const { name, address, city, zipCode, state } = details;
+  const handleChange = useContext(ChangeContext);
 
   return (
     <div className="block">
@@ -21,6 +24,7 @@ export default function AddressDetails({ title, details, errors }: {
               error={errors.firstName || ""}
               span={1}
               type="text"
+              onChange={handleChange}
             />
           </div>
           <div className="flex-1">
@@ -31,6 +35,7 @@ export default function AddressDetails({ title, details, errors }: {
               error={errors.lastName || ""}
               span={1}
               type="text"
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -42,6 +47,7 @@ export default function AddressDetails({ title, details, errors }: {
             error={errors.address || ""}
             span={1}
             type="text"
+            onChange={handleChange}
           />
         </div>
         <div>
@@ -52,6 +58,7 @@ export default function AddressDetails({ title, details, errors }: {
             error=""
             span={1}
             type="text"
+            onChange={handleChange}
           />
         </div>
         <div className="flex gap-4">
@@ -63,6 +70,7 @@ export default function AddressDetails({ title, details, errors }: {
               error={errors.city || ""}
               span={1}
               type="text"
+              onChange={handleChange}
             />
           </div>
           <div className="flex-[1]">
@@ -73,6 +81,7 @@ export default function AddressDetails({ title, details, errors }: {
               error={errors.zipCode || ""}
               span={1}
               type="text"
+              onChange={handleChange}
             />
           </div>
           <div className="flex-[1]">
@@ -83,6 +92,7 @@ export default function AddressDetails({ title, details, errors }: {
               error={errors.state || ""}
               type="select"
               span={1}
+              onChange={handleChange}
             />
           </div>
         </div>

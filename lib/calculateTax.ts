@@ -64,12 +64,13 @@ export function getTaxRate(state: string): TaxRate {
 
 export function calculateTax(
   subtotal: number, // in cents
-  state: string
+  state: string,
+  shippingAmount: number = 0 // in cents, default to 0 for backward compatibility
 ): TaxCalculation {
   // No tax for exempt states
   if (TAX_EXEMPT_STATES.includes(state)) {
     return {
-      taxableAmount: subtotal,
+      taxableAmount: subtotal + shippingAmount,
       taxAmount: 0,
       rate: 0,
       state
@@ -77,10 +78,12 @@ export function calculateTax(
   }
 
   const taxRate = getTaxRate(state);
-  const taxAmount = Math.round(subtotal * taxRate.rate);
+  // Calculate tax on both subtotal and shipping (shipping is taxable in most states)
+  const taxableAmount = subtotal + shippingAmount;
+  const taxAmount = Math.round(taxableAmount * taxRate.rate);
 
   return {
-    taxableAmount: subtotal,
+    taxableAmount,
     taxAmount,
     rate: taxRate.rate,
     state

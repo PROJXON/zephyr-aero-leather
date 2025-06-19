@@ -5,6 +5,7 @@ import stripeObj from '../../../../lib/stripeObj';
 import type { NextRequest } from 'next/server';
 import type Stripe from 'stripe';
 import type { WebhookResponse } from '../../../../types/types';
+import type { WooOrder } from '../../../../types/woocommerce';
 
 export async function POST(req: NextRequest): Promise<Response> {
   const rawBody = await req.text();
@@ -35,12 +36,37 @@ export async function POST(req: NextRequest): Promise<Response> {
       break;
     case 'payment_intent.succeeded':
       if (wooOrderId) {
-        await fetchWooCommerce(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", {
+        // First get the current order to preserve shipping and tax info
+        const currentOrder = await fetchWooCommerce<WooOrder>(`wc/v3/orders/${wooOrderId}`, "Failed to fetch order");
+        
+        console.log('Current order before completion:', {
+          total: currentOrder.total,
+          shipping_total: currentOrder.shipping_total,
+          total_tax: currentOrder.total_tax,
+          shipping_lines: currentOrder.shipping_lines,
+          tax_lines: currentOrder.tax_lines
+        });
+        
+        // Update the order with preserved shipping and tax info
+        const updatedOrder = await fetchWooCommerce<WooOrder>(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", {
           status: "completed",
           meta_data: [{
             key: "user_local_time",
             value: paymentIntent.metadata?.user_local_time,
           }],
+          total: currentOrder.total,
+          shipping_total: currentOrder.shipping_total,
+          total_tax: currentOrder.total_tax,
+          shipping_lines: currentOrder.shipping_lines,
+          tax_lines: currentOrder.tax_lines
+        });
+
+        console.log('Order after completion:', {
+          total: updatedOrder.total,
+          shipping_total: updatedOrder.shipping_total,
+          total_tax: updatedOrder.total_tax,
+          shipping_lines: updatedOrder.shipping_lines,
+          tax_lines: updatedOrder.tax_lines
         });
       }
       responseBody = { success: true };

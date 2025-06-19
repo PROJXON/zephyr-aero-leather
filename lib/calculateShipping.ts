@@ -57,16 +57,16 @@ const PRIORITY_MAIL_RATES: Record<number, Record<number, number>> = {
     10: 2795  // 10 lbs: $27.95
   },
   3: { // Zone 3 (East Coast)
-    1: 1095,  // 1 lb: $10.95
-    2: 1295,  // 2 lbs: $12.95
-    3: 1495,  // 3 lbs: $14.95
-    4: 1695,  // 4 lbs: $16.95
-    5: 1895,  // 5 lbs: $18.95
-    6: 2095,  // 6 lbs: $20.95
-    7: 2295,  // 7 lbs: $22.95
-    8: 2495,  // 8 lbs: $24.95
-    9: 2695,  // 9 lbs: $26.95
-    10: 2895  // 10 lbs: $28.95
+    1: 1495,  // 1 lb: $14.95
+    2: 1695,  // 2 lbs: $16.95
+    3: 1895,  // 3 lbs: $18.95
+    4: 2095,  // 4 lbs: $20.95
+    5: 2295,  // 5 lbs: $22.95
+    6: 2495,  // 6 lbs: $24.95
+    7: 2695,  // 7 lbs: $26.95
+    8: 2895,  // 8 lbs: $28.95
+    9: 3095,  // 9 lbs: $30.95
+    10: 3295  // 10 lbs: $32.95
   },
   4: { // Zone 4 (Midwest)
     1: 1195,  // 1 lb: $11.95
@@ -231,32 +231,60 @@ export function calculateShipping(
   products: Product[],
   selectedRateId?: string
 ): { shipping: number; shippingRate?: ShippingRate } {
-  const totalWeight = calculateCartWeight(cartItems, products);
-  const zone = getZoneFromZip(destinationZip);
-  
-  console.log(`Shipping calculation - Weight: ${totalWeight}lbs, Zone: ${zone}, ZIP: ${destinationZip}`);
-  
-  const rates = getShippingRates();
-  const selectedRate = selectedRateId
-    ? rates.find(rate => rate.id === selectedRateId)
-    : rates[0];
-
-  let shippingCost = 0;
-  
-  if (selectedRate?.id === "usps-priority-mail") {
-    shippingCost = getPriorityMailRate(totalWeight, zone);
-    console.log(`Priority Mail rate: $${(shippingCost / 100).toFixed(2)}`);
-  } else if (selectedRate?.id === "usps-priority-mail-express") {
-    shippingCost = getPriorityMailExpressRate(totalWeight, zone);
-    console.log(`Priority Mail Express rate: $${(shippingCost / 100).toFixed(2)}`);
+  // Return 0 shipping if no valid ZIP code is provided
+  if (!destinationZip || destinationZip.trim().length === 0) {
+    return { shipping: 0 };
   }
 
+  // Get total cart weight
+  const totalWeight = calculateCartWeight(cartItems, products);
+  
+  // Get shipping zone based on destination ZIP
+  const zone = getZoneFromZip(destinationZip);
+  
+  console.log('Shipping calculation:', {
+    destinationZip,
+    zone,
+    totalWeight,
+    selectedRateId
+  });
+  
+  // Get available rates
+  const rates = getShippingRates();
+  
+  // If a specific rate is selected, use that
+  if (selectedRateId) {
+    const selectedRate = rates.find(rate => rate.id === selectedRateId);
+    if (selectedRate) {
+      const cost = selectedRate.id === 'usps-priority-mail-express'
+        ? getPriorityMailExpressRate(totalWeight, zone)
+        : getPriorityMailRate(totalWeight, zone);
+      
+      console.log('Selected rate cost:', {
+        rateName: selectedRate.name,
+        cost,
+        totalWeight,
+        zone
+      });
+      
+      return {
+        shipping: cost,
+        shippingRate: selectedRate
+      };
+    }
+  }
+  
+  // Default to lowest Priority Mail rate if no rate selected
+  const cost = getPriorityMailRate(totalWeight, zone);
+  console.log('Default rate cost:', {
+    cost,
+    totalWeight,
+    zone
+  });
+  
   return {
-    shipping: shippingCost,
-    shippingRate: selectedRate ? {
-      ...selectedRate,
-      price: shippingCost
-    } : undefined
+    shipping: cost,
+    shippingRate: rates[0] // Default to first rate (Priority Mail)
   };
 }
 

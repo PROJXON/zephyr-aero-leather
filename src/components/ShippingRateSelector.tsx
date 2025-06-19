@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { ShippingRate, CartItem, Product } from "../../types/types";
 import { getAvailableShippingRates, calculateShipping } from "../../lib/calculateShipping";
 import { formatCurrency } from "../../lib/calculateTotalWithTaxAndShipping";
+import calculateTotal from "../../lib/calculateTotal";
 
 interface ShippingRateSelectorProps {
   state: string;
@@ -28,10 +29,11 @@ export default function ShippingRateSelector({
   useEffect(() => {
     if (state && zipCode && cartItems.length > 0) {
       const baseRates = getAvailableShippingRates();
+      const subtotal = calculateTotal(cartItems, products);
       
       // Calculate actual prices for each rate
       const calculatedRates = baseRates.map(rate => {
-        const { shipping } = calculateShipping(0, zipCode, cartItems, products, rate.id);
+        const { shipping } = calculateShipping(subtotal, zipCode, cartItems, products, rate.id);
         return {
           ...rate,
           price: shipping

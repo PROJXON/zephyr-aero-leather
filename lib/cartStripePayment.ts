@@ -1,11 +1,12 @@
 import syncAddress from "./syncAddress";
 import stripeObj from "./stripeObj";
-import type { StripePaymentRequestBody, StripePaymentIntent, StripeError, StripePaymentResponse, StripePaymentIntentParams } from "../types/types";
+import type { StripePaymentRequestBody, StripePaymentIntent, StripeError, StripePaymentResponse, StripePaymentIntentParams, Product } from "../types/types";
+import fetchWooCommerce from "./fetchWooCommerce";
 
 export default async function cartStripePayment(req: Request): Promise<Response> {
   try {
     const data: StripePaymentRequestBody = await req.json();
-    const { amount, currency, items, woo_order_id, payment_intent_id, user_local_time, shipping, billing } = data;
+    const { amount, currency, items, woo_order_id, payment_intent_id, user_local_time, shipping, billing, selectedShippingRateId, shippingAmount, taxAmount } = data;
 
     if (!amount || amount <= 0) {
       throw new Error('Invalid amount: Amount must be greater than 0');
@@ -28,6 +29,26 @@ export default async function cartStripePayment(req: Request): Promise<Response>
       currency: currency || 'usd',
     };
 
+    // Fetch products if we have items
+    let products: Product[] = [];
+    if (items && items.length > 0) {
+      // Fetch all products with pagination
+      let allProducts: Product[] = [];
+      let page = 1;
+      const perPage = 100;
+      
+      while (true) {
+        const productsPage = await fetchWooCommerce<Product[]>(`wc/v3/products?per_page=${perPage}&page=${page}`, 'Failed to fetch products');
+        if (productsPage.length === 0) break;
+        
+        allProducts = allProducts.concat(productsPage);
+        if (productsPage.length < perPage) break;
+        page++;
+      }
+      
+      products = allProducts;
+    }
+
     if (shipping) {
       const { name, address, city, zipCode, state } = shipping;
       basePaymentIntentObj.shipping = {
@@ -44,7 +65,8 @@ export default async function cartStripePayment(req: Request): Promise<Response>
 
       // Only sync with WooCommerce if we have a woo_order_id (signed-in user)
       if (woo_order_id) {
-        await syncAddress(shipping, woo_order_id, false);
+        // Pass frontend-calculated amounts to syncAddress
+        await syncAddress(shipping, woo_order_id, false, items, products, selectedShippingRateId, shippingAmount, taxAmount);
       } else {
         // For guest users, store shipping in metadata
         metadata.shipping = JSON.stringify(shipping);
@@ -54,7 +76,7 @@ export default async function cartStripePayment(req: Request): Promise<Response>
     if (billing) {
       // Only sync with WooCommerce if we have a woo_order_id (signed-in user)
       if (woo_order_id) {
-        await syncAddress(billing, woo_order_id, true);
+        await syncAddress(billing, woo_order_id, true, items, products, selectedShippingRateId);
       } else {
         // For guest users, store billing in metadata
         metadata.billing = JSON.stringify(billing);
