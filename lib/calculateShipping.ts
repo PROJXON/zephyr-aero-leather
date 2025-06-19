@@ -1,7 +1,7 @@
 import { ShippingRate, CartItem, Product } from "../types/types";
 
 // Origin ZIP code (Los Angeles, CA)
-const ORIGIN_ZIP = "90210"; // You can change this to your actual LA ZIP
+// const ORIGIN_ZIP = "90210"; 
 
 // Fallback weight if product doesn't have weight (in lbs)
 const FALLBACK_WEIGHT = 1.0; // 1 lb default
@@ -165,13 +165,8 @@ export function calculateCartWeight(cartItems: CartItem[], products: Product[]):
     const itemWeight = product?.weight || FALLBACK_WEIGHT;
     const itemTotalWeight = itemWeight * item.quantity;
     
-    // Debug logging
-    console.log(`Item: ${product?.name || 'Unknown'}, Weight: ${itemWeight}lbs, Qty: ${item.quantity}, Total: ${itemTotalWeight}lbs`);
-    
     return totalWeight + itemTotalWeight;
   }, 0);
-  
-  console.log(`Total cart weight: ${totalWeight}lbs`);
   return totalWeight;
 }
 
@@ -242,13 +237,6 @@ export function calculateShipping(
   // Get shipping zone based on destination ZIP
   const zone = getZoneFromZip(destinationZip);
   
-  console.log('Shipping calculation:', {
-    destinationZip,
-    zone,
-    totalWeight,
-    selectedRateId
-  });
-  
   // Get available rates
   const rates = getShippingRates();
   
@@ -260,13 +248,6 @@ export function calculateShipping(
         ? getPriorityMailExpressRate(totalWeight, zone)
         : getPriorityMailRate(totalWeight, zone);
       
-      console.log('Selected rate cost:', {
-        rateName: selectedRate.name,
-        cost,
-        totalWeight,
-        zone
-      });
-      
       return {
         shipping: cost,
         shippingRate: selectedRate
@@ -276,11 +257,6 @@ export function calculateShipping(
   
   // Default to lowest Priority Mail rate if no rate selected
   const cost = getPriorityMailRate(totalWeight, zone);
-  console.log('Default rate cost:', {
-    cost,
-    totalWeight,
-    zone
-  });
   
   return {
     shipping: cost,

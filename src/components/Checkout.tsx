@@ -67,7 +67,6 @@ export default function Checkout({ products }: CheckoutProps) {
   const { cartItems, updateQuantity, orderId, isLoading } = useCart();
   const { validateAddress, isValidating, validationResult } = useAddressValidation();
   const lastValidatedAddress = useRef<string>('');
-  const [total, setTotal] = useState<number>(calculateTotal(cartItems, products));
   const [editID, setEditID] = useState<number | null>(null);
   const [newQty, setNewQty] = useState<string>("");
   const [clientSecret, setClientSecret] = useState<string>("");
@@ -81,7 +80,6 @@ export default function Checkout({ products }: CheckoutProps) {
   const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
   const [selectedShippingRateId, setSelectedShippingRateId] = useState<string | undefined>(undefined);
 
-  // Track if we need to update payment
   const [shouldUpdatePayment, setShouldUpdatePayment] = useState(false);
 
   const states: readonly string[] = useMemo(() => [
@@ -97,7 +95,6 @@ export default function Checkout({ products }: CheckoutProps) {
     },
   });
 
-  // Handle shipping details changes
   const handleShippingChange = useCallback((event: AddressFormChange) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -116,8 +113,10 @@ export default function Checkout({ products }: CheckoutProps) {
 
     shippingDispatch({ type, value });
 
-    // Always trigger payment update when any field changes
-    setShouldUpdatePayment(true);
+    // Only trigger payment update when ZIP code or state changes (affects shipping rates)
+    if (name === "zipCode" || name === "state") {
+      setShouldUpdatePayment(true);
+    }
   }, []);
 
   // Handle shipping rate selection
@@ -129,8 +128,7 @@ export default function Checkout({ products }: CheckoutProps) {
   // Update payment when necessary
   useEffect(() => {
     const newTotal = calculateTotal(cartItems, products);
-    setTotal(newTotal);
-
+    
     // Check if all required fields are filled
     const hasRequiredFields = 
       shippingDetails.name.first.trim() &&
@@ -202,7 +200,9 @@ export default function Checkout({ products }: CheckoutProps) {
     shouldUpdatePayment,
     orderId,
     paymentIntentId,
-    shippingDetails // Added to dependencies since we check its fields
+    shippingDetails,
+    billingDetails,
+    selectedShippingRateId
   ]);
 
   useEffect(() => {
@@ -278,32 +278,6 @@ export default function Checkout({ products }: CheckoutProps) {
       shippingDispatch({ type: "ALL", value: validationResult.validatedAddress });
     }
   }, [validationResult]);
-
-  const handleChange = (
-    dispatch: Dispatch<AddressDetailsAction>,
-    setErrors: Dispatch<SetStateAction<AddressErrors>>) => (event: AddressFormChange
-    ) => {
-      const { name, value } = event.target;
-      const type = name.toUpperCase() as AddressDetailsAction["type"];
-      if (type === "ALL" || type === "RESET") return;
-
-      dispatch({ type, value });
-      setErrors((prev: AddressErrors) => {
-        const newErrors = { ...prev };
-        if (name === "address1") delete newErrors["address"];
-        else delete newErrors[name as keyof AddressErrors];
-        return newErrors;
-      });
-    };
-
-  const shippingChange = useCallback(
-    (event: AddressFormChange) => handleChange(shippingDispatch, setShippingErrors)(event),
-    [shippingDispatch, setShippingErrors]
-  );
-  const billingChange = useCallback(
-    (event: AddressFormChange) => handleChange(billingDispatch, setBillingErrors)(event),
-    [billingDispatch, setBillingErrors]
-  );
 
   const toggleBillToShipping = () => setBillToShipping(!billToShipping);
 

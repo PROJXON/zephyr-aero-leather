@@ -1,7 +1,7 @@
 "use client"
 import { useContext } from "react";
-import { ChangeContext, StatesContext } from "./Checkout";
-import type { AddressFormInputProps, AddressFormChange } from "../../types/types";
+import { StatesContext } from "./Checkout";
+import type { AddressFormChange } from "../../types/types";
 
 export default function AddressFormInput({
   name,

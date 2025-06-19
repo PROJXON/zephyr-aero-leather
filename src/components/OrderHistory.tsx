@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/AuthContext"
 import OrderSummary from "./OrderSummary"
 import LoadingSpinner from "./LoadingSpinner"
-import calculateTotal from "../../lib/calculateTotal"
 import type { Product, CartItem } from "../../types/types"
 import type { WooOrder, CartItemResponse, WooCommerceReview, WooOrderLineItem } from "../../types/woocommerce"
 
@@ -113,7 +112,7 @@ export default function OrderHistory({ products }: { products: Product[] }) {
       }
       
       return [];
-    } catch (error) {
+    } catch {
       return [];
     }
   };
@@ -131,7 +130,7 @@ export default function OrderHistory({ products }: { products: Product[] }) {
       const tax = order.total_tax ? Math.round(parseFloat(order.total_tax) * 100) : undefined;
       
       return { subtotal, shipping, tax, total };
-    } catch (error) {
+    } catch {
       // Return safe defaults if there's an error
       return { subtotal: undefined, shipping: undefined, tax: undefined, total: 0 };
     }
