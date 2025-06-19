@@ -403,6 +403,7 @@ export default function Checkout({ products }: CheckoutProps) {
                     setShippingErrors={setShippingErrors}
                     validateBilling={() => validateAddressForm(billingDetails)}
                     setBillingErrors={setBillingErrors}
+                    isUpdatingShipping={isLoadingPaymentForm}
                   />
                 </Elements>
               ) : isLoadingPaymentForm ? (

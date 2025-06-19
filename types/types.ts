@@ -487,6 +487,7 @@ export interface StripeFormProps {
   setShippingErrors: ValidateAddressFunc;
   validateBilling: () => AddressErrors;
   setBillingErrors: ValidateAddressFunc;
+  isUpdatingShipping?: boolean;
 }
 
 export interface SendEmailParams {
