@@ -90,6 +90,16 @@ export default function PaymentDetails() {
           const tax = order.total_tax ? parseFloat(order.total_tax) : 0;
           const total = order.total ? parseFloat(order.total) : 0;
           
+          // Debug logging
+          console.log("WooCommerce Order Tax Debug:", {
+            total_tax: order.total_tax,
+            parsed_tax: tax,
+            tax_lines: order.tax_lines,
+            subtotal,
+            shipping,
+            total
+          });
+          
           orderTotals.subtotal = Math.round(subtotal * 100);
           orderTotals.shipping = Math.round(shipping * 100);
           orderTotals.tax = Math.round(tax * 100);

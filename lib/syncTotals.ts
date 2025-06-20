@@ -1,7 +1,6 @@
-import { CartItem, Product, ShippingRate, TaxCalculation, State } from "../types/types";
+import { CartItem, Product, ShippingRate, State } from "../types/types";
 import calculateTotal from "./calculateTotal";
 import { calculateShipping } from "./calculateShipping";
-import { calculateTax } from "./calculateTax";
 
 /**
  * Syncs the subtotal by recalculating based on current cart items and products
@@ -24,19 +23,7 @@ export function syncShipping(
 }
 
 /**
- * Syncs the tax calculation based on state and current subtotal
- */
-export function syncTax(
-  cartItems: CartItem[],
-  products: Product[],
-  state: State
-): TaxCalculation {
-  const subtotal = syncSubtotal(cartItems, products);
-  return calculateTax(subtotal, state);
-}
-
-/**
- * Syncs all totals including subtotal, shipping, tax, and final total
+ * Syncs all totals including subtotal and shipping (tax handled by WooCommerce API)
  */
 export function syncTotals(
   cartItems: CartItem[],
@@ -47,15 +34,12 @@ export function syncTotals(
 ) {
   const subtotal = syncSubtotal(cartItems, products);
   const { shipping, shippingRate } = syncShipping(cartItems, products, destinationZip, selectedRateId);
-  const taxCalculation = syncTax(cartItems, products, state);
 
   return {
     subtotal,
     shipping,
-    tax: taxCalculation.taxAmount,
-    total: subtotal + shipping + taxCalculation.taxAmount,
-    shippingRate,
-    taxRate: taxCalculation.rate
+    total: subtotal + shipping, // Tax will be added by WooCommerce
+    shippingRate
   };
 }
 

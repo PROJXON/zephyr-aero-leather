@@ -14,8 +14,9 @@ export default function OrderSummary({
   shippingDetails,
   subtotal,
   shipping,
-  tax
-}: OrderSummaryProps) {
+  tax,
+  isLoadingTax = false
+}: OrderSummaryProps & { isLoadingTax?: boolean }) {
   const {
     updateQuantity,
     editID,
@@ -138,7 +139,15 @@ export default function OrderSummary({
         </div>
         <div className="flex justify-between">
           <span>Tax</span>
-          <span>{typeof tax === 'number' && tax > 0 ? formatPrice(tax) : '-'}</span>
+          <span>
+            {isLoadingTax ? (
+              <span className="text-blue-600">Calculating...</span>
+            ) : typeof tax === 'number' && tax > 0 ? (
+              formatPrice(tax)
+            ) : (
+              '-'
+            )}
+          </span>
         </div>
         <div className="flex justify-between font-bold pt-2">
           <span>Total</span>

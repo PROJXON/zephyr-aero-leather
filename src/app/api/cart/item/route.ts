@@ -42,10 +42,6 @@ export async function POST(req: Request): Promise<Response> {
         {
           key: "shipping_rate_id",
           value: "usps-priority-mail"
-        },
-        {
-          key: "tax_rate",
-          value: "0"
         }
       ];
 
@@ -96,7 +92,6 @@ export async function POST(req: Request): Promise<Response> {
     
     // Calculate totals if we have a shipping address
     let shippingTotal = "0.00";
-    let taxRate = "0";
     let allProducts: Product[] = [];
     let total = "0.00";
     
@@ -104,7 +99,6 @@ export async function POST(req: Request): Promise<Response> {
       allProducts = await fetchWooCommerce<Product[]>("wc/v3/products", "Failed to fetch products");
       const totals = syncTotals(updatedLineItems.map(item => ({ id: item.product_id, quantity: item.quantity })), allProducts, shipping.state as State, shipping.postcode, shippingRateId as string);
       shippingTotal = (totals.shipping / 100).toFixed(2);
-      taxRate = totals.taxRate.toString();
       total = (totals.total / 100).toFixed(2);
     }
 
@@ -116,10 +110,6 @@ export async function POST(req: Request): Promise<Response> {
       {
         key: "shipping_rate_id",
         value: shippingRateId
-      },
-      {
-        key: "tax_rate",
-        value: taxRate
       }
     ];
 

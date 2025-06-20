@@ -414,6 +414,7 @@ export interface OrderSummaryProps {
   subtotal?: number;
   shipping?: number;
   tax?: number;
+  isLoadingTax?: boolean;
 }
 
 export interface QuantityControls {
@@ -753,7 +754,7 @@ export interface TaxCalculation {
 export interface ShippingCalculation {
   subtotal: number;
   shipping: number;
-  tax: number;
+  tax?: number;
   total: number;
   shippingRate?: ShippingRate;
   taxRate?: number;

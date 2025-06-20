@@ -1,7 +1,6 @@
 import { CartItem, Product, ShippingCalculation, State } from "../types/types";
 import calculateTotal from "./calculateTotal";
 import { calculateShipping } from "./calculateShipping";
-import { calculateTax } from "./calculateTax";
 
 export function calculateTotalWithTaxAndShipping(
   cartItems: CartItem[],
@@ -20,16 +19,14 @@ export function calculateTotalWithTaxAndShipping(
     selectedRateId
   );
 
-  const taxCalculation = calculateTax(subtotal, state, shipping);
-  const total = subtotal + shipping + taxCalculation.taxAmount;
+  // Tax is now calculated by WooCommerce API, not here
+  const total = subtotal + shipping; // Tax will be added separately when available
   
   return {
     subtotal,
     shipping,
-    tax: taxCalculation.taxAmount,
     total,
-    shippingRate,
-    taxRate: taxCalculation.rate
+    shippingRate
   };
 }
 
@@ -60,7 +57,7 @@ export function getCalculationBreakdown(
     formatted: {
       subtotal: formatCurrency(calculation.subtotal),
       shipping: formatCurrency(calculation.shipping),
-      tax: formatCurrency(calculation.tax),
+      tax: calculation.tax !== undefined ? formatCurrency(calculation.tax) : "Calculating...",
       total: formatCurrency(calculation.total)
     }
   };

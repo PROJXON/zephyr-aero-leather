@@ -73,6 +73,9 @@ export default function Checkout({ products }: CheckoutProps) {
   const [clientSecret, setClientSecret] = useState<string>("");
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [isLoadingPaymentForm, setIsLoadingPaymentForm] = useState<boolean>(false);
+  const [isLoadingTax, setIsLoadingTax] = useState<boolean>(false);
+  const [fetchedTaxAmount, setFetchedTaxAmount] = useState<number | undefined>(undefined);
+  const [isUpdatingQuantities, setIsUpdatingQuantities] = useState<boolean>(false);
   const [billToShipping, setBillToShipping] = useState<boolean>(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [shippingErrors, setShippingErrors] = useState<AddressErrors>({});
@@ -114,11 +117,40 @@ export default function Checkout({ products }: CheckoutProps) {
 
     shippingDispatch({ type, value });
 
-    // Only trigger payment update when ZIP code or state changes (affects shipping rates)
+    // Trigger payment update when ZIP code or state changes (affects shipping rates and tax)
     if (name === "zipCode" || name === "state") {
       setShouldUpdatePayment(true);
+      setFetchedTaxAmount(undefined); // Clear cached tax amount when address changes
     }
   }, []);
+
+  // Fetch accurate tax from WooCommerce
+  const fetchAccurateTax = useCallback(async (state: State, zipCode: string) => {
+    if (!state || !zipCode || cartItems.length === 0) return;
+
+    setIsLoadingTax(true);
+    try {
+      const response = await fetch("/api/tax-estimate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cartItems,
+          state,
+          zipCode
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // The tax amount will be used in the calculation object
+        // We don't need to store it separately since it's calculated fresh each time
+      }
+    } catch (error) {
+      console.error("Tax estimate error:", error);
+    } finally {
+      setIsLoadingTax(false);
+    }
+  }, [cartItems]);
 
   // Handle shipping rate selection
   const handleShippingRateSelect = useCallback((rateId: string) => {
@@ -146,7 +178,7 @@ export default function Checkout({ products }: CheckoutProps) {
       // Debounce the payment update to prevent rapid-fire API calls
       const timeout = setTimeout(async () => {
         try {
-          // Calculate shipping and tax amounts from the calculation object
+          // Calculate shipping amounts from the calculation object
           const calculation = calculateTotalWithTaxAndShipping(
             cartItems,
             products,
@@ -154,6 +186,30 @@ export default function Checkout({ products }: CheckoutProps) {
             shippingDetails.zipCode,
             selectedShippingRateId
           );
+
+          // Fetch accurate tax from WooCommerce
+          let accurateTax = calculation.tax; // Fallback to calculated tax
+          try {
+            const taxResponse = await fetch("/api/tax-estimate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                items: cartItems,
+                state: shippingDetails.state,
+                zipCode: shippingDetails.zipCode,
+                shippingAmount: calculation.shipping // Pass shipping amount for tax calculation
+              }),
+            });
+
+            if (taxResponse.ok) {
+              const taxData = await taxResponse.json();
+              accurateTax = taxData.taxAmount;
+              setFetchedTaxAmount(taxData.taxAmount); // Store the fetched tax amount
+            }
+          } catch (error) {
+            console.error("Tax estimate error:", error);
+            // Use calculated tax as fallback
+          }
 
           const response = await fetch("/api/payment", {
             method: paymentIntentId ? "PUT" : "POST",
@@ -168,7 +224,7 @@ export default function Checkout({ products }: CheckoutProps) {
               billing: billingDetails,
               selectedShippingRateId: selectedShippingRateId,
               shippingAmount: calculation.shipping, // Pass frontend shipping amount
-              taxAmount: calculation.tax // Pass frontend tax amount
+              taxAmount: accurateTax // Pass accurate WooCommerce tax amount
             }),
           });
 
@@ -291,6 +347,35 @@ export default function Checkout({ products }: CheckoutProps) {
     selectedShippingRateId
   );
 
+  // Show loading state for tax if we're fetching accurate amounts
+  const displayCalculation = {
+    ...calculation,
+    tax: isLoadingTax ? undefined : (fetchedTaxAmount !== undefined ? fetchedTaxAmount : calculation.tax),
+    total: isLoadingTax ? calculation.subtotal + calculation.shipping + (calculation.tax || 0) : calculation.subtotal + calculation.shipping + (fetchedTaxAmount || calculation.tax || 0)
+  };
+
+  // Custom updateQuantity function that triggers tax recalculation
+  const handleQuantityUpdate = useCallback(async (productId: number, newQuantity: number) => {
+    setIsUpdatingQuantities(true);
+    setFetchedTaxAmount(undefined); // Clear cached tax amount
+    
+    // Update the quantity
+    await updateQuantity(productId, newQuantity);
+    
+    // Trigger payment update to recalculate tax
+    setShouldUpdatePayment(true);
+    
+    setIsUpdatingQuantities(false);
+  }, [updateQuantity]);
+
+  // Trigger tax recalculation when cart items change
+  useEffect(() => {
+    if (cartItems.length > 0 && shippingDetails.state && shippingDetails.zipCode) {
+      setFetchedTaxAmount(undefined); // Clear cached tax amount
+      setShouldUpdatePayment(true); // Trigger payment update to recalculate tax
+    }
+  }, [cartItems, shippingDetails.state, shippingDetails.zipCode]);
+
   return (
     <>
       {isLoading ? (
@@ -300,12 +385,13 @@ export default function Checkout({ products }: CheckoutProps) {
           <OrderSummary
             cartItems={cartItems}
             products={products}
-            subtotal={calculation.subtotal}
-            shipping={calculation.shipping}
-            tax={calculation.tax}
-            total={calculation.total}
+            subtotal={displayCalculation.subtotal}
+            shipping={displayCalculation.shipping}
+            tax={displayCalculation.tax}
+            total={displayCalculation.total}
+            isLoadingTax={isLoadingTax}
             quantityControls={{
-              updateQuantity,
+              updateQuantity: handleQuantityUpdate,
               editID,
               setEditID,
               newQty,
@@ -378,11 +464,11 @@ export default function Checkout({ products }: CheckoutProps) {
                     setShippingErrors={setShippingErrors}
                     validateBilling={() => validateAddressForm(billingDetails)}
                     setBillingErrors={setBillingErrors}
-                    isUpdatingShipping={isLoadingPaymentForm}
+                    isUpdatingShipping={isLoadingPaymentForm || isLoadingTax || isUpdatingQuantities}
                   />
                 </Elements>
-              ) : isLoadingPaymentForm ? (
-                <LoadingSpinner message="Loading payment form..." />
+              ) : isLoadingPaymentForm || isLoadingTax || isUpdatingQuantities ? (
+                <LoadingSpinner message={isUpdatingQuantities ? "Updating order..." : "Loading payment form..."} />
               ) : (
                 <div className="w-full border border-gray-300 rounded-md p-4 bg-white shadow-sm mt-11">
                   <div className="text-center">

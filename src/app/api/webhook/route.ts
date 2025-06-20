@@ -39,15 +39,6 @@ export async function POST(req: NextRequest): Promise<Response> {
         // First get the current order to preserve shipping and tax info
         const currentOrder = await fetchWooCommerce<WooOrder>(`wc/v3/orders/${wooOrderId}`, "Failed to fetch order");
         
-        console.log('Current order before completion:', {
-          total: currentOrder.total,
-          subtotal: currentOrder.subtotal,
-          shipping_total: currentOrder.shipping_total,
-          total_tax: currentOrder.total_tax,
-          shipping_lines: currentOrder.shipping_lines,
-          tax_lines: currentOrder.tax_lines
-        });
-        
         // Update the order with preserved shipping and tax info
         const updatedOrder = await fetchWooCommerce<WooOrder>(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", {
           status: "completed",
@@ -61,15 +52,6 @@ export async function POST(req: NextRequest): Promise<Response> {
           total_tax: currentOrder.total_tax,
           shipping_lines: currentOrder.shipping_lines,
           tax_lines: currentOrder.tax_lines
-        });
-
-        console.log('Order after completion:', {
-          total: updatedOrder.total,
-          subtotal: updatedOrder.subtotal,
-          shipping_total: updatedOrder.shipping_total,
-          total_tax: updatedOrder.total_tax,
-          shipping_lines: updatedOrder.shipping_lines,
-          tax_lines: updatedOrder.tax_lines
         });
       }
       responseBody = { success: true };
