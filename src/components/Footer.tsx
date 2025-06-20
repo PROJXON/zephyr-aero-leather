@@ -22,6 +22,7 @@ export default function Footer(): ReactElement {
                 sizes="250px"
                 style={{ width: "auto", height: "auto" }}
                 className="mx-auto rounded-xl"
+                priority
               />
             </Link>
             <p className="mt-3 text-gray-300 text-sm leading-relaxed">

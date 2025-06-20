@@ -1,4 +1,4 @@
-import { WooCommerceAddress } from "./woocommerce";
+import { WooCommerceAddress, WooCustomer } from "./woocommerce";
 
 // Next.js Page Props Types
 export interface CategoryPageProps {
@@ -185,7 +185,7 @@ export interface StripePaymentIntent {
       line2?: string;
       city: string;
       postal_code: string;
-      state: string;
+      state: State;
       country: string;
     };
   };
@@ -325,7 +325,7 @@ export interface AddressDetailsState {
   address: AddressFormAddress;
   city: string;
   zipCode: string;
-  state: string;
+  state: State;
 }
 
 export type AddressDetailsAction =
@@ -336,7 +336,7 @@ export type AddressDetailsAction =
   | { type: "CITY"; value: string; }
   | { type: "ZIPCODE"; value: string; }
   | { type: "STATE"; value: string; }
-  | { type: "ALL"; value: AddressDetailsState }
+  | { type: "ALL"; value: AddressDetailsState; }
   | { type: "RESET"; };
 
 export interface AddressErrors {
@@ -414,6 +414,7 @@ export interface OrderSummaryProps {
   subtotal?: number;
   shipping?: number;
   tax?: number;
+  isLoadingTax?: boolean;
 }
 
 export interface QuantityControls {
@@ -550,10 +551,10 @@ export interface AddressFormInputProps {
   "text" |
   "time" |
   "url" |
-  "week"
+  "week";
 }
 
-export type AddressFormChange = React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+export type AddressFormChange = React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
 
 // Authentication Types
 export interface RegisterRequest {
@@ -612,8 +613,6 @@ export interface ResetPasswordRequest {
   password: string;
 }
 
-import type { WooCustomer } from "./woocommerce";
-
 export interface ResetPasswordResponse {
   success: boolean;
   message?: string;
@@ -641,7 +640,7 @@ export interface StripePaymentIntentParams {
       line2?: string;
       city: string;
       postal_code: string;
-      state: string;
+      state: State;
       country: string;
     };
   };
@@ -711,7 +710,7 @@ export interface USPSAddress {
   Address1: string;
   Address2?: string;
   City: string;
-  State: string;
+  State: State;
   Zip5: string;
   Zip4?: string;
   DeliveryPoint?: string;
@@ -739,24 +738,23 @@ export interface ShippingRate {
   description?: string;
 }
 
-export interface TaxRate {
-  state: string;
-  rate: number;
-  name: string;
-}
-
-export interface TaxCalculation {
-  taxableAmount: number;
-  taxAmount: number;
-  rate: number;
-  state: string;
-}
-
 export interface ShippingCalculation {
   subtotal: number;
   shipping: number;
-  tax: number;
+  tax?: number;
   total: number;
   shippingRate?: ShippingRate;
-  taxRate?: number;
+}
+
+// Error handling type guards
+export function isStripeError(err: unknown): err is StripeError {
+  return typeof err === "object" && err !== null && "message" in err;
+}
+
+export function isAxiosError(err: unknown): err is { response: any } {
+  return typeof err === "object" && err !== null && "response" in err;
+}
+
+export function isError(err: unknown): err is Error {
+  return err instanceof Error;
 }

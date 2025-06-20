@@ -1,35 +1,31 @@
-import { CartItem, Product, ShippingCalculation } from "../types/types";
+import { CartItem, Product, ShippingCalculation, State } from "../types/types";
 import calculateTotal from "./calculateTotal";
 import { calculateShipping } from "./calculateShipping";
-import { calculateTax } from "./calculateTax";
 
 export function calculateTotalWithTaxAndShipping(
   cartItems: CartItem[],
   products: Product[],
-  state: string,
-  destinationZip: string,
+  state: State,
+  zipCode: string,
   selectedRateId?: string
 ): ShippingCalculation {
   const subtotal = calculateTotal(cartItems, products);
 
   const { shipping, shippingRate } = calculateShipping(
     subtotal, 
-    destinationZip, 
+    zipCode, 
     cartItems, 
     products, 
     selectedRateId
   );
 
-  const taxCalculation = calculateTax(subtotal, state, shipping);
-  const total = subtotal + shipping + taxCalculation.taxAmount;
+  const total = subtotal + shipping;
   
   return {
     subtotal,
     shipping,
-    tax: taxCalculation.taxAmount,
     total,
-    shippingRate,
-    taxRate: taxCalculation.rate
+    shippingRate
   };
 }
 
@@ -43,7 +39,7 @@ export function formatCurrency(amount: number): string {
 export function getCalculationBreakdown(
   cartItems: CartItem[],
   products: Product[],
-  state: string,
+  state: State,
   destinationZip: string,
   selectedRateId?: string
 ) {
@@ -60,7 +56,7 @@ export function getCalculationBreakdown(
     formatted: {
       subtotal: formatCurrency(calculation.subtotal),
       shipping: formatCurrency(calculation.shipping),
-      tax: formatCurrency(calculation.tax),
+      tax: calculation.tax !== undefined ? formatCurrency(calculation.tax) : "Calculating...",
       total: formatCurrency(calculation.total)
     }
   };
@@ -83,7 +79,6 @@ export function reconstructCalculationFromOrder(
     shipping: storedShipping,
     tax: storedTax,
     total: reconstructedTotal,
-    shippingRate: undefined,
-    taxRate: undefined
+    shippingRate: undefined
   };
 } 

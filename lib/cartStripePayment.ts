@@ -1,6 +1,7 @@
 import syncAddress from "./syncAddress";
 import stripeObj from "./stripeObj";
-import type { StripePaymentRequestBody, StripePaymentIntent, StripeError, StripePaymentResponse, StripePaymentIntentParams, Product } from "../types/types";
+import type { StripePaymentRequestBody, StripePaymentIntent, StripePaymentResponse, StripePaymentIntentParams, Product } from "../types/types";
+import { isStripeError } from "../types/types";
 import fetchWooCommerce from "./fetchWooCommerce";
 
 export default async function cartStripePayment(req: Request): Promise<Response> {
@@ -29,10 +30,8 @@ export default async function cartStripePayment(req: Request): Promise<Response>
       currency: currency || 'usd',
     };
 
-    // Fetch products if we have items
     let products: Product[] = [];
     if (items && items.length > 0) {
-      // Fetch all products with pagination
       let allProducts: Product[] = [];
       let page = 1;
       const perPage = 100;
@@ -63,24 +62,24 @@ export default async function cartStripePayment(req: Request): Promise<Response>
         }
       };
 
-      // Only sync with WooCommerce if we have a woo_order_id (signed-in user)
+      // Handle WooCommerce order updates
       if (woo_order_id) {
-        // Pass frontend-calculated amounts to syncAddress
+        // Signed-in user: update existing order
         await syncAddress(shipping, woo_order_id, false, items, products, selectedShippingRateId, shippingAmount, taxAmount);
       } else {
-        // For guest users, store shipping in metadata
+        // Guest user: store order data in metadata for webhook to create order later
         metadata.shipping = JSON.stringify(shipping);
+        metadata.billing = JSON.stringify(billing);
+        metadata.selectedShippingRateId = selectedShippingRateId || "usps-priority-mail";
+        metadata.shippingAmount = String(shippingAmount || 0);
+        metadata.taxAmount = String(taxAmount || 0);
+        metadata.guest_order = "true";
       }
     }
 
-    if (billing) {
-      // Only sync with WooCommerce if we have a woo_order_id (signed-in user)
-      if (woo_order_id) {
-        await syncAddress(billing, woo_order_id, true, items, products, selectedShippingRateId);
-      } else {
-        // For guest users, store billing in metadata
-        metadata.billing = JSON.stringify(billing);
-      }
+    if (billing && woo_order_id) {
+      // Only sync billing for signed-in users (guest billing is stored in metadata)
+      await syncAddress(billing, woo_order_id, true, items, products, selectedShippingRateId);
     }
 
     try {
@@ -93,13 +92,16 @@ export default async function cartStripePayment(req: Request): Promise<Response>
         }) as StripePaymentIntent;
       }
     } catch (stripeError: unknown) {
-      const error = stripeError as StripeError;
-      console.error('Stripe API error:', {
-        message: error.message,
-        type: error.type,
-        code: error.code
-      });
-      throw error;
+      if (isStripeError(stripeError)) {
+        console.error('Stripe API error:', {
+          message: stripeError.message,
+          type: stripeError.type,
+          code: stripeError.code
+        });
+      } else {
+        console.error('Unknown Stripe API error:', stripeError);
+      }
+      throw stripeError;
     }
 
     if (!paymentIntent) {
@@ -115,16 +117,30 @@ export default async function cartStripePayment(req: Request): Promise<Response>
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err: unknown) {
-    console.error('Payment processing error:', err);
-    const error = err as StripeError;
+  } catch (error: unknown) {
+    console.error('Payment processing error:', error);
+    
+    let errorMessage = 'Unknown payment error';
+    let errorType: string | undefined;
+    let errorCode: string | undefined;
+    let errorDetails: string | Record<string, unknown> | undefined;
+    
+    if (isStripeError(error)) {
+      errorMessage = error.message;
+      errorType = error.type;
+      errorCode = error.code;
+      errorDetails = error.raw as string | Record<string, unknown> | undefined;
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+    
     const response: StripePaymentResponse = {
       clientSecret: '',
       payment_intent_id: '',
-      error: error.message,
-      type: error.type,
-      code: error.code,
-      details: error.raw as string | Record<string, unknown> | undefined
+      error: errorMessage,
+      type: errorType,
+      code: errorCode,
+      details: errorDetails
     };
     return new Response(JSON.stringify(response), {
       status: 500,
