@@ -25,7 +25,7 @@ import { calculateTotalWithTaxAndShipping } from "../../lib/calculateTotalWithTa
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-const defaultAddressDetails = {
+const defaultAddressDetails: AddressDetailsState = {
   name: {
     first: "",
     last: ""
@@ -187,7 +187,7 @@ export default function Checkout({ products }: CheckoutProps) {
       shippingDetails.name.last.trim() &&
       shippingDetails.address.line1.trim() &&
       shippingDetails.city.trim() &&
-      shippingDetails.state &&
+      shippingDetails.state.trim() &&
       shippingDetails.zipCode.trim().length >= 5;
 
     // Only update payment if we have a valid total, all required fields, and a reason to update
@@ -319,7 +319,7 @@ export default function Checkout({ products }: CheckoutProps) {
     }
     
     const statesSet = new Set(states);
-    if (!statesSet.has(details.state)) errors.state = "Please select a state";
+    if (!statesSet.has(details.state as State)) errors.state = "Please select a state";
 
     // Address line 2 is optional, no validation needed
 

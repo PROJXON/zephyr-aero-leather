@@ -473,7 +473,7 @@ export interface ResetPasswordFormState {
 export interface AddressDetailsProps {
   details: AddressDetailsState;
   errors: { [key: string]: string };
-  states: string[];
+  disabled?: boolean;
 }
 
 export interface ShippingFormInputProps {

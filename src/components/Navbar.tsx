@@ -242,42 +242,66 @@ const Navbar = ({ allProducts }: NavbarProps) => {
                     }}
                   >
                     {cartItems?.length > 0 ? (
-                      <>
-                        <ul>
-                          {cartItems.map((item) => {
-                            const itemName =
-                              allProducts.find((product) => product.id === item.id)
-                                ?.name || "Item";
-                            return (
-                              <li
-                                key={`${item.id}-${item.lineItemId || "temp"}`}
-                                className="grid grid-cols-[1fr_auto] border-b py-2 gap-1"
-                              >
-                                <span>{itemName}</span>
-                                <div className="m-auto">
-                                  <div className="text-center">x {item.quantity}</div>
-                                  <div className="flex items-center flex-wrap gap-1">
-                                    <ChangeQuantitySpans
-                                      cqs={changeQuantity}
-                                      item={item}
-                                    />
-                                  </div>
-                                </div>
-                              </li>
+                      (() => {
+                        const subtotal = cartItems
+                          .reduce((total, item) => {
+                            const product = allProducts.find(
+                              (p) => p.id === item.id
                             );
-                          })}
-                        </ul>
-                        <div className="mt-4 flex justify-end">
-                          <button
-                            className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
-                            onClick={() => replace("/checkout")}
-                          >
-                            Checkout
-                          </button>
-                        </div>
-                      </>
+                            const price = product ? product.price : 0;
+                            return total + price * item.quantity;
+                          }, 0)
+                          .toFixed(2);
+
+                        return (
+                          <>
+                            <ul>
+                              {cartItems.map((item) => {
+                                const itemName =
+                                  allProducts.find(
+                                    (product) => product.id === item.id
+                                  )?.name || "Item";
+                                return (
+                                  <li
+                                    key={`${item.id}-${
+                                      item.lineItemId || "temp"
+                                    }`}
+                                    className="grid grid-cols-[1fr_auto] border-b py-2 gap-1"
+                                  >
+                                    <span>{itemName}</span>
+                                    <div className="m-auto">
+                                      <div className="text-center">
+                                        x {item.quantity}
+                                      </div>
+                                      <div className="flex items-center flex-wrap gap-1">
+                                        <ChangeQuantitySpans
+                                          cqs={changeQuantity}
+                                          item={item}
+                                        />
+                                      </div>
+                                    </div>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                            <div className="mt-4 flex items-center">
+                              <div className="flex-grow text-center">
+                                <span className="text-sm font-medium text-neutral-dark">${subtotal}</span>
+                              </div>
+                              <button
+                                className="py-2 px-4 text-sm font-medium bg-neutral-light text-neutral-dark rounded hover:bg-neutral-medium transition-colors"
+                                onClick={() => replace("/checkout")}
+                              >
+                                Checkout
+                              </button>
+                            </div>
+                          </>
+                        );
+                      })()
                     ) : (
-                      <p className="text-sm text-gray-900">Your cart is empty.</p>
+                      <p className="text-sm text-gray-900">
+                        Your cart is empty.
+                      </p>
                     )}
                   </div>
                 )}
