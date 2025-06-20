@@ -1,4 +1,4 @@
-import { TaxRate, TaxCalculation } from "../types/types";
+import { TaxRate, TaxCalculation, State } from "../types/types";
 
 // State tax rates (as of 2024 - you should update these regularly)
 const stateTaxRates: TaxRate[] = [
@@ -57,14 +57,14 @@ const stateTaxRates: TaxRate[] = [
 // Tax-exempt states (no sales tax)
 const TAX_EXEMPT_STATES = ["AK", "DE", "MT", "NH", "OR"];
 
-export function getTaxRate(state: string): TaxRate {
+export function getTaxRate(state: State): TaxRate {
   const taxRate = stateTaxRates.find(rate => rate.state === state);
   return taxRate || { state, rate: 0, name: "Unknown" };
 }
 
 export function calculateTax(
   subtotal: number, // in cents
-  state: string,
+  state: State,
   shippingAmount: number = 0 // in cents, default to 0 for backward compatibility
 ): TaxCalculation {
   // No tax for exempt states
@@ -90,7 +90,7 @@ export function calculateTax(
   };
 }
 
-export function isTaxExempt(state: string): boolean {
+export function isTaxExempt(state: State): boolean {
   return TAX_EXEMPT_STATES.includes(state);
 }
 

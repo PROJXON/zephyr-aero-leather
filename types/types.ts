@@ -185,7 +185,7 @@ export interface StripePaymentIntent {
       line2?: string;
       city: string;
       postal_code: string;
-      state: string;
+      state: State;
       country: string;
     };
   };
@@ -637,7 +637,7 @@ export interface StripePaymentIntentParams {
       line2?: string;
       city: string;
       postal_code: string;
-      state: string;
+      state: State;
       country: string;
     };
   };
@@ -707,7 +707,7 @@ export interface USPSAddress {
   Address1: string;
   Address2?: string;
   City: string;
-  State: string;
+  State: State;
   Zip5: string;
   Zip4?: string;
   DeliveryPoint?: string;
@@ -736,7 +736,7 @@ export interface ShippingRate {
 };
 
 export interface TaxRate {
-  state: string;
+  state: State;
   rate: number;
   name: string;
 };
@@ -745,7 +745,7 @@ export interface TaxCalculation {
   taxableAmount: number;
   taxAmount: number;
   rate: number;
-  state: string;
+  state: State;
 };
 
 export interface ShippingCalculation {

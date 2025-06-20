@@ -1,4 +1,4 @@
-import { CartItem, Product, ShippingCalculation } from "../types/types";
+import { CartItem, Product, ShippingCalculation, State } from "../types/types";
 import calculateTotal from "./calculateTotal";
 import { calculateShipping } from "./calculateShipping";
 import { calculateTax } from "./calculateTax";
@@ -6,23 +6,23 @@ import { calculateTax } from "./calculateTax";
 export function calculateTotalWithTaxAndShipping(
   cartItems: CartItem[],
   products: Product[],
-  state: string,
+  state: State,
   destinationZip: string,
   selectedRateId?: string
 ): ShippingCalculation {
   const subtotal = calculateTotal(cartItems, products);
 
   const { shipping, shippingRate } = calculateShipping(
-    subtotal, 
-    destinationZip, 
-    cartItems, 
-    products, 
+    subtotal,
+    destinationZip,
+    cartItems,
+    products,
     selectedRateId
   );
 
   const taxCalculation = calculateTax(subtotal, state, shipping);
   const total = subtotal + shipping + taxCalculation.taxAmount;
-  
+
   return {
     subtotal,
     shipping,
@@ -43,18 +43,18 @@ export function formatCurrency(amount: number): string {
 export function getCalculationBreakdown(
   cartItems: CartItem[],
   products: Product[],
-  state: string,
+  state: State,
   destinationZip: string,
   selectedRateId?: string
 ) {
   const calculation = calculateTotalWithTaxAndShipping(
-    cartItems, 
-    products, 
-    state, 
-    destinationZip, 
+    cartItems,
+    products,
+    state,
+    destinationZip,
     selectedRateId
   );
-  
+
   return {
     ...calculation,
     formatted: {
@@ -72,12 +72,12 @@ export function reconstructCalculationFromOrder(
   orderData: { shipping_total?: string; cart_tax?: string; total?: string }
 ): ShippingCalculation {
   const actualSubtotal = calculateTotal(cartItems, products);
-  
+
   const storedShipping = Math.round(parseFloat(orderData.shipping_total || "0") * 100);
   const storedTax = Math.round(parseFloat(orderData.cart_tax || "0") * 100);
-  
+
   const reconstructedTotal = actualSubtotal + storedShipping + storedTax;
-  
+
   return {
     subtotal: actualSubtotal,
     shipping: storedShipping,
