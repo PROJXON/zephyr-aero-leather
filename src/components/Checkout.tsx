@@ -14,7 +14,8 @@ import type {
   AddressDetailsState,
   AddressDetailsAction,
   AddressErrors,
-  AddressFormChange
+  AddressFormChange,
+  State,
 } from "../../types/types";
 import { useAddressValidation } from "../hooks/useAddressValidation";
 import LoadingSpinner from "./LoadingSpinner";
@@ -24,7 +25,7 @@ import { calculateTotalWithTaxAndShipping } from "../../lib/calculateTotalWithTa
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-const defaultAddressDetails = {
+const defaultAddressDetails: AddressDetailsState = {
   name: {
     first: "",
     last: ""
@@ -35,7 +36,7 @@ const defaultAddressDetails = {
   },
   city: "",
   zipCode: "",
-  state: ""
+  state: "" as State,
 };
 
 function reducer(details: AddressDetailsState, action: AddressDetailsAction): AddressDetailsState {
@@ -53,7 +54,7 @@ function reducer(details: AddressDetailsState, action: AddressDetailsAction): Ad
     case "ZIPCODE":
       return { ...details, zipCode: action.value };
     case "STATE":
-      return { ...details, state: action.value };
+      return { ...details, state: action.value as State };
     case "ALL": return { ...action.value };
     case "RESET": return { ...defaultAddressDetails };
     default: return details;
@@ -61,7 +62,7 @@ function reducer(details: AddressDetailsState, action: AddressDetailsAction): Ad
 }
 
 export const ChangeContext = createContext<((event: AddressFormChange) => void)>(() => { });
-export const StatesContext = createContext<readonly string[]>([]);
+export const StatesContext = createContext<readonly State[]>([]);
 
 export default function Checkout({ products }: CheckoutProps) {
   const { cartItems, updateQuantity, orderId, isLoading } = useCart();
@@ -82,7 +83,7 @@ export default function Checkout({ products }: CheckoutProps) {
 
   const [shouldUpdatePayment, setShouldUpdatePayment] = useState(false);
 
-  const states: readonly string[] = useMemo(() => [
+  const states: readonly State[] = useMemo(() => [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
   ] as const, []);
 
@@ -135,7 +136,7 @@ export default function Checkout({ products }: CheckoutProps) {
       shippingDetails.name.last.trim() &&
       shippingDetails.address.line1.trim() &&
       shippingDetails.city.trim() &&
-      shippingDetails.state &&
+      shippingDetails.state.trim() &&
       shippingDetails.zipCode.trim().length >= 5;
 
     // Only update payment if we have a valid total, all required fields, and a reason to update
