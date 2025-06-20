@@ -1,4 +1,4 @@
-import { CartItem, Product, ShippingCalculation } from "../types/types";
+import { CartItem, Product, ShippingCalculation, State } from "../types/types";
 import calculateTotal from "./calculateTotal";
 import { calculateShipping } from "./calculateShipping";
 import { calculateTax } from "./calculateTax";
@@ -6,15 +6,15 @@ import { calculateTax } from "./calculateTax";
 export function calculateTotalWithTaxAndShipping(
   cartItems: CartItem[],
   products: Product[],
-  state: string,
-  destinationZip: string,
+  state: State,
+  zipCode: string,
   selectedRateId?: string
 ): ShippingCalculation {
   const subtotal = calculateTotal(cartItems, products);
 
   const { shipping, shippingRate } = calculateShipping(
     subtotal, 
-    destinationZip, 
+    zipCode, 
     cartItems, 
     products, 
     selectedRateId
@@ -43,7 +43,7 @@ export function formatCurrency(amount: number): string {
 export function getCalculationBreakdown(
   cartItems: CartItem[],
   products: Product[],
-  state: string,
+  state: State,
   destinationZip: string,
   selectedRateId?: string
 ) {

@@ -1,4 +1,4 @@
-import { CartItem, Product, ShippingRate, TaxCalculation } from "../types/types";
+import { CartItem, Product, ShippingRate, TaxCalculation, State } from "../types/types";
 import calculateTotal from "./calculateTotal";
 import { calculateShipping } from "./calculateShipping";
 import { calculateTax } from "./calculateTax";
@@ -29,7 +29,7 @@ export function syncShipping(
 export function syncTax(
   cartItems: CartItem[],
   products: Product[],
-  state: string
+  state: State
 ): TaxCalculation {
   const subtotal = syncSubtotal(cartItems, products);
   return calculateTax(subtotal, state);
@@ -41,7 +41,7 @@ export function syncTax(
 export function syncTotals(
   cartItems: CartItem[],
   products: Product[],
-  state: string,
+  state: State,
   destinationZip: string,
   selectedRateId?: string
 ) {
@@ -57,4 +57,13 @@ export function syncTotals(
     shippingRate,
     taxRate: taxCalculation.rate
   };
+}
+
+export function syncAddress(
+  address: {
+    state: State;
+    zipCode: string;
+  }
+) {
+  // ... existing code ...
 } 
