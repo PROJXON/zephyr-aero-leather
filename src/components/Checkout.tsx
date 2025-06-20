@@ -129,6 +129,54 @@ export default function Checkout({ products }: CheckoutProps) {
     setShouldUpdatePayment(true);
   }, []);
 
+  // Create payment intent on initial load
+  useEffect(() => {
+    if (clientSecret || cartItems.length === 0 || products.length === 0) {
+      if (!clientSecret) setIsLoadingPaymentForm(false);
+      return;
+    }
+
+    const createPaymentIntent = async () => {
+      setIsLoadingPaymentForm(true);
+      try {
+        const initialTotal = calculateTotal(cartItems, products);
+        if (initialTotal <= 50) {
+            setIsLoadingPaymentForm(false);
+            return;
+        }
+
+        const response = await fetch("/api/payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: initialTotal,
+            currency: 'usd',
+            items: cartItems,
+            woo_order_id: orderId,
+          }),
+        });
+        
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Initial payment request failed');
+        }
+        
+        const data = await response.json();
+        setClientSecret(data.clientSecret);
+        if (data.payment_intent_id) {
+          setPaymentIntentId(data.payment_intent_id);
+        }
+      } catch (error) {
+        console.error('Payment intent creation error:', error);
+        setFormError(error instanceof Error ? error.message : 'Payment intent creation failed');
+      } finally {
+        setIsLoadingPaymentForm(false);
+      }
+    };
+    
+    createPaymentIntent();
+  }, [cartItems, products, orderId, clientSecret]);
+
   // Update payment when necessary
   useEffect(() => {
     const newTotal = calculateTotal(cartItems, products);
@@ -143,7 +191,7 @@ export default function Checkout({ products }: CheckoutProps) {
       shippingDetails.zipCode.trim().length >= 5;
 
     // Only update payment if we have a valid total, all required fields, and a reason to update
-    if (newTotal > 50 && hasRequiredFields && shouldUpdatePayment) {
+    if (newTotal > 50 && hasRequiredFields && shouldUpdatePayment && paymentIntentId) {
       setIsLoadingPaymentForm(true);
       
       // Debounce the payment update to prevent rapid-fire API calls
@@ -186,7 +234,7 @@ export default function Checkout({ products }: CheckoutProps) {
           }
 
           const response = await fetch("/api/payment", {
-            method: paymentIntentId ? "PUT" : "POST",
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               amount: newTotal,
@@ -363,7 +411,7 @@ export default function Checkout({ products }: CheckoutProps) {
             shipping={displayCalculation.shipping}
             tax={displayCalculation.tax}
             total={displayCalculation.total}
-            isLoadingTax={fetchedTaxAmount === undefined && (isLoadingPaymentForm || isUpdatingQuantities)}
+            isLoading={isLoadingPaymentForm || isUpdatingQuantities}
             quantityControls={{
               updateQuantity: handleQuantityUpdate,
               editID,
@@ -447,14 +495,8 @@ export default function Checkout({ products }: CheckoutProps) {
                     isUpdatingShipping={isLoadingPaymentForm || isUpdatingQuantities}
                   />
                 </Elements>
-              ) : isLoadingPaymentForm || isUpdatingQuantities ? (
-                <LoadingSpinner message={isUpdatingQuantities ? "Updating order..." : "Loading payment form..."} />
               ) : (
-                <div className="w-full border border-gray-300 rounded-md p-4 bg-white shadow-sm mt-11">
-                  <div className="text-center">
-                    <p className="text-gray-500">Please enter your shipping information to proceed with payment</p>
-                  </div>
-                </div>
+                <LoadingSpinner message="Loading payment form..." />
               )}
             </div>
           </div>
