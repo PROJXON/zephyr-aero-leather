@@ -6,6 +6,7 @@ import OrderSummary from "./OrderSummary";
 import LoadingSpinner from "./LoadingSpinner";
 import calculateTotal from "../../lib/calculateTotal";
 import { useCart } from "@/app/context/CartContext";
+import { useAuth } from "@/app/context/AuthContext";
 import type { Product, PaymentDetailsData, OrderTotals } from "../../types/types";
 import type { WooCommerceAddress, WooOrder, WooOrderLineItem, WooOrderShippingLine } from "../../types/woocommerce";
 
@@ -24,6 +25,7 @@ export default function PaymentDetails() {
   const [shippingDetails, setShippingDetails] = useState<WooCommerceAddress | undefined>(undefined);
 
   const { clearCart } = useCart();
+  const { user } = useAuth();
   const queryIntent = searchParams.get("payment_intent");
 
   useEffect(() => {
@@ -58,10 +60,14 @@ export default function PaymentDetails() {
         const paymentRes = await fetch(`/api/payment?payment_intent=${paymentIntentId}`);
         const paymentData = await paymentRes.json();
         
+        console.log("Payment data for signed-in user:", paymentData);
+        
         // Load products and order data in parallel
         const [productsRes, orderRes] = await Promise.all([
           fetch("/api/products"),
-          fetch("/api/order")
+          // Use appropriate endpoint based on authentication status
+          user ? fetch("/api/order", { credentials: 'include' }) // Signed-in user: get all orders
+            : fetch(`/api/order?id=${paymentData.wooOrderId}&payment_intent=${paymentIntentId}`) // Guest: lookup specific order
         ]);
 
         const [productsData, orderData] = await Promise.all([
@@ -69,9 +75,23 @@ export default function PaymentDetails() {
           orderRes.json()
         ]);
 
-        // Find the specific order for this payment
+        console.log("Order data response:", orderData);
         const orders = orderData.orders || [];
-        const order = orders.find((o: WooOrder) => o.id.toString() === paymentData.wooOrderId);
+        console.log("Orders found:", orders.length);
+        
+        // Find the specific order for this payment
+        let order = orders.find((o: WooOrder) => o.id.toString() === paymentData.wooOrderId);
+        console.log("Order found by wooOrderId:", order ? order.id : "not found");
+        
+        // If no order found, try to find by payment intent ID as fallback
+        if (!order) {
+          order = orders.find((o: WooOrder) => 
+            o.meta_data?.some((meta) => 
+              meta.key === "stripe_payment_intent_id" && meta.value === paymentIntentId
+            )
+          );
+          console.log("Order found by payment intent ID:", order ? order.id : "not found");
+        }
 
         // Prepare all the data
         const orderTotals: OrderTotals = {
@@ -84,16 +104,33 @@ export default function PaymentDetails() {
 
         if (order) {
           orderTotals.shippingDetails = order.shipping;
-          // Extract values from WooCommerce order
           const subtotal = order.line_items?.reduce((sum: number, item: WooOrderLineItem) => sum + parseFloat(item.subtotal || '0'), 0) || 0;
           const shipping = order.shipping_lines?.reduce((sum: number, line: WooOrderShippingLine) => sum + parseFloat(line.total || '0'), 0) || 0;
           const tax = order.total_tax ? parseFloat(order.total_tax) : 0;
           const total = order.total ? parseFloat(order.total) : 0;
           
+          console.log("Order parsing debug:", {
+            orderId: order.id,
+            subtotal: subtotal,
+            shipping: shipping,
+            tax: tax,
+            total: total,
+            shipping_lines: order.shipping_lines,
+            total_tax: order.total_tax,
+            order_total: order.total
+          });
+          
           orderTotals.subtotal = Math.round(subtotal * 100);
           orderTotals.shipping = Math.round(shipping * 100);
           orderTotals.tax = Math.round(tax * 100);
           orderTotals.total = Math.round(total * 100);
+          
+          console.log("Order totals calculated:", {
+            subtotal: orderTotals.subtotal,
+            shipping: orderTotals.shipping,
+            tax: orderTotals.tax,
+            total: orderTotals.total
+          });
         } else {
           // Fallback to calculated amounts if order not found
           const calculatedTotal = calculateTotal(paymentData.items, productsData);
@@ -108,14 +145,15 @@ export default function PaymentDetails() {
         setTax(orderTotals.tax);
         setTotal(orderTotals.total);
         setShippingDetails(orderTotals.shippingDetails);
-      } catch {
+      } catch (error) {
+        console.error("Error loading payment details:", error);
         // Handle error silently or show user-friendly message
         // Could add error state here if needed
       }
     };
 
     loadAllData();
-  }, [paymentIntentId]);
+  }, [paymentIntentId, user]);
 
   return allowed ? (
     <div className="container mx-auto p-6 mt-6">

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { WooOrder, WooCommerceAddress, WooOrderMetaData } from "../../../../../types/woocommerce";
 import { WordPressUser, Product, State } from "../../../../../types/types";
 import fetchWooCommerce from "../../../../../lib/fetchWooCommerce";
+import fetchProducts from "../../../../../lib/woocommerce";
 import { getItemInfoById } from "../../../../../lib/getItemInfo";
 import getCookieInfo from "../../../../../lib/getCookieInfo";
 import { syncTotals } from "../../../../../lib/syncTotals";
@@ -42,10 +43,6 @@ export async function POST(req: Request): Promise<Response> {
         {
           key: "shipping_rate_id",
           value: "usps-priority-mail"
-        },
-        {
-          key: "tax_rate",
-          value: "0"
         }
       ];
 
@@ -83,10 +80,34 @@ export async function POST(req: Request): Promise<Response> {
     const updatedLineItems = existingItem 
       ? orderData.line_items.map(item => 
           item.product_id === productId 
-            ? { ...item, quantity } 
-            : item
+            ? { 
+                product_id: item.product_id,
+                quantity,
+                name: item.name,
+                price: item.price,
+                subtotal: item.subtotal,
+                total: item.total,
+                total_tax: item.total_tax
+              } 
+            : {
+                product_id: item.product_id,
+                quantity: item.quantity,
+                name: item.name,
+                price: item.price,
+                subtotal: item.subtotal,
+                total: item.total,
+                total_tax: item.total_tax
+              }
         )
-      : [...orderData.line_items, { product_id: productId, quantity }];
+      : [...orderData.line_items.map(item => ({
+          product_id: item.product_id,
+          quantity: item.quantity,
+          name: item.name,
+          price: item.price,
+          subtotal: item.subtotal,
+          total: item.total,
+          total_tax: item.total_tax
+        })), { product_id: productId, quantity }];
 
     // Get the current shipping rate ID from meta data
     const shippingRateId = orderData.meta_data?.find(meta => meta.key === "shipping_rate_id")?.value || "usps-priority-mail";
@@ -96,15 +117,13 @@ export async function POST(req: Request): Promise<Response> {
     
     // Calculate totals if we have a shipping address
     let shippingTotal = "0.00";
-    let taxRate = "0";
     let allProducts: Product[] = [];
     let total = "0.00";
     
     if (isValidShippingAddress(shipping)) {
-      allProducts = await fetchWooCommerce<Product[]>("wc/v3/products", "Failed to fetch products");
+      allProducts = await fetchProducts();
       const totals = syncTotals(updatedLineItems.map(item => ({ id: item.product_id, quantity: item.quantity })), allProducts, shipping.state as State, shipping.postcode, shippingRateId as string);
       shippingTotal = (totals.shipping / 100).toFixed(2);
-      taxRate = totals.taxRate.toString();
       total = (totals.total / 100).toFixed(2);
     }
 
@@ -116,10 +135,6 @@ export async function POST(req: Request): Promise<Response> {
       {
         key: "shipping_rate_id",
         value: shippingRateId
-      },
-      {
-        key: "tax_rate",
-        value: taxRate
       }
     ];
 

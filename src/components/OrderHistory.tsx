@@ -123,11 +123,28 @@ export default function OrderHistory({ products }: { products: Product[] }) {
       // Get the order total (always available)
       const total = order.total ? Math.round(parseFloat(order.total) * 100) : 0;
       
-      // Only use breakdown fields if they exist and are valid
-      // For older orders, these fields won't exist, so we return undefined
-      const subtotal = order.subtotal ? Math.round(parseFloat(order.subtotal) * 100) : undefined;
+      // Get subtotal from line items (this is the correct WooCommerce field)
+      const subtotal = order.line_items?.reduce((sum: number, item: WooOrderLineItem) => {
+        return sum + (parseFloat(item.subtotal || '0') * 100);
+      }, 0) || undefined;
+      
+      // Get shipping and tax from order fields
       const shipping = order.shipping_total ? Math.round(parseFloat(order.shipping_total) * 100) : undefined;
       const tax = order.total_tax ? Math.round(parseFloat(order.total_tax) * 100) : undefined;
+      
+      // Debug logging to see what fields are available
+      console.log("Order amounts debug:", {
+        orderId: order.id,
+        total: order.total,
+        shipping: order.shipping_total,
+        tax: order.total_tax,
+        calculatedSubtotal: subtotal,
+        lineItems: order.line_items?.map(item => ({
+          name: item.name,
+          subtotal: item.subtotal,
+          quantity: item.quantity
+        }))
+      });
       
       return { subtotal, shipping, tax, total };
     } catch {

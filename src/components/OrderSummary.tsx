@@ -14,8 +14,9 @@ export default function OrderSummary({
   shippingDetails,
   subtotal,
   shipping,
-  tax
-}: OrderSummaryProps) {
+  tax,
+  isLoading = false
+}: OrderSummaryProps & { isLoading?: boolean }) {
   const {
     updateQuantity,
     editID,
@@ -37,7 +38,7 @@ export default function OrderSummary({
       <h2 className="text-2xl font-bold">Order Summary</h2>
 
       <div className="space-y-4">
-        {cartItems.map((item) => {
+        {cartItems.map((item, index) => {
           const [itemInfo, priceInCents] = getItemInfo(products, item);
           if (!itemInfo) return null;
 
@@ -46,7 +47,7 @@ export default function OrderSummary({
           const alreadyReviewed = item.productId ? reviewedProductIds.includes(item.productId) : false;
 
           return (
-            <div key={item.id} className="flex gap-4 border rounded-lg p-4 bg-amber-50/30">
+            <div key={`${item.id}-${index}`} className="flex gap-4 border rounded-lg p-4 bg-amber-50/30">
               <Link href={productLink} className="relative w-24 h-24 block">
                 <Image
                   src={imageInfo?.src || "/images/placeholder.svg"}
@@ -138,11 +139,27 @@ export default function OrderSummary({
         </div>
         <div className="flex justify-between">
           <span>Tax</span>
-          <span>{typeof tax === 'number' && tax > 0 ? formatPrice(tax) : '-'}</span>
+          <span>
+            {isLoading ? (
+              <span>Calculating...</span>
+            ) : typeof tax === 'number' && tax >= 0 ? (
+              formatPrice(tax)
+            ) : (
+              '-'
+            )}
+          </span>
         </div>
         <div className="flex justify-between font-bold pt-2">
           <span>Total</span>
-          <span>{total > 0 ? formatPrice(total) : '$0.00'}</span>
+          <span>
+            {isLoading ? (
+              <span>Calculating...</span>
+            ) : total > 0 ? (
+              formatPrice(total)
+            ) : (
+              '$0.00'
+            )}
+          </span>
         </div>
       </div>
     </div>

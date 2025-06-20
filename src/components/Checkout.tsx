@@ -15,7 +15,7 @@ import type {
   AddressDetailsAction,
   AddressErrors,
   AddressFormChange,
-  State,
+  State
 } from "../../types/types";
 import { useAddressValidation } from "../hooks/useAddressValidation";
 import LoadingSpinner from "./LoadingSpinner";
@@ -36,7 +36,7 @@ const defaultAddressDetails: AddressDetailsState = {
   },
   city: "",
   zipCode: "",
-  state: "" as State,
+  state: "" as State
 };
 
 function reducer(details: AddressDetailsState, action: AddressDetailsAction): AddressDetailsState {
@@ -73,6 +73,8 @@ export default function Checkout({ products }: CheckoutProps) {
   const [clientSecret, setClientSecret] = useState<string>("");
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [isLoadingPaymentForm, setIsLoadingPaymentForm] = useState<boolean>(false);
+  const [fetchedTaxAmount, setFetchedTaxAmount] = useState<number | undefined>(undefined);
+  const [isUpdatingQuantities, setIsUpdatingQuantities] = useState<boolean>(false);
   const [billToShipping, setBillToShipping] = useState<boolean>(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [shippingErrors, setShippingErrors] = useState<AddressErrors>({});
@@ -114,9 +116,10 @@ export default function Checkout({ products }: CheckoutProps) {
 
     shippingDispatch({ type, value });
 
-    // Only trigger payment update when ZIP code or state changes (affects shipping rates)
+    // Trigger payment update when ZIP code or state changes (affects shipping rates and tax)
     if (name === "zipCode" || name === "state") {
       setShouldUpdatePayment(true);
+      setFetchedTaxAmount(undefined); // Clear cached tax amount when address changes
     }
   }, []);
 
@@ -125,6 +128,54 @@ export default function Checkout({ products }: CheckoutProps) {
     setSelectedShippingRateId(rateId);
     setShouldUpdatePayment(true);
   }, []);
+
+  // Create payment intent on initial load
+  useEffect(() => {
+    if (clientSecret || cartItems.length === 0 || products.length === 0) {
+      if (!clientSecret) setIsLoadingPaymentForm(false);
+      return;
+    }
+
+    const createPaymentIntent = async () => {
+      setIsLoadingPaymentForm(true);
+      try {
+        const initialTotal = calculateTotal(cartItems, products);
+        if (initialTotal <= 50) {
+            setIsLoadingPaymentForm(false);
+            return;
+        }
+
+        const response = await fetch("/api/payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: initialTotal,
+            currency: 'usd',
+            items: cartItems,
+            woo_order_id: orderId,
+          }),
+        });
+        
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Initial payment request failed');
+        }
+        
+        const data = await response.json();
+        setClientSecret(data.clientSecret);
+        if (data.payment_intent_id) {
+          setPaymentIntentId(data.payment_intent_id);
+        }
+      } catch (error) {
+        console.error('Payment intent creation error:', error);
+        setFormError(error instanceof Error ? error.message : 'Payment intent creation failed');
+      } finally {
+        setIsLoadingPaymentForm(false);
+      }
+    };
+    
+    createPaymentIntent();
+  }, [cartItems, products, orderId, clientSecret]);
 
   // Update payment when necessary
   useEffect(() => {
@@ -140,13 +191,13 @@ export default function Checkout({ products }: CheckoutProps) {
       shippingDetails.zipCode.trim().length >= 5;
 
     // Only update payment if we have a valid total, all required fields, and a reason to update
-    if (newTotal > 50 && hasRequiredFields && shouldUpdatePayment) {
+    if (newTotal > 50 && hasRequiredFields && shouldUpdatePayment && paymentIntentId) {
       setIsLoadingPaymentForm(true);
       
       // Debounce the payment update to prevent rapid-fire API calls
       const timeout = setTimeout(async () => {
         try {
-          // Calculate shipping and tax amounts from the calculation object
+          // Calculate shipping amounts from the calculation object
           const calculation = calculateTotalWithTaxAndShipping(
             cartItems,
             products,
@@ -155,8 +206,35 @@ export default function Checkout({ products }: CheckoutProps) {
             selectedShippingRateId
           );
 
+          // Fetch accurate tax from WooCommerce
+          let accurateTax: number | undefined;
+          try {
+            const taxResponse = await fetch("/api/tax-estimate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                items: cartItems,
+                state: shippingDetails.state,
+                zipCode: shippingDetails.zipCode,
+                shippingAmount: calculation.shipping // Pass shipping amount for tax calculation
+              }),
+            });
+
+            if (taxResponse.ok) {
+              const taxData = await taxResponse.json();
+              accurateTax = taxData.taxAmount;
+              setFetchedTaxAmount(taxData.taxAmount); // Store the fetched tax amount
+            } else {
+              throw new Error("Tax calculation failed");
+            }
+          } catch (error) {
+            console.error("Tax estimate error:", error);
+            // Don't proceed with payment if we can't get accurate tax
+            throw new Error("Unable to calculate tax. Please try again.");
+          }
+
           const response = await fetch("/api/payment", {
-            method: paymentIntentId ? "PUT" : "POST",
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               amount: newTotal,
@@ -167,8 +245,8 @@ export default function Checkout({ products }: CheckoutProps) {
               shipping: shippingDetails,
               billing: billingDetails,
               selectedShippingRateId: selectedShippingRateId,
-              shippingAmount: calculation.shipping, // Pass frontend shipping amount
-              taxAmount: calculation.tax // Pass frontend tax amount
+              shippingAmount: calculation.shipping,
+              taxAmount: accurateTax
             }),
           });
 
@@ -291,6 +369,35 @@ export default function Checkout({ products }: CheckoutProps) {
     selectedShippingRateId
   );
 
+  // Show loading state for tax if we're fetching accurate amounts
+  const displayCalculation = {
+    ...calculation,
+    tax: fetchedTaxAmount,
+    total: calculation.subtotal + calculation.shipping + (fetchedTaxAmount || 0)
+  };
+
+  // Custom updateQuantity function that triggers tax recalculation
+  const handleQuantityUpdate = useCallback(async (productId: number, newQuantity: number) => {
+    setIsUpdatingQuantities(true);
+    setFetchedTaxAmount(undefined); // Clear cached tax amount
+    
+    // Update the quantity
+    await updateQuantity(productId, newQuantity);
+    
+    // Trigger payment update to recalculate tax
+    setShouldUpdatePayment(true);
+    
+    setIsUpdatingQuantities(false);
+  }, [updateQuantity]);
+
+  // Trigger tax recalculation when cart items change
+  useEffect(() => {
+    if (cartItems.length > 0 && shippingDetails.state && shippingDetails.zipCode) {
+      setFetchedTaxAmount(undefined); // Clear cached tax amount
+      setShouldUpdatePayment(true); // Trigger payment update to recalculate tax
+    }
+  }, [cartItems, shippingDetails.state, shippingDetails.zipCode]);
+
   return (
     <>
       {isLoading ? (
@@ -300,12 +407,13 @@ export default function Checkout({ products }: CheckoutProps) {
           <OrderSummary
             cartItems={cartItems}
             products={products}
-            subtotal={calculation.subtotal}
-            shipping={calculation.shipping}
-            tax={calculation.tax}
-            total={calculation.total}
+            subtotal={displayCalculation.subtotal}
+            shipping={displayCalculation.shipping}
+            tax={displayCalculation.tax}
+            total={displayCalculation.total}
+            isLoading={isLoadingPaymentForm || isUpdatingQuantities}
             quantityControls={{
-              updateQuantity,
+              updateQuantity: handleQuantityUpdate,
               editID,
               setEditID,
               newQty,
@@ -317,7 +425,12 @@ export default function Checkout({ products }: CheckoutProps) {
             <div className="w-full lg:w-1/2">
               <StatesContext.Provider value={states}>
                 <ChangeContext.Provider value={handleShippingChange}>
-                  <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
+                  <AddressDetails 
+                    title="Shipping Information" 
+                    details={shippingDetails} 
+                    errors={shippingErrors}
+                    disabled={isLoadingPaymentForm}
+                  />
                   {isValidating && (
                     <div className="mt-6 text-sm text-blue-600">
                       <LoadingSpinner message="Validating address..." size="sm" className="h-8" />
@@ -346,6 +459,7 @@ export default function Checkout({ products }: CheckoutProps) {
                     products={products}
                     selectedRateId={selectedShippingRateId}
                     onRateSelect={handleShippingRateSelect}
+                    disabled={isLoadingPaymentForm}
                   />
                 </div>
                 <div className="mt-4">
@@ -378,17 +492,11 @@ export default function Checkout({ products }: CheckoutProps) {
                     setShippingErrors={setShippingErrors}
                     validateBilling={() => validateAddressForm(billingDetails)}
                     setBillingErrors={setBillingErrors}
-                    isUpdatingShipping={isLoadingPaymentForm}
+                    isUpdatingShipping={isLoadingPaymentForm || isUpdatingQuantities}
                   />
                 </Elements>
-              ) : isLoadingPaymentForm ? (
-                <LoadingSpinner message="Loading payment form..." />
               ) : (
-                <div className="w-full border border-gray-300 rounded-md p-4 bg-white shadow-sm mt-11">
-                  <div className="text-center">
-                    <p className="text-gray-500">Please enter your shipping information to proceed with payment</p>
-                  </div>
-                </div>
+                <LoadingSpinner message="Loading payment form..." />
               )}
             </div>
           </div>
