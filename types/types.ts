@@ -738,24 +738,23 @@ export interface ShippingRate {
   description?: string;
 }
 
-export interface TaxRate {
-  state: State;
-  rate: number;
-  name: string;
-}
-
-export interface TaxCalculation {
-  taxableAmount: number;
-  taxAmount: number;
-  rate: number;
-  state: State;
-}
-
 export interface ShippingCalculation {
   subtotal: number;
   shipping: number;
   tax?: number;
   total: number;
   shippingRate?: ShippingRate;
-  taxRate?: number;
+}
+
+// Error handling type guards
+export function isStripeError(err: unknown): err is StripeError {
+  return typeof err === "object" && err !== null && "message" in err;
+}
+
+export function isAxiosError(err: unknown): err is { response: any } {
+  return typeof err === "object" && err !== null && "response" in err;
+}
+
+export function isError(err: unknown): err is Error {
+  return err instanceof Error;
 }

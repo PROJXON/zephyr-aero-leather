@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import type { CartItem, CartContextType } from "../../../types/types";
+import { isError } from "../../../types/types";
 import type { CartItemResponse } from "../../../types/woocommerce";
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -48,7 +49,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       );
       setOrderId(data.orderId || null);
     } catch (error: unknown) {
-      console.error("Error fetching cart:", error instanceof Error ? error.message : 'Unknown error');
+      console.error("Error fetching cart:", isError(error) ? error.message : 'Unknown error');
       setCartItems([]);
       setOrderId(null);
     } finally {
@@ -278,7 +279,10 @@ export const CartProvider = ({ children }: CartProviderProps) => {
           setIsClearing(false);
         }, 2000);
       } catch (error: unknown) {
-        console.error("Error clearing cart:", error instanceof Error ? error.message : 'Unknown error');
+        console.error("Error clearing cart:", isError(error) ? error.message : 'Unknown error');
+        setCartItems([]);
+        setOrderId(null);
+      } finally {
         setIsClearing(false);
       }
     } else {

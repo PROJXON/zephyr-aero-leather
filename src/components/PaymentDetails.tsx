@@ -84,21 +84,10 @@ export default function PaymentDetails() {
 
         if (order) {
           orderTotals.shippingDetails = order.shipping;
-          // Extract values from WooCommerce order
           const subtotal = order.line_items?.reduce((sum: number, item: WooOrderLineItem) => sum + parseFloat(item.subtotal || '0'), 0) || 0;
           const shipping = order.shipping_lines?.reduce((sum: number, line: WooOrderShippingLine) => sum + parseFloat(line.total || '0'), 0) || 0;
           const tax = order.total_tax ? parseFloat(order.total_tax) : 0;
           const total = order.total ? parseFloat(order.total) : 0;
-          
-          // Debug logging
-          console.log("WooCommerce Order Tax Debug:", {
-            total_tax: order.total_tax,
-            parsed_tax: tax,
-            tax_lines: order.tax_lines,
-            subtotal,
-            shipping,
-            total
-          });
           
           orderTotals.subtotal = Math.round(subtotal * 100);
           orderTotals.shipping = Math.round(shipping * 100);

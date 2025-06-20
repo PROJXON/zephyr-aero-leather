@@ -19,8 +19,7 @@ export function calculateTotalWithTaxAndShipping(
     selectedRateId
   );
 
-  // Tax is now calculated by WooCommerce API, not here
-  const total = subtotal + shipping; // Tax will be added separately when available
+  const total = subtotal + shipping;
   
   return {
     subtotal,
@@ -80,7 +79,6 @@ export function reconstructCalculationFromOrder(
     shipping: storedShipping,
     tax: storedTax,
     total: reconstructedTotal,
-    shippingRate: undefined,
-    taxRate: undefined
+    shippingRate: undefined
   };
 } 

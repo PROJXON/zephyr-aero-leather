@@ -40,7 +40,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         const currentOrder = await fetchWooCommerce<WooOrder>(`wc/v3/orders/${wooOrderId}`, "Failed to fetch order");
         
         // Update the order with preserved shipping and tax info
-        const updatedOrder = await fetchWooCommerce<WooOrder>(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", {
+        await fetchWooCommerce<WooOrder>(`wc/v3/orders/${wooOrderId}`, "Failed to update status", null, "PUT", {
           status: "completed",
           meta_data: [{
             key: "user_local_time",
