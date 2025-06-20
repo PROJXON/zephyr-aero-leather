@@ -241,7 +241,7 @@ export default function Checkout({ products }: CheckoutProps) {
     }
     
     const statesSet = new Set(states);
-    if (!statesSet.has(details.state)) errors.state = "Please select a state";
+    if (!statesSet.has(details.state as State)) errors.state = "Please select a state";
 
     // Address line 2 is optional, no validation needed
 
