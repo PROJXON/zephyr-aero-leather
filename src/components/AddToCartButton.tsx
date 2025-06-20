@@ -71,10 +71,12 @@ export default function AddToCartButton({ productId, className = "" }: AddToCart
           
           <button
             onClick={handleRemove}
-            className="ml-1 text-xs text-neutral-medium hover:text-neutral-dark transition-colors"
+            className="ml-1 p-1 rounded-full hover:bg-neutral-light transition-colors"
             aria-label="Remove from cart"
           >
-            Remove
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
         
