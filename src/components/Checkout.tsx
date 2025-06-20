@@ -377,7 +377,12 @@ export default function Checkout({ products }: CheckoutProps) {
             <div className="w-full lg:w-1/2">
               <StatesContext.Provider value={states}>
                 <ChangeContext.Provider value={handleShippingChange}>
-                  <AddressDetails title="Shipping Information" details={shippingDetails} errors={shippingErrors} />
+                  <AddressDetails 
+                    title="Shipping Information" 
+                    details={shippingDetails} 
+                    errors={shippingErrors}
+                    disabled={isLoadingPaymentForm}
+                  />
                   {isValidating && (
                     <div className="mt-6 text-sm text-blue-600">
                       <LoadingSpinner message="Validating address..." size="sm" className="h-8" />
@@ -406,6 +411,7 @@ export default function Checkout({ products }: CheckoutProps) {
                     products={products}
                     selectedRateId={selectedShippingRateId}
                     onRateSelect={handleShippingRateSelect}
+                    disabled={isLoadingPaymentForm}
                   />
                 </div>
                 <div className="mt-4">
