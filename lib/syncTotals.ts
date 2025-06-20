@@ -41,13 +41,4 @@ export function syncTotals(
     total: subtotal + shipping, // Tax will be added by WooCommerce
     shippingRate
   };
-}
-
-export function syncAddress(
-  address: {
-    state: State;
-    zipCode: string;
-  }
-) {
-  // ... existing code ...
 } 

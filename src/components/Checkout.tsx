@@ -73,7 +73,6 @@ export default function Checkout({ products }: CheckoutProps) {
   const [clientSecret, setClientSecret] = useState<string>("");
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [isLoadingPaymentForm, setIsLoadingPaymentForm] = useState<boolean>(false);
-  const [isLoadingTax, setIsLoadingTax] = useState<boolean>(false);
   const [fetchedTaxAmount, setFetchedTaxAmount] = useState<number | undefined>(undefined);
   const [isUpdatingQuantities, setIsUpdatingQuantities] = useState<boolean>(false);
   const [billToShipping, setBillToShipping] = useState<boolean>(true);
@@ -321,8 +320,8 @@ export default function Checkout({ products }: CheckoutProps) {
   // Show loading state for tax if we're fetching accurate amounts
   const displayCalculation = {
     ...calculation,
-    tax: isLoadingTax ? undefined : (fetchedTaxAmount !== undefined ? fetchedTaxAmount : calculation.tax),
-    total: isLoadingTax ? calculation.subtotal + calculation.shipping + (calculation.tax || 0) : calculation.subtotal + calculation.shipping + (fetchedTaxAmount || calculation.tax || 0)
+    tax: fetchedTaxAmount !== undefined ? fetchedTaxAmount : calculation.tax,
+    total: calculation.subtotal + calculation.shipping + (fetchedTaxAmount || calculation.tax || 0)
   };
 
   // Custom updateQuantity function that triggers tax recalculation
@@ -360,7 +359,7 @@ export default function Checkout({ products }: CheckoutProps) {
             shipping={displayCalculation.shipping}
             tax={displayCalculation.tax}
             total={displayCalculation.total}
-            isLoadingTax={isLoadingTax}
+            isLoadingTax={false}
             quantityControls={{
               updateQuantity: handleQuantityUpdate,
               editID,

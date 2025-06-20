@@ -61,7 +61,9 @@ export default function PaymentDetails() {
         // Load products and order data in parallel
         const [productsRes, orderRes] = await Promise.all([
           fetch("/api/products"),
-          fetch("/api/order")
+          paymentData.wooOrderId 
+            ? fetch(`/api/order?id=${paymentData.wooOrderId}&payment_intent=${paymentIntentId}`) // Guest order lookup
+            : fetch("/api/order") // Signed-in user order lookup
         ]);
 
         const [productsData, orderData] = await Promise.all([
@@ -69,9 +71,19 @@ export default function PaymentDetails() {
           orderRes.json()
         ]);
 
-        // Find the specific order for this payment
         const orders = orderData.orders || [];
-        const order = orders.find((o: WooOrder) => o.id.toString() === paymentData.wooOrderId);
+        
+        // For guests, we should get exactly one order. For signed-in users, find the matching one.
+        let order = orders.find((o: WooOrder) => o.id.toString() === paymentData.wooOrderId);
+        
+        // If no order found and we're a signed-in user, try to find by payment intent ID as fallback
+        if (!order && !paymentData.wooOrderId) {
+          order = orders.find((o: WooOrder) => 
+            o.meta_data?.some((meta) => 
+              meta.key === "stripe_payment_intent_id" && meta.value === paymentIntentId
+            )
+          );
+        }
 
         // Prepare all the data
         const orderTotals: OrderTotals = {
@@ -107,7 +119,8 @@ export default function PaymentDetails() {
         setTax(orderTotals.tax);
         setTotal(orderTotals.total);
         setShippingDetails(orderTotals.shippingDetails);
-      } catch {
+      } catch (error) {
+        console.error("Error loading payment details:", error);
         // Handle error silently or show user-friendly message
         // Could add error state here if needed
       }

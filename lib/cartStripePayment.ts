@@ -19,7 +19,6 @@ export default async function cartStripePayment(req: Request): Promise<Response>
 
     let paymentIntent: StripePaymentIntent | null = null;
     const metadata: Record<string, string> = {};
-    let guestOrderId: number | undefined;
 
     if (items) metadata.items = JSON.stringify(items);
     if (woo_order_id) metadata.woo_order_id = String(woo_order_id);
@@ -63,86 +62,23 @@ export default async function cartStripePayment(req: Request): Promise<Response>
         }
       };
 
-      // Create or update WooCommerce order for both signed-in and guest users
+      // Handle WooCommerce order updates
       if (woo_order_id) {
         // Signed-in user: update existing order
         await syncAddress(shipping, woo_order_id, false, items, products, selectedShippingRateId, shippingAmount, taxAmount);
       } else {
-        // Guest user: create new order
-        const subtotal = items?.reduce((sum, item) => {
-          const product = products?.find(p => p.id === item.id);
-          const price = product?.price || item.price || 0;
-          return sum + (price * item.quantity);
-        }, 0) || 0;
-
-        const guestOrder = await fetchWooCommerce<WooOrder>("wc/v3/orders", "Failed to create guest order", null, "POST", {
-          status: "pending",
-          billing: {
-            first_name: billing?.name.first || name.first,
-            last_name: billing?.name.last || name.last,
-            address_1: billing?.address.line1 || address.line1,
-            address_2: billing?.address.line2 || address.line2 || "",
-            city: billing?.city || city,
-            state: billing?.state || state,
-            postcode: billing?.zipCode || zipCode,
-            country: "US"
-          },
-          shipping: {
-            first_name: name.first,
-            last_name: name.last,
-            address_1: address.line1,
-            address_2: address.line2 || "",
-            city: city,
-            state: state,
-            postcode: zipCode,
-            country: "US"
-          },
-          line_items: items?.map(item => ({
-            product_id: item.id,
-            quantity: item.quantity
-          })) || [],
-          shipping_lines: shippingAmount ? [{
-            method_title: selectedShippingRateId === "usps-priority-mail-express" ? "USPS Priority Mail Express" : "USPS Priority Mail",
-            method_id: selectedShippingRateId || "usps-priority-mail",
-            total: (shippingAmount / 100).toFixed(2),
-            total_tax: "0.00"
-          }] : [],
-          tax_lines: taxAmount && taxAmount > 0 ? [{
-            rate_code: `US-${state}-STATE-TAX`,
-            rate_id: 1,
-            label: `${state} State Tax`,
-            compound: false,
-            tax_total: (taxAmount / 100).toFixed(2),
-            shipping_tax_total: "0.00",
-            rate_percent: (taxAmount / subtotal) * 100
-          }] : [],
-          total: (amount / 100).toFixed(2),
-          subtotal: (subtotal / 100).toFixed(2),
-          shipping_total: shippingAmount ? (shippingAmount / 100).toFixed(2) : "0.00",
-          total_tax: taxAmount ? (taxAmount / 100).toFixed(2) : "0.00",
-          meta_data: [
-            {
-              key: "user_local_time",
-              value: user_local_time || new Date().toISOString()
-            },
-            {
-              key: "shipping_rate_id",
-              value: selectedShippingRateId || "usps-priority-mail"
-            },
-            {
-              key: "guest_order",
-              value: "true"
-            }
-          ]
-        });
-
-        guestOrderId = guestOrder.id;
-        metadata.woo_order_id = String(guestOrderId);
+        // Guest user: store order data in metadata for webhook to create order later
+        metadata.shipping = JSON.stringify(shipping);
+        metadata.billing = JSON.stringify(billing);
+        metadata.selectedShippingRateId = selectedShippingRateId || "usps-priority-mail";
+        metadata.shippingAmount = String(shippingAmount || 0);
+        metadata.taxAmount = String(taxAmount || 0);
+        metadata.guest_order = "true";
       }
     }
 
     if (billing && woo_order_id) {
-      // Only sync billing for signed-in users (guest billing is set during order creation)
+      // Only sync billing for signed-in users (guest billing is stored in metadata)
       await syncAddress(billing, woo_order_id, true, items, products, selectedShippingRateId);
     }
 
