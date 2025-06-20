@@ -123,6 +123,25 @@ export default function Checkout({ products }: CheckoutProps) {
     }
   }, []);
 
+  const handleBillingChange = useCallback((event: AddressFormChange) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    let type: AddressDetailsAction["type"];
+    
+    switch (name) {
+      case "firstName": type = "FIRSTNAME"; break;
+      case "lastName": type = "LASTNAME"; break;
+      case "address1": type = "ADDRESS1"; break;
+      case "address2": type = "ADDRESS2"; break;
+      case "city": type = "CITY"; break;
+      case "zipCode": type = "ZIPCODE"; break;
+      case "state": type = "STATE"; break;
+      default: return;
+    }
+
+    billingDispatch({ type, value });
+  }, []);
+
   // Handle shipping rate selection
   const handleShippingRateSelect = useCallback((rateId: string) => {
     setSelectedShippingRateId(rateId);
@@ -473,7 +492,7 @@ export default function Checkout({ products }: CheckoutProps) {
                   </label>
                 </div>
                 {!billToShipping && (
-                  <ChangeContext.Provider value={handleShippingChange}>
+                  <ChangeContext.Provider value={handleBillingChange}>
                     <AddressDetails title="Billing Information" details={billingDetails} errors={billingErrors} />
                   </ChangeContext.Provider>
                 )}
