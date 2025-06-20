@@ -31,6 +31,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   const updateTimers = useRef<Record<number, NodeJS.Timeout>>({});
   const pendingRemovals = useRef<Record<number, boolean>>({});
   const removeTimers = useRef<Record<number, NodeJS.Timeout>>({});
+  const isCreatingOrder = useRef<boolean>(false);
 
   const fetchUserCart = useCallback(async (showLoading = true) => {
     if (!isAuthenticated) return;
@@ -95,26 +96,38 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
       clearTimeout(updateTimers.current[productId]);
 
-      updateTimers.current[productId] = setTimeout(() => {
+      updateTimers.current[productId] = setTimeout(async () => {
         if (!isAuthenticated) return;
         const batchedQuantity = pendingUpdates.current[productId];
         delete pendingUpdates.current[productId];
 
-        fetch("/api/cart/item", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, productId, quantity: batchedQuantity }),
-        })
-          .then((res) => {
-            if (!res.ok) throw new Error("Failed to add item to cart");
-            return res.json();
-          })
-          .then(() => {
-            fetchUserCart(false);
-          })
-          .catch((err) => {
-            console.error("Error syncing cart with Woo:", err.message);
+        // Prevent multiple simultaneous order creation requests
+        if (!orderId && isCreatingOrder.current) {
+          console.log("Order creation already in progress, skipping...");
+          return;
+        }
+
+        if (!orderId) {
+          isCreatingOrder.current = true;
+        }
+
+        try {
+          const res = await fetch("/api/cart/item", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId, productId, quantity: batchedQuantity }),
           });
+          
+          if (!res.ok) throw new Error("Failed to add item to cart");
+          await res.json();
+          await fetchUserCart(false);
+        } catch (err) {
+          console.error("Error syncing cart with Woo:", err instanceof Error ? err.message : 'Unknown error');
+        } finally {
+          if (!orderId) {
+            isCreatingOrder.current = false;
+          }
+        }
       }, 300);
     } else {
       const updatedCart = [...cartItems];

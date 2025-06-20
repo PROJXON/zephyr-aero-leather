@@ -159,7 +159,7 @@ export default function Checkout({ products }: CheckoutProps) {
           );
 
           // Fetch accurate tax from WooCommerce
-          let accurateTax = calculation.tax;
+          let accurateTax: number | undefined;
           try {
             const taxResponse = await fetch("/api/tax-estimate", {
               method: "POST",
@@ -176,9 +176,13 @@ export default function Checkout({ products }: CheckoutProps) {
               const taxData = await taxResponse.json();
               accurateTax = taxData.taxAmount;
               setFetchedTaxAmount(taxData.taxAmount); // Store the fetched tax amount
+            } else {
+              throw new Error("Tax calculation failed");
             }
           } catch (error) {
             console.error("Tax estimate error:", error);
+            // Don't proceed with payment if we can't get accurate tax
+            throw new Error("Unable to calculate tax. Please try again.");
           }
 
           const response = await fetch("/api/payment", {
@@ -320,8 +324,8 @@ export default function Checkout({ products }: CheckoutProps) {
   // Show loading state for tax if we're fetching accurate amounts
   const displayCalculation = {
     ...calculation,
-    tax: fetchedTaxAmount !== undefined ? fetchedTaxAmount : calculation.tax,
-    total: calculation.subtotal + calculation.shipping + (fetchedTaxAmount || calculation.tax || 0)
+    tax: fetchedTaxAmount,
+    total: calculation.subtotal + calculation.shipping + (fetchedTaxAmount || 0)
   };
 
   // Custom updateQuantity function that triggers tax recalculation
@@ -359,7 +363,7 @@ export default function Checkout({ products }: CheckoutProps) {
             shipping={displayCalculation.shipping}
             tax={displayCalculation.tax}
             total={displayCalculation.total}
-            isLoadingTax={false}
+            isLoadingTax={fetchedTaxAmount === undefined && (isLoadingPaymentForm || isUpdatingQuantities)}
             quantityControls={{
               updateQuantity: handleQuantityUpdate,
               editID,
