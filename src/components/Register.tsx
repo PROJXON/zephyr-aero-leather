@@ -145,7 +145,7 @@ const Register = (): JSX.Element => {
               value={formData.name}
               onChange={handleChange}
               className="w-full px-4 py-3 mb-4 bg-gray-100 border border-gray-300 text-gray-900 rounded-lg focus:ring-0 focus:border-neutral-dark placeholder-gray-400 transition-all" 
-              placeholder="Name or Callsign" 
+              placeholder="Name or Call Sign" 
               required 
               disabled={loading}
             />
