@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ShippingRate, CartItem, Product } from "../../types/types";
+import { ShippingRate, CartItem, Product, State } from "../../types/types";
 import { getAvailableShippingRates, calculateShipping } from "../../lib/calculateShipping";
 import { formatCurrency } from "../../lib/calculateTotalWithTaxAndShipping";
 import calculateTotal from "../../lib/calculateTotal";
 
 interface ShippingRateSelectorProps {
-  state: string;
+  state: State;
   zipCode: string;
   cartItems: CartItem[];
   products: Product[];
@@ -30,7 +30,7 @@ export default function ShippingRateSelector({
     if (state && zipCode && cartItems.length > 0) {
       const baseRates = getAvailableShippingRates();
       const subtotal = calculateTotal(cartItems, products);
-      
+
       // Calculate actual prices for each rate
       const calculatedRates = baseRates.map(rate => {
         const { shipping } = calculateShipping(subtotal, zipCode, cartItems, products, rate.id);
@@ -39,9 +39,9 @@ export default function ShippingRateSelector({
           price: shipping
         };
       });
-      
+
       setAvailableRates(calculatedRates);
-      
+
       // Auto-select first rate if none selected
       if (!selectedRateId && calculatedRates.length > 0) {
         onRateSelect(calculatedRates[0].id);
@@ -60,11 +60,10 @@ export default function ShippingRateSelector({
         {availableRates.map((rate) => (
           <label
             key={rate.id}
-            className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-              selectedRateId === rate.id
+            className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${selectedRateId === rate.id
                 ? "border-blue-500 bg-blue-50"
                 : "border-gray-200 hover:border-gray-300"
-            }`}
+              }`}
           >
             <input
               type="radio"

@@ -1,6 +1,16 @@
 "use client";
 import { useCart } from "@/app/context/CartContext";
-import { useState, useEffect, useReducer, useCallback, createContext, useRef, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  useReducer,
+  useCallback,
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useRef,
+  useMemo
+} from "react";
 import { FaEdit } from "react-icons/fa";
 import getChangeQuantity from "../../lib/getChangeQuantity";
 import calculateTotal from "../../lib/calculateTotal";
@@ -14,7 +24,8 @@ import type {
   AddressDetailsState,
   AddressDetailsAction,
   AddressErrors,
-  AddressFormChange
+  AddressFormChange,
+  State
 } from "../../types/types";
 import { useAddressValidation } from "../hooks/useAddressValidation";
 import LoadingSpinner from "./LoadingSpinner";
@@ -35,7 +46,7 @@ const defaultAddressDetails = {
   },
   city: "",
   zipCode: "",
-  state: ""
+  state: "" as State
 };
 
 function reducer(details: AddressDetailsState, action: AddressDetailsAction): AddressDetailsState {
@@ -53,7 +64,7 @@ function reducer(details: AddressDetailsState, action: AddressDetailsAction): Ad
     case "ZIPCODE":
       return { ...details, zipCode: action.value };
     case "STATE":
-      return { ...details, state: action.value };
+      return { ...details, state: action.value as State };
     case "ALL": return { ...action.value };
     case "RESET": return { ...defaultAddressDetails };
     default: return details;
@@ -61,7 +72,7 @@ function reducer(details: AddressDetailsState, action: AddressDetailsAction): Ad
 }
 
 export const ChangeContext = createContext<((event: AddressFormChange) => void)>(() => { });
-export const StatesContext = createContext<readonly string[]>([]);
+export const StatesContext = createContext<readonly State[]>([]);
 
 export default function Checkout({ products }: CheckoutProps) {
   const { cartItems, updateQuantity, orderId, isLoading } = useCart();
@@ -75,15 +86,15 @@ export default function Checkout({ products }: CheckoutProps) {
   const [billToShipping, setBillToShipping] = useState<boolean>(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [shippingErrors, setShippingErrors] = useState<AddressErrors>({});
-  const [shippingDetails, shippingDispatch] = useReducer(reducer, defaultAddressDetails)
+  const [shippingDetails, shippingDispatch] = useReducer(reducer, defaultAddressDetails);
   const [billingErrors, setBillingErrors] = useState<AddressErrors>({});
   const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
   const [selectedShippingRateId, setSelectedShippingRateId] = useState<string | undefined>(undefined);
 
   const [shouldUpdatePayment, setShouldUpdatePayment] = useState(false);
 
-  const states: readonly string[] = useMemo(() => [
-    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+  const states: readonly State[] = useMemo(() => [
+    "AA", "AE", "AL", "AK", "AP", "AS", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FM", "FL", "GA", "GU", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MH", "MD", "MA", "MI", "MN", "MS", "MO", "MP", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PW", "PA", "PR", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VI", "VA", "WA", "WV", "WI", "WY"
   ] as const, []);
 
   const changeQuantity = getChangeQuantity({ updateQuantity });
@@ -99,7 +110,7 @@ export default function Checkout({ products }: CheckoutProps) {
     const name = event.target.name;
     const value = event.target.value;
     let type: AddressDetailsAction["type"];
-    
+
     switch (name) {
       case "firstName": type = "FIRSTNAME"; break;
       case "lastName": type = "LASTNAME"; break;
@@ -128,9 +139,9 @@ export default function Checkout({ products }: CheckoutProps) {
   // Update payment when necessary
   useEffect(() => {
     const newTotal = calculateTotal(cartItems, products);
-    
+
     // Check if all required fields are filled
-    const hasRequiredFields = 
+    const hasRequiredFields =
       shippingDetails.name.first.trim() &&
       shippingDetails.name.last.trim() &&
       shippingDetails.address.line1.trim() &&
@@ -141,7 +152,7 @@ export default function Checkout({ products }: CheckoutProps) {
     // Only update payment if we have a valid total, all required fields, and a reason to update
     if (newTotal > 50 && hasRequiredFields && shouldUpdatePayment) {
       setIsLoadingPaymentForm(true);
-      
+
       // Debounce the payment update to prevent rapid-fire API calls
       const timeout = setTimeout(async () => {
         try {
@@ -232,13 +243,13 @@ export default function Checkout({ products }: CheckoutProps) {
     if (!details.name.last.trim()) errors.lastName = "Last name is required";
     if (!details.address.line1.trim()) errors.address = "Address is required";
     if (!details.city.trim()) errors.city = "City is required";
-    
+
     // ZIP code validation for 5-digit or 9-digit format (XXXXX-XXXX)
     const zipCode = details.zipCode.trim();
     if (!/^\d{5}(-\d{4})?$/.test(zipCode)) {
       errors.zipCode = "Enter a valid ZIP code (5 or 9 digits)";
     }
-    
+
     const statesSet = new Set(states);
     if (!statesSet.has(details.state)) errors.state = "Please select a state";
 
@@ -251,13 +262,13 @@ export default function Checkout({ products }: CheckoutProps) {
   useEffect(() => {
     const errors = validateAddressForm(shippingDetails);
     const hasAllRequiredFields = !errors.firstName && !errors.lastName && !errors.address && !errors.city && !errors.zipCode && !errors.state;
-    
+
     // Only validate if all required fields are complete AND we have a meaningful address
-    if (hasAllRequiredFields && 
-        shippingDetails.address.line1.trim().length > 5 && 
-        shippingDetails.city.trim().length > 2 &&
-        shippingDetails.zipCode.trim().length >= 5) {
-      
+    if (hasAllRequiredFields &&
+      shippingDetails.address.line1.trim().length > 5 &&
+      shippingDetails.city.trim().length > 2 &&
+      shippingDetails.zipCode.trim().length >= 5) {
+
       // Debounce validation to avoid too many API calls
       const timeout = setTimeout(() => {
         // Double-check that we haven't already validated this exact address
@@ -355,7 +366,11 @@ export default function Checkout({ products }: CheckoutProps) {
                     checked={billToShipping}
                     className="w-5 h-5 border border-gray-300 rounded bg-gray-50 focus:ring-2 focus:ring-neutral-dark transition accent-neutral-dark"
                   />
-                  <label htmlFor="billToShipping" onClick={toggleBillToShipping} className="ml-2 text-neutral-dark">
+                  <label
+                    htmlFor="billToShipping"
+                    onClick={toggleBillToShipping}
+                    className="ml-2 text-neutral-dark"
+                  >
                     Bill to shipping address
                   </label>
                 </div>
