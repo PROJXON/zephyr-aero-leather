@@ -31,11 +31,33 @@ export interface WooCommerceAddress {
 
 // WooCommerce Order Types
 export interface WooOrderLineItem {
-  id: number;
-  name: string;
+  id?: number;
+  name?: string;
   product_id: number;
   quantity: number;
-  price: string;
+  price?: string;
+  subtotal?: string;
+  total?: string;
+  total_tax?: string;
+  [key: string]: unknown;
+}
+
+export interface WooOrderShippingLine {
+  method_title: string;
+  method_id: string;
+  total: string;
+  total_tax: string;
+  [key: string]: unknown;
+}
+
+export interface WooOrderTaxLine {
+  rate_code: string;
+  rate_id: number;
+  label: string;
+  compound: boolean;
+  tax_total: string;
+  shipping_tax_total: string;
+  rate_percent: number;
   [key: string]: unknown;
 }
 
@@ -48,8 +70,13 @@ export interface WooOrder {
   id: number;
   status: string;
   total: string;
+  subtotal?: string;
+  shipping_total?: string;
+  total_tax?: string;
   currency: string;
   line_items: WooOrderLineItem[];
+  shipping_lines: WooOrderShippingLine[];
+  tax_lines: WooOrderTaxLine[];
   items: CartItemResponse[];
   shipping: WooCommerceAddress;
   billing?: WooCommerceAddress;
@@ -57,7 +84,23 @@ export interface WooOrder {
   [key: string]: unknown;
 }
 
-export type WooOrderUpdate = Partial<Pick<WooOrder, 'shipping' | 'meta_data' | 'status' | 'line_items' | 'billing' | 'customer_note' | 'payment_method' | 'payment_method_title' | 'set_paid'>>;
+export type WooOrderUpdate = Partial<Pick<WooOrder, 
+  'shipping' | 
+  'meta_data' | 
+  'status' | 
+  'line_items' | 
+  'billing' | 
+  'customer_note' | 
+  'payment_method' | 
+  'payment_method_title' | 
+  'set_paid' |
+  'total' |
+  'subtotal' |
+  'total_tax' |
+  'shipping_total' |
+  'shipping_lines' |
+  'tax_lines'
+>>;
 
 // WooCommerce Product Types
 export interface WooProduct {

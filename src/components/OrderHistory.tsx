@@ -4,9 +4,8 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/app/context/AuthContext"
 import OrderSummary from "./OrderSummary"
 import LoadingSpinner from "./LoadingSpinner"
-import calculateTotal from "../../lib/calculateTotal"
 import type { Product, CartItem } from "../../types/types"
-import type { WooOrder, CartItemResponse, WooCommerceReview } from "../../types/woocommerce"
+import type { WooOrder, CartItemResponse, WooCommerceReview, WooOrderLineItem } from "../../types/woocommerce"
 
 export default function OrderHistory({ products }: { products: Product[] }) {
   const { isAuthenticated, user } = useAuth()
@@ -46,7 +45,6 @@ export default function OrderHistory({ products }: { products: Product[] }) {
             
             return dateB.getTime() - dateA.getTime() // Newest first
           })
-          
           setOrders(sortedOrders)
 
           const times = sortedOrders.map((order: WooOrder) => {
@@ -54,8 +52,8 @@ export default function OrderHistory({ products }: { products: Product[] }) {
             return timeString ? new Date(timeString as string) : new Date()
           })
           setLocalTimes(times)
-        } catch (err) {
-          console.error("Error fetching orders:", err)
+        } catch {
+          // Handle error silently or show user-friendly message
         } finally {
           setLoading(false)
         }
@@ -75,8 +73,8 @@ export default function OrderHistory({ products }: { products: Product[] }) {
           const productIds = data.map((review: WooCommerceReview) => Number(review.product_id));
           setReviewedProductIds(productIds);
         }
-      } catch (error) {
-        console.error('Error fetching reviewed products:', error);
+      } catch {
+        // Handle error silently
       }
     };
 
@@ -90,6 +88,53 @@ export default function OrderHistory({ products }: { products: Product[] }) {
     price: item.price ? parseFloat(item.price) : undefined,
     productId: item.id
   })
+
+  // Helper function to convert WooOrderLineItem to CartItem
+  const convertLineItemToCartItem = (lineItem: WooOrderLineItem): CartItem => ({
+    id: lineItem.product_id, // Use product_id as the id
+    quantity: lineItem.quantity,
+    name: lineItem.name,
+    price: lineItem.price ? parseFloat(lineItem.price) : undefined,
+    productId: lineItem.product_id
+  })
+
+  // Helper function to safely convert order items
+  const convertOrderItems = (order: WooOrder): CartItem[] => {
+    try {
+      // First try to use line_items (standard WooCommerce field)
+      if (order.line_items && Array.isArray(order.line_items)) {
+        return order.line_items.map(convertLineItemToCartItem);
+      }
+      
+      // Fallback to items (custom field that might not exist on older orders)
+      if (order.items && Array.isArray(order.items)) {
+        return order.items.map(convertToCartItem);
+      }
+      
+      return [];
+    } catch {
+      return [];
+    }
+  };
+
+  // Helper function to get order amounts in cents
+  const getOrderAmounts = (order: WooOrder) => {
+    try {
+      // Get the order total (always available)
+      const total = order.total ? Math.round(parseFloat(order.total) * 100) : 0;
+      
+      // Only use breakdown fields if they exist and are valid
+      // For older orders, these fields won't exist, so we return undefined
+      const subtotal = order.subtotal ? Math.round(parseFloat(order.subtotal) * 100) : undefined;
+      const shipping = order.shipping_total ? Math.round(parseFloat(order.shipping_total) * 100) : undefined;
+      const tax = order.total_tax ? Math.round(parseFloat(order.total_tax) * 100) : undefined;
+      
+      return { subtotal, shipping, tax, total };
+    } catch {
+      // Return safe defaults if there's an error
+      return { subtotal: undefined, shipping: undefined, tax: undefined, total: 0 };
+    }
+  };
 
   // Don't render anything if not authenticated (will redirect)
   if (!isAuthenticated) {
@@ -107,31 +152,45 @@ export default function OrderHistory({ products }: { products: Product[] }) {
       ) : (
         <ul>
           {orders.map((order: WooOrder, i: number) => {
-            const datePaid = localTimes[i]
-            const items = order.items.map(convertToCartItem)
-            const total = calculateTotal(items, products)
+            try {
+              const datePaid = localTimes[i] || new Date()
+              const items = convertOrderItems(order)
+              const { subtotal, shipping, tax, total } = getOrderAmounts(order)
 
-            return (
-              <li key={order.id}>
-                <h2 className="font-bold text-xl text-center">
-                  <div className={`p-2${i !== 0 ? " border-t-2 border-black" : ""}`}>
-                    {months[datePaid.getMonth()]} {datePaid.getDate()}, {datePaid.getFullYear()}{" "}
-                    {datePaid.toLocaleString([], {
-                      hour: "numeric",
-                      minute: "2-digit"
-                    })}
+              return (
+                <li key={order.id}>
+                  <h2 className="font-bold text-xl text-center">
+                    <div className={`p-2${i !== 0 ? " border-t-2 border-black" : ""}`}>
+                      {months[datePaid.getMonth()]} {datePaid.getDate()}, {datePaid.getFullYear()}{" "}
+                      {datePaid.toLocaleString([], {
+                        hour: "numeric",
+                        minute: "2-digit"
+                      })}
+                    </div>
+                  </h2>
+                  <OrderSummary
+                    cartItems={items}
+                    products={products}
+                    total={total}
+                    subtotal={subtotal}
+                    shipping={shipping}
+                    tax={tax}
+                    showReviewLinks={true}
+                    reviewedProductIds={reviewedProductIds}
+                    shippingDetails={order.shipping || undefined}
+                  />
+                </li>
+              )
+            } catch (error) {
+              return (
+                <li key={order.id}>
+                  <div className="p-4 border rounded bg-red-50">
+                    <h3 className="font-bold text-red-600">Order #{order.id}</h3>
+                    <p className="text-red-500">Error displaying order details: {error instanceof Error ? error.message : 'Unknown error'}</p>
                   </div>
-                </h2>
-                <OrderSummary
-                  cartItems={items}
-                  products={products}
-                  total={total}
-                  showReviewLinks={true}
-                  reviewedProductIds={reviewedProductIds}
-                  shippingDetails={order.shipping}
-                />
-              </li>
-            )
+                </li>
+              );
+            }
           })}
         </ul>
       )}

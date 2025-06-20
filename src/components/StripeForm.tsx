@@ -10,7 +10,8 @@ export default function StripeForm({
   validateShipping,
   setShippingErrors,
   validateBilling,
-  setBillingErrors
+  setBillingErrors,
+  isUpdatingShipping = false
 }: StripeFormProps) {
   const stripe = useStripe();
   const elements = useElements();
@@ -28,6 +29,12 @@ export default function StripeForm({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!stripe || !elements) return;
+
+    // Prevent submission if shipping is being updated
+    if (isUpdatingShipping) {
+      setFormError("Please wait for shipping update to complete before proceeding with payment");
+      return;
+    }
 
     const shippingError = checkAddressForm(validateShipping, setShippingErrors);
     if (shippingError) {
@@ -112,10 +119,10 @@ export default function StripeForm({
 
         <button
           type="submit"
-          disabled={isProcessing}
+          disabled={isProcessing || isUpdatingShipping}
           className="w-full bg-neutral-light text-neutral-dark px-4 py-2 rounded hover:bg-neutral-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isProcessing ? 'Processing...' : 'Pay Now'}
+          {isUpdatingShipping ? 'Updating shipping...' : isProcessing ? 'Processing...' : 'Pay Now'}
         </button>
         <div className="text-sm text-gray-500 mt-4 italic">
           Use Card Number: 4242 4242 4242 4242 to test payment
