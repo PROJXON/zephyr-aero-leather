@@ -98,7 +98,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <AuthProvider>
           <CartProvider>
             <Navbar allProducts={products} />
-            <main className="flex-1 relative z-0 overflow-x-hidden pt-12">{children}</main>
+            <main className="flex-1 relative z-0 overflow-x-hidden pt-16">{children}</main>
             <Footer />
           </CartProvider>
         </AuthProvider>
