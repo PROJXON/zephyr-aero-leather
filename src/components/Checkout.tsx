@@ -429,7 +429,6 @@ export default function Checkout({ products }: CheckoutProps) {
                     title="Shipping Information" 
                     details={shippingDetails} 
                     errors={shippingErrors}
-                    disabled={isLoadingPaymentForm}
                   />
                   {isValidating && (
                     <div className="mt-6 text-sm text-blue-600">
@@ -459,7 +458,6 @@ export default function Checkout({ products }: CheckoutProps) {
                     products={products}
                     selectedRateId={selectedShippingRateId}
                     onRateSelect={handleShippingRateSelect}
-                    disabled={isLoadingPaymentForm}
                   />
                 </div>
                 <div className="mt-4">
