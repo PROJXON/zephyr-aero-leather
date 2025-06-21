@@ -97,50 +97,35 @@ export default function Checkout({ products }: CheckoutProps) {
       setNewQty(item.quantity.toString());
     },
   });
+  const createAddressChangeHandler = useCallback((dispatch: React.Dispatch<AddressDetailsAction>, isShipping: boolean = false) => {
+    return (event: AddressFormChange) => {
+      const name = event.target.name;
+      const value = event.target.value;
+      let type: AddressDetailsAction["type"];
+      
+      switch (name) {
+        case "firstName": type = "FIRSTNAME"; break;
+        case "lastName": type = "LASTNAME"; break;
+        case "address1": type = "ADDRESS1"; break;
+        case "address2": type = "ADDRESS2"; break;
+        case "city": type = "CITY"; break;
+        case "zipCode": type = "ZIPCODE"; break;
+        case "state": type = "STATE"; break;
+        default: return;
+      }
 
-  const handleShippingChange = useCallback((event: AddressFormChange) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    let type: AddressDetailsAction["type"];
-    
-    switch (name) {
-      case "firstName": type = "FIRSTNAME"; break;
-      case "lastName": type = "LASTNAME"; break;
-      case "address1": type = "ADDRESS1"; break;
-      case "address2": type = "ADDRESS2"; break;
-      case "city": type = "CITY"; break;
-      case "zipCode": type = "ZIPCODE"; break;
-      case "state": type = "STATE"; break;
-      default: return;
-    }
+      dispatch({ type, value });
 
-    shippingDispatch({ type, value });
-
-    // Trigger payment update when ZIP code or state changes (affects shipping rates and tax)
-    if (name === "zipCode" || name === "state") {
-      setShouldUpdatePayment(true);
-      setFetchedTaxAmount(undefined); // Clear cached tax amount when address changes
-    }
+      // Trigger payment update when ZIP code or state changes (affects shipping rates and tax)
+      if (isShipping && (name === "zipCode" || name === "state")) {
+        setShouldUpdatePayment(true);
+        setFetchedTaxAmount(undefined); // Clear cached tax amount when address changes
+      }
+    };
   }, []);
 
-  const handleBillingChange = useCallback((event: AddressFormChange) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    let type: AddressDetailsAction["type"];
-    
-    switch (name) {
-      case "firstName": type = "FIRSTNAME"; break;
-      case "lastName": type = "LASTNAME"; break;
-      case "address1": type = "ADDRESS1"; break;
-      case "address2": type = "ADDRESS2"; break;
-      case "city": type = "CITY"; break;
-      case "zipCode": type = "ZIPCODE"; break;
-      case "state": type = "STATE"; break;
-      default: return;
-    }
-
-    billingDispatch({ type, value });
-  }, []);
+  const handleShippingChange = useCallback(createAddressChangeHandler(shippingDispatch, true), [createAddressChangeHandler]);
+  const handleBillingChange = useCallback(createAddressChangeHandler(billingDispatch, false), [createAddressChangeHandler]);
 
   // Handle shipping rate selection
   const handleShippingRateSelect = useCallback((rateId: string) => {
