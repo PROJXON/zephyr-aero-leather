@@ -1,16 +1,6 @@
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
-import { CartItem } from "../types/types";
-import { UpdateQuantityFn } from "../types/types";
-
-interface GetChangeQuantityArgs {
-  updateQuantity: UpdateQuantityFn;
-}
-
-interface ChangeAction {
-  icon: React.ComponentType;
-  onClick: (item: CartItem) => void;
-}
+import { CartItem, GetChangeQuantityArgs, ChangeAction } from "../types/types";
 
 export default function getChangeQuantity({
   updateQuantity,

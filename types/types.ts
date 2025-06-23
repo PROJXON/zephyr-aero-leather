@@ -742,3 +742,26 @@ export function isAxiosError(err: unknown): err is { response: any } {
 export function isError(err: unknown): err is Error {
   return err instanceof Error;
 }
+
+// --- Additional Interfaces from Components ---
+
+// From getChangeQuantity.ts
+export interface GetChangeQuantityArgs {
+  updateQuantity: UpdateQuantityFn;
+}
+
+export interface ChangeAction {
+  icon: React.ComponentType;
+  onClick: (item: CartItem) => void;
+}
+
+// From ShippingRateSelector.tsx
+export interface ShippingRateSelectorProps {
+  state: State;
+  zipCode: string;
+  cartItems: CartItem[];
+  products: Product[];
+  selectedRateId?: string;
+  onRateSelect: (rateId: string) => void;
+  className?: string;
+}
