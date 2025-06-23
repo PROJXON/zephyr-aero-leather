@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         status: error.response?.status,
         statusText: error.response?.statusText,
         data: error.response?.data,
-        url: error.response?.config?.url
+        url: (error.response as any)?.config?.url
       });
     }
     return NextResponse.json(
