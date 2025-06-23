@@ -26,6 +26,9 @@ export class USPSAddressesApi {
    */
   async standardizeAddress(address: USPSAddressRequest): Promise<USPSAddressResponse> {
     try {
+      // Extract only the 5-digit ZIP code (remove ZIP+4 if present)
+      const zip5 = address.zipCode ? address.zipCode.split('-')[0] : '';
+      
       // Build query string with correct parameter names
       const params = new URLSearchParams({
         streetAddress: address.addressLine1,
@@ -33,7 +36,7 @@ export class USPSAddressesApi {
         state: address.state,
       });
       if (address.addressLine2) params.append('secondaryAddress', address.addressLine2);
-      if (address.zipCode) params.append('ZIPCode', address.zipCode);
+      if (zip5) params.append('ZIPCode', zip5);
 
       const url = `${this.config.baseUrl}/addresses/v3/address?${params.toString()}`;
       const response = await fetch(url, {
@@ -113,7 +116,10 @@ export class USPSAddressesApi {
    */
   async getCityState(request: USPSCityStateRequest): Promise<USPSCityStateResponse> {
     try {
-      const response = await fetch(`${this.config.baseUrl}/addresses/v3/city-state?ZIPCode=${encodeURIComponent(request.zipCode)}`, {
+      // Extract only the 5-digit ZIP code (remove ZIP+4 if present)
+      const zip5 = request.zipCode ? request.zipCode.split('-')[0] : '';
+      
+      const response = await fetch(`${this.config.baseUrl}/addresses/v3/city-state?ZIPCode=${encodeURIComponent(zip5)}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.config.apiKey}`,

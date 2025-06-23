@@ -41,20 +41,13 @@ const defaultAddressDetails: AddressDetailsState = {
 
 function reducer(details: AddressDetailsState, action: AddressDetailsAction): AddressDetailsState {
   switch (action.type) {
-    case "FIRSTNAME":
-      return { ...details, name: { ...details.name, first: action.value } };
-    case "LASTNAME":
-      return { ...details, name: { ...details.name, last: action.value } };
-    case "ADDRESS1":
-      return { ...details, address: { ...details.address, line1: action.value } };
-    case "ADDRESS2":
-      return { ...details, address: { ...details.address, line2: action.value } };
-    case "CITY":
-      return { ...details, city: action.value };
-    case "ZIPCODE":
-      return { ...details, zipCode: action.value };
-    case "STATE":
-      return { ...details, state: action.value as State };
+    case "FIRSTNAME": return { ...details, name: { ...details.name, first: action.value } };
+    case "LASTNAME": return { ...details, name: { ...details.name, last: action.value } };
+    case "ADDRESS1": return { ...details, address: { ...details.address, line1: action.value } };
+    case "ADDRESS2": return { ...details, address: { ...details.address, line2: action.value } };
+    case "CITY": return { ...details, city: action.value };
+    case "ZIPCODE": return { ...details, zipCode: action.value };
+    case "STATE": return { ...details, state: action.value as State };
     case "ALL": return { ...action.value };
     case "RESET": return { ...defaultAddressDetails };
     default: return details;
@@ -78,9 +71,9 @@ export default function Checkout({ products }: CheckoutProps) {
   const [billToShipping, setBillToShipping] = useState<boolean>(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [shippingErrors, setShippingErrors] = useState<AddressErrors>({});
-  const [shippingDetails, shippingDispatch] = useReducer(reducer, defaultAddressDetails)
+  const [shippingDetails, shippingDispatch] = useReducer(reducer, defaultAddressDetails);
   const [billingErrors, setBillingErrors] = useState<AddressErrors>({});
-  const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails)
+  const [billingDetails, billingDispatch] = useReducer(reducer, defaultAddressDetails);
   const [selectedShippingRateId, setSelectedShippingRateId] = useState<string | undefined>(undefined);
 
   const [shouldUpdatePayment, setShouldUpdatePayment] = useState(false);
@@ -97,35 +90,38 @@ export default function Checkout({ products }: CheckoutProps) {
       setNewQty(item.quantity.toString());
     },
   });
-  const createAddressChangeHandler = useCallback((dispatch: React.Dispatch<AddressDetailsAction>, isShipping: boolean = false) => {
-    return (event: AddressFormChange) => {
-      const name = event.target.name;
-      const value = event.target.value;
-      let type: AddressDetailsAction["type"];
-      
-      switch (name) {
-        case "firstName": type = "FIRSTNAME"; break;
-        case "lastName": type = "LASTNAME"; break;
-        case "address1": type = "ADDRESS1"; break;
-        case "address2": type = "ADDRESS2"; break;
-        case "city": type = "CITY"; break;
-        case "zipCode": type = "ZIPCODE"; break;
-        case "state": type = "STATE"; break;
-        default: return;
-      }
+  const createAddressChangeHandler = useCallback(
+    (dispatch: React.Dispatch<AddressDetailsAction>, isShipping: boolean = false) => {
+      return (event: AddressFormChange) => {
+        const name = event.target.name;
+        const value = event.target.value;
+        let type: AddressDetailsAction["type"];
+        
+        switch (name) {
+          case "firstName": type = "FIRSTNAME"; break;
+          case "lastName": type = "LASTNAME"; break;
+          case "address1": type = "ADDRESS1"; break;
+          case "address2": type = "ADDRESS2"; break;
+          case "city": type = "CITY"; break;
+          case "zipCode": type = "ZIPCODE"; break;
+          case "state": type = "STATE"; break;
+          default: return;
+        }
 
-      dispatch({ type, value });
+        dispatch({ type, value });
+        
+        // Trigger payment update when ZIP code or state changes (affects shipping rates and tax)
+        if (isShipping && (name === "zipCode" || name === "state")) {
+          setShouldUpdatePayment(true);
+          setFetchedTaxAmount(undefined); // Clear cached tax amount when address changes
+        }
+      };
+    },
+    [setShouldUpdatePayment, setFetchedTaxAmount]
+  );
 
-      // Trigger payment update when ZIP code or state changes (affects shipping rates and tax)
-      if (isShipping && (name === "zipCode" || name === "state")) {
-        setShouldUpdatePayment(true);
-        setFetchedTaxAmount(undefined); // Clear cached tax amount when address changes
-      }
-    };
-  }, []);
-
-  const handleShippingChange = useCallback(createAddressChangeHandler(shippingDispatch, true), [createAddressChangeHandler]);
-  const handleBillingChange = useCallback(createAddressChangeHandler(billingDispatch, false), [createAddressChangeHandler]);
+  const handleShippingChange = createAddressChangeHandler(shippingDispatch, true);
+  const handleBillingChange = createAddressChangeHandler(billingDispatch, false);
 
   // Handle shipping rate selection
   const handleShippingRateSelect = useCallback((rateId: string) => {

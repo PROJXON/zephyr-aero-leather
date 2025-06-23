@@ -103,7 +103,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
         // Prevent multiple simultaneous order creation requests
         if (!orderId && isCreatingOrder.current) {
-          console.log("Order creation already in progress, skipping...");
           return;
         }
 
