@@ -16,6 +16,7 @@ const config = {
   ],
   rules: {
     '@typescript-eslint/no-unused-vars': ['warn'],
+    '@typescript-eslint/semi': ['error', 'always'],
     'react/react-in-jsx-scope': 'off', 
   },
   settings: {

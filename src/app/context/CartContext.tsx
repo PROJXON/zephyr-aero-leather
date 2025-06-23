@@ -1,15 +1,11 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/app/context/AuthContext";
-import type { CartItem, CartContextType } from "../../../types/types";
+import type { CartItem, CartContextType, CartProviderProps } from "../../../types/types";
 import { isError } from "../../../types/types";
 import type { CartItemResponse } from "../../../types/woocommerce";
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
-
-interface CartProviderProps {
-  children: ReactNode;
-}
 
 const loadGuestCart = (): CartItem[] => {
   return JSON.parse(localStorage.getItem("guestCart") || "[]");

@@ -1,19 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ShippingRate, CartItem, Product, State } from "../../types/types";
+import { ShippingRate, ShippingRateSelectorProps } from "../../types/types";
 import { getAvailableShippingRates, calculateShipping } from "../../lib/calculateShipping";
 import { formatCurrency } from "../../lib/calculateTotalWithTaxAndShipping";
 import calculateTotal from "../../lib/calculateTotal";
-
-interface ShippingRateSelectorProps {
-  state: State;
-  zipCode: string;
-  cartItems: CartItem[];
-  products: Product[];
-  selectedRateId?: string;
-  onRateSelect: (rateId: string) => void;
-  className?: string;
-}
 
 export default function ShippingRateSelector({
   state,
