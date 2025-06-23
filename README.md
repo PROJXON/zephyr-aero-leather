@@ -49,26 +49,50 @@ There are some challenges implementing a headless WooCommerce backend, which thi
 
 ---
 
-## Installation
+## Quick Start
 
-Clone the repository and navigate to the project folder:
-
-```sh
+### For Developers
+```bash
+# Clone and setup
 git clone https://github.com/projxon/zephyr.git
 cd zephyr
-```
-
-Install dependencies:
-
-```sh
 npm install
-```
 
-Start the development server:
+# Create environment file
+cp .env.example .env.local
+# Edit .env.local with your API keys (see Environment Variables section below)
 
-```sh
+# Start development server
 npm run dev
 ```
+
+Visit [http://localhost:3000](http://localhost:3000) to see your local development site.
+
+### Minimum Required Environment Variables
+For basic functionality, you'll need at least:
+```env
+WOOCOMMERCE_API_URL=your_woocommerce_url
+WOOCOMMERCE_API_KEY=your_consumer_key
+WOOCOMMERCE_API_SECRET=your_consumer_secret
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key
+STRIPE_SECRET_KEY=sk_test_your_key
+RESEND_API_KEY=re_your_key
+```
+
+**Note:** See the [Environment Variables](#environment-variables) section below for the complete list and setup instructions.
+
+### Using Docker
+```bash
+# Build and run with Docker
+docker build -t zephyr .
+docker run -p 3000:3000 zephyr
+```
+
+### Prerequisites
+- Node.js 18+ 
+- WooCommerce backend (see [WooCommerce Setup](#woocommerce-setup))
+- Stripe account for payments
+- Resend account for emails
 
 ---
 
