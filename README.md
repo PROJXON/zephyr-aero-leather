@@ -112,9 +112,16 @@ WOOCOMMERCE_API_URL=https://api.zephyraeroleather.com
 WOOCOMMERCE_API_KEY=your_consumer_key_here
 WOOCOMMERCE_API_SECRET=your_consumer_secret_here
 
+<<<<<<< HEAD
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key_here
 STRIPE_SECRET_KEY=your_stripe_secret_key_here
 STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret_here
+=======
+# Stripe
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_XXXXXXXXXXXXXXXXXXXXXXXX
+STRIPE_SECRET_KEY=sk_XXXXXXXXXXXXXXXXXXXXXXXX
+STRIPE_WEBHOOK_SECRET=whsec_XXXXXXXXXXXXXXXXXXXXXXXX
+>>>>>>> 48ecad1 (Fix readme secret)
 
 RESEND_API_KEY=your_resend_api_key_here
 ```
