@@ -735,7 +735,15 @@ export function isStripeError(err: unknown): err is StripeError {
   return typeof err === "object" && err !== null && "message" in err;
 }
 
-export function isAxiosError(err: unknown): err is { response: any } {
+export interface AxiosErrorResponse {
+  data?: unknown;
+  status?: number;
+  statusText?: string;
+  headers?: Record<string, string>;
+  config?: unknown;
+}
+
+export function isAxiosError(err: unknown): err is { response: AxiosErrorResponse } {
   return typeof err === "object" && err !== null && "response" in err;
 }
 
