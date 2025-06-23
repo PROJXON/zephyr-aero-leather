@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import type { CartItem, CartContextType, CartProviderProps } from "../../../types/types";
 import { isError } from "../../../types/types";
