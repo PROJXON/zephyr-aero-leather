@@ -8,13 +8,26 @@ There are some challenges implementing a headless WooCommerce backend, which thi
 
 ### Features
 
-- Guest vs Signed-in user functionality
-- Shopping Cart, including Guest Cart
-- Forgot Password, Sign In, Log out, Register
-- Order History
-- Leave Reviews
-- Stripe for purchasing (admin can manage payments using Stripe)
-- WooCommerce for CMS (admin can manage product inventory using WooCommerce)
+- **Guest and Registered User Support** – Seamless shopping experience for both guests and signed-in users.
+- **Mobile-Friendly Design** – Responsive layout ensures a smooth experience on any device.
+- **Real-Time Shipping Calculation** – Instantly calculates shipping costs during checkout, based on user input.
+- **Automated Tax Calculation** – Fetches accurate tax rates directly from WooCommerce for every order.
+- **USPS Address Verification (OAuth API)** – Validates shipping addresses in real time using the official USPS OAuth API.
+- **Comprehensive Shopping Cart** – Persistent cart for guests and users, with easy add/remove/update functionality.
+- **Secure Authentication** – Includes registration, login, logout, and password reset flows.
+- **Forgot Password Functionality** – Secure password reset via Resend transactional email and WooCommerce integration.
+- **Contact Form with Email Delivery** – User inquiries are sent directly to your team using Resend transactional email service.
+- **Order History** – Users can view their complete order history and details.
+- **Product Reviews** – Customers can leave and view reviews for products.
+- **Stripe Payments** – Secure, integrated payment processing with Stripe (admin can manage payments via Stripe dashboard).
+- **WooCommerce CMS Integration** – Full product and inventory management through WooCommerce.
+- **JWT Authentication** – Secure API authentication for WooCommerce using JWT tokens.
+- **Cart & Order Synchronization** – Real-time synchronization between frontend cart and WooCommerce backend.
+- **Modern UI with Tailwind CSS** – Clean, responsive, and modern user interface built with Tailwind CSS.
+- **Docker Support** – Containerized deployment for consistent development and production environments.
+- **Nginx Reverse Proxy** – Production-ready web server configuration with SSL termination and security headers.
+- **Automated SSL Renewal** – SSL certificates are automatically renewed using Certbot and cron jobs.
+- **CI/CD Ready** – Project structure and scripts are ready for integration with CI/CD pipelines.
 
 ### Deployment Architecture
 
@@ -191,7 +204,7 @@ Transactional emails are sent through **Resend API** for reliable delivery.
 
 ## SSL Setup
 
-- For **LocalWP**, trust your local development site’s HTTPS certificate.
+- For **LocalWP**, trust your local development site's HTTPS certificate.
 - For **Amazon Lightsail**, install Certbot to enable HTTPS:
 
   ```bash
