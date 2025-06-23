@@ -1,5 +1,13 @@
 import { WooCommerceAddress, WooCustomer } from "./woocommerce";
 
+// Import USPS types from dedicated file
+export type {
+  USPSAddress,
+  USPSAddressValidationRequest,
+  AddressValidationConfig,
+  AddressValidationProvider
+} from './usps';
+
 // Next.js Page Props Types
 export interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -704,30 +712,6 @@ export interface AddressValidationResponse {
   dpvConfirmation?: string;
   carrierRoute?: string;
   deliveryPoint?: string;
-}
-
-export interface USPSAddress {
-  Address1: string;
-  Address2?: string;
-  City: string;
-  State: State;
-  Zip5: string;
-  Zip4?: string;
-  DeliveryPoint?: string;
-  CarrierRoute?: string;
-  Footnotes?: string;
-  DPVConfirmation?: string;
-  DPVCMRA?: string;
-  DPVVacant?: string;
-  Business?: string;
-  CentralDeliveryPoint?: string;
-  Vacant?: string;
-}
-
-export interface USPSAddressValidationRequest {
-  AddressValidateRequest: {
-    Address: USPSAddress;
-  };
 }
 
 export interface ShippingRate {
