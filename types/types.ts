@@ -740,7 +740,11 @@ export interface AxiosErrorResponse {
   status?: number;
   statusText?: string;
   headers?: Record<string, string>;
-  config?: unknown;
+  config?: {
+    url?: string;
+    method?: string;
+    [key: string]: unknown;
+  };
 }
 
 export function isAxiosError(err: unknown): err is { response: AxiosErrorResponse } {
