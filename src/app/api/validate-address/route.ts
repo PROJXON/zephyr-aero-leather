@@ -63,9 +63,11 @@ async function validateAddressUSPSNew(addressData: AddressDetailsState): Promise
   deliveryPoint?: string;
 }> {
   try {
-    const apiKey = process.env.USPS_OAUTH_TOKEN;
-    if (!apiKey) {
-      throw new Error('USPS_OAUTH_TOKEN environment variable not configured');
+    const consumerKey = process.env.USPS_CONSUMER_KEY;
+    const consumerSecret = process.env.USPS_CONSUMER_SECRET;
+    
+    if (!consumerKey || !consumerSecret) {
+      throw new Error('USPS_CONSUMER_KEY and USPS_CONSUMER_SECRET environment variables not configured');
     }
 
     const uspsRequest: USPSAddressRequest = {
@@ -76,7 +78,7 @@ async function validateAddressUSPSNew(addressData: AddressDetailsState): Promise
       zipCode: addressData.zipCode.trim()
     };
 
-    const result = await validateAddressWithUSPS(uspsRequest, apiKey);
+    const result = await validateAddressWithUSPS(uspsRequest);
 
     if (!result.valid) {
       return {
@@ -137,12 +139,12 @@ export async function POST(req: NextRequest): Promise<Response> {
     switch (validationMethod) {
       case 'usps':
         try {
-          // Use new USPS Addresses 3.0 API with OAuth
-          if (process.env.USPS_OAUTH_TOKEN) {
+          // Use new USPS Addresses 3.0 API with automatic token refresh
+          if (process.env.USPS_CONSUMER_KEY && process.env.USPS_CONSUMER_SECRET) {
             validationResult = await validateAddressUSPSNew(addressData);
           } else {
-            // Fall back to basic validation if no OAuth token
-            console.warn('No USPS OAuth token found, falling back to basic validation');
+            // Fall back to basic validation if no credentials
+            console.warn('No USPS credentials found, falling back to basic validation');
             validationResult = validateAddressBasic(addressData);
           }
         } catch (error) {

@@ -85,6 +85,13 @@ export default function PaymentDetails() {
               meta.key === "stripe_payment_intent_id" && meta.value === paymentIntentId
             )
           );
+        } // If no order found and this is a guest user, the webhook might not have finished yet
+        // Try to retry after a short delay
+        if (!order && !user && !paymentData.wooOrderId) {
+          setTimeout(() => {
+            loadAllData();
+          }, 2000);
+          return;
         }
 
         // Prepare all the data

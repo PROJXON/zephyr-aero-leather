@@ -4,7 +4,7 @@ import fetchWooCommerce from '../../../../lib/fetchWooCommerce';
 import stripeObj from '../../../../lib/stripeObj';
 import type { NextRequest } from 'next/server';
 import type Stripe from 'stripe';
-import type { WebhookResponse } from '../../../../types/types';
+import type { WebhookResponse, Product } from '../../../../types/types';
 import type { WooOrder } from '../../../../types/woocommerce';
 
 export async function POST(req: NextRequest): Promise<Response> {
@@ -54,45 +54,60 @@ export async function POST(req: NextRequest): Promise<Response> {
         });
       } else if (paymentIntent.metadata?.guest_order === "true") {
         // Guest user: create new order from metadata
-        const items = JSON.parse(paymentIntent.metadata.items || "[]") as Array<{id: number; quantity: number; price?: number}>;
-        const shipping = JSON.parse(paymentIntent.metadata.shipping || "{}") as {name?: {first: string; last: string}; address?: {line1: string; line2?: string}; city: string; state: string; zipCode: string};
-        const billing = JSON.parse(paymentIntent.metadata.billing || "{}") as {name?: {first: string; last: string}; address?: {line1: string; line2?: string}; city: string; state: string; zipCode: string};
+        const compactItems = JSON.parse(paymentIntent.metadata.i || "[]") as Array<{id: number; q: number}>;
+        const compactShipping = JSON.parse(paymentIntent.metadata.s || "{}") as {n: string; a: string; a2: string; c: string; s: string; z: string};
+        const compactBilling = paymentIntent.metadata.b ? JSON.parse(paymentIntent.metadata.b) as {n: string; a: string; a2: string; c: string; s: string; z: string} : null;
         const selectedShippingRateId = paymentIntent.metadata.selectedShippingRateId || "usps-priority-mail";
         const shippingAmount = parseInt(paymentIntent.metadata.shippingAmount || "0");
         const taxAmount = parseInt(paymentIntent.metadata.taxAmount || "0");
+        const subtotal = parseFloat(paymentIntent.metadata.subtotal || "0");
         
-        // Calculate subtotal from items
-        const subtotal = items.reduce((sum: number, item) => {
-          const price = item.price || 0;
-          return sum + (price * item.quantity);
-        }, 0);
+        // Create line items using stored subtotal
+        const lineItems = compactItems.map((item) => {
+          // Calculate item subtotal proportionally based on quantity
+          const itemSubtotal = (subtotal / compactItems.reduce((sum, i) => sum + i.q, 0)) * item.q;
+          
+          return {
+            product_id: item.id,
+            quantity: item.q,
+            subtotal: itemSubtotal.toFixed(2),
+            total: itemSubtotal.toFixed(2),
+            total_tax: "0.00"
+          };
+        });
 
         const guestOrder = await fetchWooCommerce<WooOrder>("wc/v3/orders", "Failed to create guest order", null, "POST", {
           status: "completed",
-          billing: {
-            first_name: billing.name?.first || shipping.name?.first,
-            last_name: billing.name?.last || shipping.name?.last,
-            address_1: billing.address?.line1 || shipping.address?.line1,
-            address_2: billing.address?.line2 || shipping.address?.line2 || "",
-            city: billing.city || shipping.city,
-            state: billing.state || shipping.state,
-            postcode: billing.zipCode || shipping.zipCode,
+          billing: compactBilling ? {
+            first_name: compactBilling.n.split(' ')[0] || "",
+            last_name: compactBilling.n.split(' ').slice(1).join(' ') || "",
+            address_1: compactBilling.a,
+            address_2: compactBilling.a2,
+            city: compactBilling.c,
+            state: compactBilling.s,
+            postcode: compactBilling.z,
+            country: "US"
+          } : {
+            first_name: compactShipping.n.split(' ')[0] || "",
+            last_name: compactShipping.n.split(' ').slice(1).join(' ') || "",
+            address_1: compactShipping.a,
+            address_2: compactShipping.a2,
+            city: compactShipping.c,
+            state: compactShipping.s,
+            postcode: compactShipping.z,
             country: "US"
           },
           shipping: {
-            first_name: shipping.name?.first,
-            last_name: shipping.name?.last,
-            address_1: shipping.address?.line1,
-            address_2: shipping.address?.line2 || "",
-            city: shipping.city,
-            state: shipping.state,
-            postcode: shipping.zipCode,
+            first_name: compactShipping.n.split(' ')[0] || "",
+            last_name: compactShipping.n.split(' ').slice(1).join(' ') || "",
+            address_1: compactShipping.a,
+            address_2: compactShipping.a2,
+            city: compactShipping.c,
+            state: compactShipping.s,
+            postcode: compactShipping.z,
             country: "US"
           },
-          line_items: items.map((item) => ({
-            product_id: item.id,
-            quantity: item.quantity
-          })),
+          line_items: lineItems,
           shipping_lines: shippingAmount > 0 ? [{
             method_title: selectedShippingRateId === "usps-priority-mail-express" ? "USPS Priority Mail Express" : "USPS Priority Mail",
             method_id: selectedShippingRateId,
@@ -100,13 +115,13 @@ export async function POST(req: NextRequest): Promise<Response> {
             total_tax: "0.00"
           }] : [],
           tax_lines: taxAmount > 0 ? [{
-            rate_code: `US-${shipping.state}-STATE-TAX`,
+            rate_code: `US-${compactShipping.s}-STATE-TAX`,
             rate_id: 1,
-            label: `${shipping.state} State Tax`,
+            label: `${compactShipping.s} State Tax`,
             compound: false,
             tax_total: (taxAmount / 100).toFixed(2),
             shipping_tax_total: "0.00",
-            rate_percent: (taxAmount / subtotal) * 100
+            rate_percent: subtotal > 0 ? (taxAmount / (subtotal * 100)) * 100 : 0
           }] : [],
           total: (paymentIntent.amount / 100).toFixed(2),
           subtotal: (subtotal / 100).toFixed(2),

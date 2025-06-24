@@ -9,7 +9,7 @@ export async function GET(request: Request): Promise<Response> {
   const paymentIntentId = searchParams.get('payment_intent');
   
   // If specific order lookup is requested (for guests)
-  if (orderId && paymentIntentId) {
+  if (orderId && paymentIntentId && orderId !== 'undefined') {
     try {
       const order = await fetchWooCommerce<WooOrder>(`wc/v3/orders/${orderId}`, "Error fetching order");
       

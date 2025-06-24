@@ -70,7 +70,7 @@ export default async function syncAddress(
     if (frontendShippingAmount !== undefined && wooCommerceTaxAmount !== undefined) { 
       const subtotal = cartItems?.reduce((sum, item) => {
         const product = productsToUse?.find(p => p.id === item.productId || p.id === item.id);
-        const price = product?.price || item.price || 0;
+        const price = product ? (typeof product.price === "string" ? parseFloat(product.price) : product.price) : 0;
         return sum + (price * item.quantity);
       }, 0) || 0;
       
@@ -98,7 +98,7 @@ export default async function syncAddress(
           compound: false,
           tax_total: (wooCommerceTaxAmount / 100).toFixed(2),
           shipping_tax_total: "0.00",
-          rate_percent: (wooCommerceTaxAmount / (cartItems?.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0) || 1)) * 100
+          rate_percent: subtotal > 0 ? (wooCommerceTaxAmount / (subtotal * 100)) * 100 : 0
         }];
       } else {
         // Explicitly set empty tax lines to remove any existing ones

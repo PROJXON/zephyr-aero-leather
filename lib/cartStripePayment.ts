@@ -67,13 +67,47 @@ export default async function cartStripePayment(req: Request): Promise<Response>
         // Signed-in user: update existing order
         await syncAddress(shipping, woo_order_id, false, items, products, selectedShippingRateId, shippingAmount, taxAmount);
       } else {
-        // Guest user: store order data in metadata for webhook to create order later
-        metadata.shipping = JSON.stringify(shipping);
-        metadata.billing = JSON.stringify(billing);
-        metadata.selectedShippingRateId = selectedShippingRateId || "usps-priority-mail";
+        // Guest user: store minimal order data in metadata for webhook to create order later
+        // Store only essential data to avoid metadata size limits
+        metadata.guest_order = "true";
         metadata.shippingAmount = String(shippingAmount || 0);
         metadata.taxAmount = String(taxAmount || 0);
-        metadata.guest_order = "true";
+        metadata.selectedShippingRateId = selectedShippingRateId || "usps-priority-mail";
+        
+        // Calculate and store subtotal to avoid API calls in webhook
+        const subtotal = items.reduce((sum, item) => {
+          const product = products.find(p => p.id === item.productId || p.id === item.id);
+          const price = product ? (typeof product.price === "string" ? parseFloat(product.price) : product.price) : 0;
+          return sum + (price * item.quantity);
+        }, 0);
+        metadata.subtotal = String(subtotal);
+        
+        // Store compact address data (minimal format)
+        const compactShipping = {
+          n: `${shipping.name.first} ${shipping.name.last}`,
+          a: shipping.address.line1,
+          a2: shipping.address.line2 || "",
+          c: shipping.city,
+          s: shipping.state,
+          z: shipping.zipCode
+        };
+        metadata.s = JSON.stringify(compactShipping);
+        
+        if (billing) {
+          const compactBilling = {
+            n: `${billing.name.first} ${billing.name.last}`,
+            a: billing.address.line1,
+            a2: billing.address.line2 || "",
+            c: billing.city,
+            s: billing.state,
+            z: billing.zipCode
+          };
+          metadata.b = JSON.stringify(compactBilling);
+        }
+        
+        // Store compact items (just id and qty)
+        const compactItems = items.map(item => ({ id: item.id, q: item.quantity }));
+        metadata.i = JSON.stringify(compactItems);
       }
     }
 

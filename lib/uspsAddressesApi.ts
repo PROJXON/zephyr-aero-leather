@@ -13,12 +13,64 @@ import type {
 
 export class USPSAddressesApi {
   private config: USPSAddressesApiConfig;
+  private accessToken: string | null = null;
+  private tokenExpiry: number = 0;
 
   constructor(config: USPSAddressesApiConfig) {
     this.config = {
-      baseUrl: 'https://apis-tem.usps.com', // Testing environment - change to apis.usps.com for production
+      baseUrl: 'https://apis-tem.usps.com', // Test environment for development
       ...config
     };
+  }
+
+  /**
+   * Get or refresh OAuth access token
+   */
+  private async getAccessToken(): Promise<string> {
+    const now = Math.floor(Date.now() / 1000);
+    
+    // If we have a valid token, return it
+    if (this.accessToken && now < this.tokenExpiry) {
+      return this.accessToken;
+    }
+
+    // Token expired or doesn't exist, get a new one
+    try {
+      const consumerKey = process.env.USPS_CONSUMER_KEY;
+      const consumerSecret = process.env.USPS_CONSUMER_SECRET;
+      
+      if (!consumerKey || !consumerSecret) {
+        throw new Error('USPS_CONSUMER_KEY and USPS_CONSUMER_SECRET must be set');
+      }
+
+      const response = await fetch(`${this.config.baseUrl}/oauth2/v3/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'client_credentials',
+          client_id: consumerKey,
+          client_secret: consumerSecret,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to get OAuth token: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const tokenData = await response.json();
+      
+      this.accessToken = tokenData.access_token;
+      // Set expiry to 1 hour from now (or use expires_in if provided)
+      this.tokenExpiry = now + (tokenData.expires_in || 3600);
+      
+      return this.accessToken!;
+      
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**
@@ -42,7 +94,7 @@ export class USPSAddressesApi {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Authorization': `Bearer ${await this.getAccessToken()}`,
           'Content-Type': 'application/json'
         }
       });
@@ -89,7 +141,7 @@ export class USPSAddressesApi {
       const response = await fetch(`${this.config.baseUrl}/addresses/v3/zipcode?city=${encodeURIComponent(request.city)}&state=${encodeURIComponent(request.state)}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Authorization': `Bearer ${await this.getAccessToken()}`,
           'Content-Type': 'application/json'
         }
       });
@@ -122,7 +174,7 @@ export class USPSAddressesApi {
       const response = await fetch(`${this.config.baseUrl}/addresses/v3/city-state?ZIPCode=${encodeURIComponent(zip5)}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Authorization': `Bearer ${await this.getAccessToken()}`,
           'Content-Type': 'application/json'
         }
       });
@@ -168,8 +220,8 @@ export function createUSPSAddressesApi(apiKey: string): USPSAddressesApi {
 // Helper function to validate address using USPS Addresses 3.0 API
 export async function validateAddressWithUSPS(
   address: USPSAddressRequest,
-  apiKey: string
+  apiKey?: string // Made optional since we now use consumer key/secret
 ): Promise<USPSAddressResponse> {
-  const uspsApi = createUSPSAddressesApi(apiKey);
+  const uspsApi = createUSPSAddressesApi(apiKey || 'dummy'); // apiKey is no longer used
   return await uspsApi.standardizeAddress(address);
 } 
