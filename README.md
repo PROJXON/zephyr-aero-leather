@@ -124,6 +124,15 @@ WOOCOMMERCE_API_KEY=ck_XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 WOOCOMMERCE_API_SECRET=cs_XXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
+6. **Import US State Tax Rates:**
+   - Go to **WooCommerce > Settings > Tax** in your WordPress admin.
+   - Click on **Standard rates** tab.
+   - Click **Import CSV** and upload the `state_tax_rates.csv` file from this project's root directory.
+   - This will import tax rates for all 50 US states plus Washington DC (6.00%).
+   - Verify the import was successful by checking that all states are listed.
+
+**Note:** The included `state_tax_rates.csv` file contains current tax rates for all US states and Washington DC. Tax rates may change over time, so verify current rates for your business needs.
+
 ---
 
 ## Custom Plugin: Customer Cart Editor
