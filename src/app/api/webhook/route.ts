@@ -4,7 +4,7 @@ import fetchWooCommerce from '../../../../lib/fetchWooCommerce';
 import stripeObj from '../../../../lib/stripeObj';
 import type { NextRequest } from 'next/server';
 import type Stripe from 'stripe';
-import type { WebhookResponse, Product } from '../../../../types/types';
+import type { WebhookResponse } from '../../../../types/types';
 import type { WooOrder } from '../../../../types/woocommerce';
 
 export async function POST(req: NextRequest): Promise<Response> {
