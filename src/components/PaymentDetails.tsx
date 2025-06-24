@@ -21,6 +21,7 @@ export default function PaymentDetails() {
   const [shipping, setShipping] = useState<number | undefined>(undefined);
   const [tax, setTax] = useState<number | undefined>(undefined);
   const [allowed, setAllowed] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const cartClearedRef = useRef(false);
   const [shippingDetails, setShippingDetails] = useState<WooCommerceAddress | undefined>(undefined);
 
@@ -128,8 +129,10 @@ export default function PaymentDetails() {
         setTax(orderTotals.tax);
         setTotal(orderTotals.total);
         setShippingDetails(orderTotals.shippingDetails);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error loading payment details:", error);
+        setIsLoading(false);
         // Handle error silently or show user-friendly message
         // Could add error state here if needed
       }
@@ -142,7 +145,9 @@ export default function PaymentDetails() {
     <div className="container mx-auto p-6 mt-6 pb-16">
       <h1 className="text-3xl font-bold mb-4">Payment Successful! 🎉</h1>
       <p className="mb-6">Thank you for your purchase!</p>
-      {paymentDetails ? (
+      {isLoading || !paymentDetails || products.length === 0 || subtotal === undefined || shipping === undefined || tax === undefined ? (
+        <LoadingSpinner message="Loading your payment details..." />
+      ) : (
         <OrderSummary
           cartItems={paymentDetails.items}
           products={products}
@@ -152,9 +157,8 @@ export default function PaymentDetails() {
           tax={tax}
           showReviewLinks={true}
           shippingDetails={shippingDetails}
+          isLoading={false}
         />
-      ) : (
-        <LoadingSpinner message="Loading your payment details..." />
       )}
     </div>
   ) : null;
