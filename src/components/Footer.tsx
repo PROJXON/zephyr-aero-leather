@@ -47,6 +47,10 @@ export default function Footer(): ReactElement {
                   name: "Contact",
                   href: "/contact",
                 },
+                {
+                  name: "Powered by PROJXON",
+                  href: "https://www.projxon.com"
+                },
               ].map(({ name, href }) => (
                 <li key={name} className="group">
                   <Link
