@@ -2,7 +2,14 @@ import { NextResponse } from "next/server";
 import fetchWooCommerce from "../../../../lib/fetchWooCommerce";
 import getCookieInfo from "../../../../lib/getCookieInfo";
 import type { NextRequest } from "next/server";
-import type { WooOrder, WooCustomer, WooCommerceReview } from "../../../../types/woocommerce";
+import type { WooOrder, WooCustomer, WooCommerceReview, PublicReview } from "../../../../types/woocommerce";
+
+function stripReviewerEmail(review: WooCommerceReview): PublicReview {
+  // Remove sensitive reviewer_email field without creating an unused binding
+  const rest = { ...review } as Record<string, unknown>;
+  delete (rest as { reviewer_email?: unknown }).reviewer_email;
+  return rest as unknown as PublicReview;
+}
 
 export async function GET(req: NextRequest): Promise<Response> {
   const { searchParams } = new URL(req.url);
@@ -48,13 +55,15 @@ export async function GET(req: NextRequest): Promise<Response> {
         
         page++;
       }
-      
-      return NextResponse.json(allReviews);
+      // Remove sensitive fields before returning
+      const sanitized: PublicReview[] = allReviews.map(stripReviewerEmail);
+      return NextResponse.json(sanitized);
     } else {
       // For specific product reviews, just get the first page
       endpoint += `?${query.toString()}`;
-      const reviews = await fetchWooCommerce(endpoint, reviewsError);
-      return NextResponse.json(reviews);
+      const reviews = await fetchWooCommerce(endpoint, reviewsError) as WooCommerceReview[];
+      const sanitized: PublicReview[] = reviews.map(stripReviewerEmail);
+      return NextResponse.json(sanitized);
     }
   } catch {
     return NextResponse.json({ error: reviewsError }, { status: 500 });
