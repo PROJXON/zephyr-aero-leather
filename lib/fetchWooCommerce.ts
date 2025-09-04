@@ -18,6 +18,8 @@ export default async function fetchWooCommerce<T = unknown>(
     method,
     headers: {
       Authorization: auth,
+      "User-Agent": "zephyr-server/1.0 (+https://zephyraeroleather.com)",
+      Accept: "application/json",
     },
   };
 

@@ -17,6 +17,12 @@ export default function getWooCommerceApi() {
       version: "wc/v3" as const,
       queryStringAuth: false,
       timeout: 60000,
+      axiosConfig: {
+        headers: {
+          "User-Agent": "zephyr-server/1.0 (+https://zephyraeroleather.com)",
+          Accept: "application/json",
+        },
+      },
     });
   }
   return api;
