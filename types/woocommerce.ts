@@ -162,5 +162,8 @@ export interface WooCommerceReview {
   [key: string]: unknown;
 }
 
+// Public-safe review type without reviewer_email
+export type PublicReview = Omit<WooCommerceReview, 'reviewer_email'>;
+
 // WooCommerce API Request Types
 export type WooRequestBody = Record<string, unknown>;

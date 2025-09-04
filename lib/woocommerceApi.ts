@@ -15,7 +15,7 @@ export default function getWooCommerceApi() {
       consumerKey: WOOCOMMERCE_API_KEY,
       consumerSecret: WOOCOMMERCE_API_SECRET,
       version: "wc/v3" as const,
-      queryStringAuth: true,
+      queryStringAuth: false,
       timeout: 60000,
     });
   }
