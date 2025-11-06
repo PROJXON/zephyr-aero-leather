@@ -63,7 +63,7 @@ export default async function ProductPage({ params }: ProductPageProps): Promise
             ${product.price}
           </p>
           <div
-            className="prose max-w-none mb-8 text-right w-full"
+            className="prose max-w-none mb-8 w-full"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
           <div className="flex justify-end mt-6">
