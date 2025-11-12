@@ -2,6 +2,7 @@ import fetchProducts from "../../lib/woocommerce";
 import ProductCarousel from "@/components/ProductCarousel";
 import Link from "next/link";
 import Hero from "../components/Hero";
+import AdPopup from "@/components/Ad-Popup";
 import { GiDiamondHard, GiHandSaw } from "react-icons/gi";
 import { FaLeaf } from "react-icons/fa";
 import type { JSX } from "react";
@@ -42,6 +43,7 @@ export default async function Home(): Promise<JSX.Element> {
 
   return (
     <div className="min-h-screen bg-background">
+      <AdPopup />
       <Hero
         title="Zephyr Aero Leather"
         subtitle={
